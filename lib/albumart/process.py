@@ -106,6 +106,7 @@ class AutoDownloadProcess(Process):
     recognized = 0
     coversFound = 0
     coversInstalled = 0
+    failures = 0
     cache = {}
     
     items = []
@@ -116,6 +117,7 @@ class AutoDownloadProcess(Process):
     try:
       for path in items:
         if self.isCanceled():
+          failures = -1
           break
 
         (artist, album) = albumart.guessArtistAndAlbum(path)
@@ -129,9 +131,12 @@ class AutoDownloadProcess(Process):
               albumart.setCover(path, cache[(artist, album)])
               coversInstalled += 1
             except Exception, x:
+              failures += 1
               traceback.print_exc(file = sys.stderr)
           else:
+            foundAny = False
             for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = True):
+              foundAny = True
               try:
                 img = Image.open(cover)
                 img.load()
@@ -146,8 +151,11 @@ class AutoDownloadProcess(Process):
                 albumart.setCover(path, cover)
                 coversInstalled += 1
               except Exception, x:
+                failures += 1
                 traceback.print_exc(file = sys.stderr)
               break
+            if not foundAny:
+              failures += 1
                 
         itemsProcessed += 1
         self.setProgress(itemsProcessed, len(items))
@@ -166,7 +174,7 @@ class AutoDownloadProcess(Process):
         "%d matching covers were found and \n" +
         "%d were installed.") % \
       (len(items), recognized, coversFound, coversInstalled),
-      result = (len(items) == coversInstalled))
+      result = (failures == 0))
 
 class SynchronizeProcess(Process):
   "Cover Image Synchronization"
