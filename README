@@ -67,6 +67,12 @@
    -s, --synchronize
           Synchronizes all covers below the given path.
 
+   -H, --hidden
+          Don't show a progress dialog while working.
+
+   -i, --summary
+          Show summary information when done.
+
  Internals                                                                 
                                                                              
    The cover images are in one or more of the following places:              

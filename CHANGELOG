@@ -6,6 +6,7 @@
 	- New win32 installer.
 	- Removed support for Qt 3.0.0.
 	- Improved album and artist guessing.
+	- Removed need to register with Amazon Web Services.
 
 1.3.2:
 
