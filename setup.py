@@ -19,7 +19,7 @@ setup(
 	contact="Sami Kyöstilä", 
 	contact_email="skyostil@kempele.fi",
 	url="http://kempele.fi/~skyostil/projects/albumart",
-	version="1.3.1",
+	version="1.4.0",
 	license="GPL",
 	description="Downloads album cover images semi-automatically from the Internet.",
 	long_description="Album Cover Art Downloader is a utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
@@ -47,7 +47,8 @@ setup(
 		('share/apps/konqueror/servicemenus',['share/apps/konqueror/servicemenus/albumart_set_cover_image.desktop']),
 		('share/pixmaps',['share/pixmaps/albumart.png']),
 		('lib/albumart',[
-			'lib/albumart/albumart.py',
+			'lib/albumart/albumart_ui.py',
+			'lib/albumart/albumart_unattended_ui.py',
 			'lib/albumart/albumartdialog.py',
 			'lib/albumart/albumartdialog_qt230.py',
 			'lib/albumart/albumartdialog_qt300.py',
@@ -58,6 +59,8 @@ setup(
 			'lib/albumart/albumart_target_freedesktop.py',
 			'lib/albumart/albumart_target_windows.py',
 			'lib/albumart/albumart_target_id3v2.py',
+			'lib/albumart/albumart_recognizer_path.py',
+			'lib/albumart/albumart_recognizer_id3v2.py',
 		]),
 		('lib/albumart/id3',[
 			'lib/albumart/id3/__init__.py',
