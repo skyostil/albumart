@@ -31,6 +31,31 @@ __version__ = "1.1"
 __copyright__ = "Copyright (c) 2003 Sami Kyöstilä"
 __license__ = "GPL"
 
+class CoverDownloadedEvent(QCustomEvent):
+	def __init__(self,filename):
+		QCustomEvent.__init__(self,QEvent.User+0)
+		self.filename = filename
+
+class TaskFinishedEvent(QCustomEvent):
+	def __init__(self):
+		QCustomEvent.__init__(self,QEvent.User+1)
+
+class CoverDownloader(QThread):
+	def __init__(self,dialog,artist,album):
+		QThread.__init__(self)
+		self.dialog = dialog
+		self.artist = artist
+		self.album = album
+
+	def run(self):
+		try:
+			for c in albumart.getAvailableCovers(self.artist, self.album):
+				self.postEvent(self.dialog, CoverDownloadedEvent(c))
+		except Exception,x:
+			QMessageBox.critical(self, __program__,"The following error occured while downloading cover images:\n%s"%str(x))
+
+		self.postEvent(self.dialog, TaskFinishedEvent())
+
 class AlbumArt(AlbumArtDialog):
 	def __init__(self,parent = None,name = None,fl = 0):
 		AlbumArtDialog.__init__(self,parent,name,fl)
@@ -92,8 +117,9 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 		self.artistEdit.setEnabled(1)
 		self.albumEdit.setEnabled(1)
 		self.coverview.setEnabled(1)
-		self.coverfiles = {}
-		self.covers = []
+		self.coverfiles = {}	# a map of listiview items to cover files
+		self.covers = []	# a list of downloaded covers
+		self.thread = None
 
 	def addCoverToList(self,coverfile):
 		# if we're running on Qt 2, convert the image to a png.
@@ -122,7 +148,26 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 			return 1
 		return 0
 
+	def customEvent(self,event):
+		if event.type()==QEvent.User+0:
+			self.covers.append(event.filename)
+			self.addCoverToList(event.filename)
+			self.statusBar().message("%d covers found. Looking for more..." % len(self.coverfiles.keys()))
+		elif event.type()==QEvent.User+1:
+			self.thread.wait()
+			self.thread = None			
+			self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
+
+			if not len(self.coverfiles.keys()):
+				QMessageBox.information(self, __program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
+
+			self.pushDownload.setEnabled(1)
+		del event
+
 	def pushDownload_clicked(self):
+		if self.thread:
+			return
+
 		# delete the previously downloaded covers
 		try:
 			for f in self.covers:
@@ -131,21 +176,15 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 			pass
 
 		self.coverview.clear()
-		try:
-			self.covers = albumart.getAvailableCovers(self.artistEdit.text(), self.albumEdit.text())
-		except Exception,x:
-			QMessageBox.critical(self, __program__,"The following error occured while downloading cover images:\n%s"%str(x))
-			self.covers = []
 		self.pushSet.setEnabled(0)
+		self.pushDownload.setEnabled(0)
 		self.coverfiles = {}
+		self.covers = []
 
-		if len(self.covers):
-			for c in self.covers:
-				self.addCoverToList(c)
-		else:
-			QMessageBox.information(self, __program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
-
-		self.statusBar().message("%d covers found." % len(self.coverfiles.keys()), 5000);
+		# start the downloader thread
+		self.statusBar().message("Searching for covers...")
+		self.thread = CoverDownloader(self,self.artistEdit.text(), self.albumEdit.text())
+		self.thread.start()
 
 	def coverview_selectionChanged(self,a0):
 		self.pushSet.setEnabled(1)
@@ -156,7 +195,6 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 		cover = self.coverfiles[self.selectedCover]
 
 		try:
-			print path, cover
 			albumart.setCover(path,cover)
 			self.pushSet.setEnabled(0)
 			self.selectedAlbum.setPixmap(0,self.coverPixmap)
