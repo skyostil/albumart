@@ -11,56 +11,121 @@
 
 import os
 import sys
-import qt
 import getopt
 
+#
+# @returns the directory where the script resides
+#
 def getBaseDir():
   path = os.path.dirname(sys.argv[0])
   if os.path.split(path)[-1] == 'bin':
     path = os.path.dirname(path)
   return path
 
+#
+# @returns the directory for library files
+#
 def getLibDir():
   return os.path.join(getBaseDir(), "lib", "albumart")
 
+#
+# @returns the directory for shared data files
+#
 def getShareDir():
   return os.path.join(getBaseDir(), "share", "albumart")
-
-def printUsage():
-  print """\
-Assings cover images to directories holding albums.
-Usage:
-%(app)s      [directory]""" % { "app" : sys.argv[0] }
 
 # find out where our program and data files are and set up sys.path accordingly.
 sys.path = [getBaseDir(), getLibDir()] + sys.path
 
-import albumart_ui
+import version
+
+#
+# Prints program usage information to stdout.
+#
+def printUsage():
+  print """\
+%(app)s version %(version)s by %(author)s
+http://kempele.fi/~skyostil/projects/albumart
+
+Assings cover images to directories holding albums.
+
+Usage:
+  %(executable)-18s      [options] [path]
+Options:
+  -h, --help              This text.
+  -d, --download          Download covers for the given path.
+  -x, --delete            Remove covers below the given path.
+  -s, --synchronize       Synchronizes all covers below the given path.""" % \
+  {
+    "executable" : sys.argv[0],
+    "app" : version.__program__, 
+    "version" : version.__version__, 
+    "author" : version.__author__
+  }
+
+#
+# Run the graphical user interface
+#
+# @param albumPath Initial album path.
+#                  Pass None to have it read from the config file.
+#
+def runGui(albumPath = None):
+  # load the heavy modules on demand
+  import albumart_ui
+  import qt
+  
+  app = qt.QApplication(sys.argv)
+  mainwin = albumart_ui.AlbumArtUi(dataPath = getShareDir(), albumPath = albumPath)
+  app.setMainWidget(mainwin)
+  mainwin.show()
+  app.exec_loop()
+
+#
+# Run the unattended graphical user interface
+#
+def runUnattendedGui(operation, albumPath):
+  # load the heavy modules on demand
+  import albumart_unattended_ui
+  import qt
+  
+  app = qt.QApplication(sys.argv)
+  ui = albumart_unattended_ui.AlbumArtUnattendedUi()
+  app.setMainWidget(ui)
+  
+  if operation == "download":
+    ui.downloadCovers(albumPath)
+  elif operation == "delete":
+    ui.deleteCovers(albumPath)
+  elif operation == "synchronize":
+    ui.synchronizeCovers(albumPath)
+    
+  app.exec_loop()
 
 if __name__=="__main__":
   try:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "h",
-                               ["help"])
+                               "hdxs",
+                               ["help", "download", "synchronize"])
   except getopt.GetoptError:
     printUsage()
     sys.exit(2)
-    
+  
+  operation = None
   for option, arg in opts:
     if option in ("-h", "--help"):
       printUsage()
       sys.exit()
+    elif option in ("-d", "--download"):
+      operation = "download"
+    elif option in ("-x", "--delete"):
+      operation = "delete"
+    elif option in ("-s", "--synchronize"):
+      operation = "synchronize"
       
   if not args:
-    args = [None]
-  
-  app = qt.QApplication(sys.argv)
-  mainwin = albumart_ui.AlbumArtUi(dataPath = getShareDir(), albumPath = args[0])
-  app.setMainWidget(mainwin)
-  mainwin.show()
-
-  try:
-    app.exec_loop()
-  except:
-    traceback.print_exc(file = sys.stdout)
-    sys.exit(1)
+    runGui()
+  else:
+    if operation:
+      runUnattendedGui(operation, args[0])
+    else:
+      runGui(args[0])

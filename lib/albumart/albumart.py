@@ -18,6 +18,8 @@ __module__ = "albumart"
 
 import os
 import tempfile
+import traceback
+import sys
 
 class Module:
   """Base class for a module that provides additional functionality."""
@@ -41,15 +43,22 @@ class Target(Module):
     """Returns a cover image for the given path or None if one isn't found."""
     pass
   def setCover(self, path, cover):
-    """Assigns a cover image to the given path."""
+    """Assigns a cover image to the given path. Note that the path may also point to a file."""
     pass
   def removeCover(path):
-    """Removes the album image for the given path."""
+    """Removes the album image for the given path. Note that the path may also point to a file."""
     pass
   def hasCover(self, path):
     """Returns 1 if the given path has an associated cover image and 0 otherwise."""
     return 0
 
+class Recognizer(Module):
+  """A virtual base class for album recognizers. Recognizers extract album and artist
+     information from paths and files."""
+  def guessArtistAndAlbum(self, path):
+    """Returns an (artist, album) tuple for the given path."""
+    pass
+    
 # the sources to use
 #from albumart_source_amazon import Amazon
 #sources = [Amazon]
@@ -61,6 +70,7 @@ class Target(Module):
 
 sources = []
 targets = []
+recognizers = []
 
 def addSource(source):
   global sources
@@ -78,7 +88,15 @@ def removeTarget(target):
   global targets
   targets.remove(target)
 
-def getAvailableCovers(artist,album,requireExactMatch=0):
+def addRecognizer(recognizer):
+  global recognizers
+  recognizers.append(recognizer)
+
+def removeRecognizer(recognizer):
+  global recognizers
+  recognizers.remove(recognizer)
+  
+def getAvailableCovers(artist, album, requireExactMatch = False):
   """
   Downloads a set of cover images for the given artist/album pair and
   returns an iterator for the list of file names.
@@ -94,7 +112,7 @@ def getAvailableCovers(artist,album,requireExactMatch=0):
       results = []
 
       try:
-        results+=s.findAlbum("%s %s" % (artist,album))
+        results+=s.findAlbum("%s %s" % (artist, album))
       except TypeError:
         if requireExactMatch:
           return
@@ -109,37 +127,25 @@ def getAvailableCovers(artist,album,requireExactMatch=0):
 
       for a in results:
         yield s.getCover(a)
-  except Exception,x:
-    print x
+  except Exception, x:
+    traceback.print_exc(file = sys.stderr)
 
 def guessArtistAndAlbum(path):
-  """Given a path, try to extract the artist and album. Works in cases such as:
-
-    artist/album
-    artist - album/
-    ...
-
-  """
-  try:
-    p = os.path.split(path)
-    artist = p[0]
-    album = p[-1]
-  except:
-    artist = None
-    album = path
-  if album.find("- ")>0:
-    (artist,album) = album.split("-",1)
-
-  artist = artist.strip()
-  album = album.strip()
-
-  if not len(artist): artist=None
-  if not len(album): album=None
-
-  if not artist and (album and len(album)):
-    return (album,None)
-
-  return (artist,album)
+  """Given a path/file, try to extract the artist and album.
+     Returns an (artist, album) tuple."""
+  
+  artist = None
+  album = None
+  
+  for r in recognizers:
+    try:
+      (artist, album) = r.guessArtistAndAlbum(path)
+      if artist and album:
+        break
+    except Exception, x:
+      traceback.print_exc(file = sys.stderr)
+     
+  return (artist, album)
 
 def synchronizeCovers(path):
   """Makes sure all the cover image targets for the given path
@@ -170,10 +176,10 @@ def hasCover(path):
   for t in targets:
     try:
       if t.hasCover(path):
-        return 1
+        return True
     except:
       pass
-  return 0
+  return False
 
 def setCover(path,cover):
   """Sets the specified album image for the given path."""

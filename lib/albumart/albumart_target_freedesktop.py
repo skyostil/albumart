@@ -54,7 +54,12 @@ class Freedesktop(albumart.Target):
         return os.path.join(path,self.filename)
 
   def setCover(self, path, cover):
-    if not self.enabled: return
+    if not self.enabled:
+      return
+    
+    # check that it is not a file
+    if os.path.isfile(path):
+      return
 
     i = Image.open(cover)
     i.save(os.path.join(path, self.filename), "PNG")
@@ -62,7 +67,7 @@ class Freedesktop(albumart.Target):
     # .directory-file entry
     cf=MyParser()
     try:
-      cf.read(os.path.join(path,".directory"))
+      cf.read(os.path.join(path, ".directory"))
     except:
       pass
     if not cf.has_section("Desktop Entry"):
@@ -72,11 +77,16 @@ class Freedesktop(albumart.Target):
       cf.set("Desktop Entry", "Icon", os.path.join(".", self.filename))
     else:
       cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))
-    cf.write(open(os.path.join(path,".directory"),"w"))
+    cf.write(open(os.path.join(path, ".directory"), "w"))
 
   def removeCover(self, path):
-    if not self.enabled: return
+    if not self.enabled:
+      return
     
+    # check that it is not a file
+    if os.path.isfile(path):
+      return
+
     try:
       os.unlink(os.path.join(path, self.filename))
     except OSError:
@@ -85,16 +95,16 @@ class Freedesktop(albumart.Target):
     # .directory-file entry
     cf=MyParser()
     try:
-      cf.read(os.path.join(path,".directory"))
+      cf.read(os.path.join(path, ".directory"))
     except:
       pass
       
     try:
       cf.remove_option("Desktop Entry", "Icon")
-      cf.write(open(os.path.join(path,".directory"),"w"))
+      cf.write(open(os.path.join(path, ".directory"), "w"))
     except:
       pass
 
   def hasCover(self, path):
-    if self.enabled:
+    if self.enabled and not os.path.isfile(path):
       return os.path.isfile(os.path.join(path,self.filename))

@@ -24,20 +24,21 @@ class Windows(albumart.Target):
   def getCover(self, path):
     if self.enabled:
       if self.hasCover(path):
-        return os.path.join(path,self.filename)
+        return os.path.join(path, self.filename)
 
   def setCover(self, path, cover):
-    if self.enabled:
+    if self.enabled and not os.path.isfile(path):
       i = Image.open(cover)
       i.save(os.path.join(path, self.filename), "JPEG")
 
   def hasCover(self, path):
-    if self.enabled:
+    if self.enabled and not os.path.isfile(path):
       return os.path.isfile(os.path.join(path,self.filename))
     return 0
 
   def removeCover(self, path):
-    if not self.enabled: return
+    if not self.enabled or os.path.isfile(path):
+      return
     
     try:
       os.unlink(os.path.join(path, self.filename))

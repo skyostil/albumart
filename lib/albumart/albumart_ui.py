@@ -13,7 +13,6 @@
 import os
 import sys
 import traceback
-import encodings
 import imghdr
 import StringIO
 import time
@@ -47,7 +46,7 @@ class AlbumArtUi(AlbumArtDialog):
   # @param albumPath Path to walk at startup
   #
   def __init__(self, parent = None,
-               name = "AlbumArtDialog",
+               name = "AlbumArtUi",
                fl = 0,
                dataPath = ".",
                albumPath = None):
@@ -59,6 +58,9 @@ class AlbumArtUi(AlbumArtDialog):
     self.dataPath = dataPath
     self.lastRepaintTime = 0
 
+    self.loadIcons()
+    self.show()
+    
     # load the configuration
     try:
       fn = os.path.join(config.getConfigPath("albumart"), "config")
@@ -73,6 +75,10 @@ class AlbumArtUi(AlbumArtDialog):
                       "albumart_target_freedesktop.Freedesktop:" +
                       "albumart_target_windows.Windows:" +
                       "albumart_target_id3v2.ID3v2")
+      self.config.set("albumart", "recognizers",
+                      "albumart_recognizer_id3v2.ID3v2Recognizer:" +
+                      "albumart_recognizer_path.PathRecognizer"
+                      )
 
       self.settingsMenu = QPopupMenu()
       self.connect(self.settingsMenu,SIGNAL("activated(int)"), self.settingsMenuActivated)
@@ -105,11 +111,13 @@ class AlbumArtUi(AlbumArtDialog):
       for t in self.config.get("albumart", "targets").split(":"):
         mod = self.loadModule(t)
         albumart.addTarget(mod)
+        
+      for t in self.config.get("albumart", "recognizers").split(":"):
+        mod = self.loadModule(t)
+        albumart.addRecognizer(mod)
+        
     except Exception, x:
       self.reportException(self.tr("Loading settings"), x)
-
-    self.loadIcons()
-    self.show()
 
     # restore the previous directory
     try:
@@ -122,7 +130,7 @@ class AlbumArtUi(AlbumArtDialog):
       self.reportException(self.tr("Reading the previous album directory"), x)
 
   def scaleIconPixmap(self, pixmap):
-    if not pixmap.isNull() and pixmap.width()>0 and pixmap.height()>0:
+    if not pixmap.isNull() and pixmap.width() > 0 and pixmap.height() > 0:
       try:
         pixmap.convertFromImage(pixmap.convertToImage().scale(self.iconSize,self.iconSize))
       except AttributeError:
@@ -347,12 +355,13 @@ class AlbumArtUi(AlbumArtDialog):
       else:
         if not root[-1] == "/": root+="/"
 
+    (artist, album) = albumart.guessArtistAndAlbum(dirname)
+    
     dirname=dirname.replace(root,"")
 
     if not len(dirname):
       dirname="."
 
-    (artist,album)=albumart.guessArtistAndAlbum(dirname)
 
     item = QListViewItem(self.dirlist, dirname, artist, album)
     item.setPixmap(0, self.getIconForPath(path))
@@ -512,7 +521,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.thread = process
 
     # looks like trolltech fixed their spelling in Qt 3
-    if qVersion().split(".")[0]=="2":
+    if qVersion().split(".")[0] == "2":
       self.progressDialog.connect(self.progressDialog, SIGNAL("cancelled()"), self.processCanceled)
     else:
       self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
@@ -533,9 +542,6 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   def autoDownloadAction_activated(self):
     item = self.dirlist.firstChild()
     items = []
-    recognized = 0
-    coversFound = 0
-    coversInstalled = 0
 
     self.setCursor(Qt.waitCursor)
     self.statusBar().message(self.tr("Preparing automatic download..."))
@@ -671,6 +677,9 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       return 1
     return 0
 
+  #
+  # Handle events from processes
+  #        
   def customEvent(self,event):
     try:
       # if the message was sent by an older thread, ignore it.
