@@ -26,27 +26,14 @@ class Freedesktop(albumart.Target):
 	def __init__(self):
 		self.configure(defaultConfig)
 
-#	def __init__(self, config={}):
-#		self.config = config
-#		if config:
-#			if config.has_section("Freedesktop"):
-#				self.filename = config.get("Freedesktop", "filename")
-#				self.enabled = config.getboolean("Freedesktop", "enabled")
-#			else:
-#				self.filename = ".folder.png"
-#				self.enabled = 1
-#				config.add_section("Freedesktop")
-#				config.set("Freedesktop", "enabled", "yes")
-#				config.set("Freedesktop", "filename", self.filename)
-
 	def configure(self, config):
 		self.filename = config["filename"]
 		self.enabled = config["enabled"]
 
 	def getCover(self, path):
-		if not self.enabled: return
-		if self.hasCover(path):
-			return os.path.join(path,self.filename)
+		if self.enabled:
+			if self.hasCover(path):
+				return os.path.join(path,self.filename)
 
 	def setCover(self, path, cover):
 		if not self.enabled: return
@@ -67,10 +54,5 @@ class Freedesktop(albumart.Target):
 		cf.write(w)
 
 	def hasCover(self, path):
-		if not self.enabled: return 0
-		return os.path.isfile(os.path.join(path,self.filename))
-
-#	def setEnabled(self, enabled):
-#		self.enabled = enabled
-#		if self.config:
-#			self.config.set("Freedesktop", "enabled", str(enabled))
+		if self.enabled:
+			return os.path.isfile(os.path.join(path,self.filename))

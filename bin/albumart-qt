@@ -118,52 +118,8 @@ class AlbumArt(AlbumArtDialog):
 			for t in self.config.get("albumart", "targets").split(":"):
 				mod = self.loadModule(t)
 				albumart.addTarget(mod)
-
-			"""
-			for s in self.config.get("albumart", "sources").split(":"):
-				try:
-					(mod, cls) = s.split(".")
-					exec("import %s" % (mod))
-					exec("cfg = %s.defaultConfig.copy()" % (mod))
-					exec("cfgdesc = %s.configDesc" % (mod))
-					exec("c = %s.%s()" % (mod,cls))
-
-#					exec("c = %s(self.config)" % cls)
-					albumart.addSource(c)
-#					id = self.settingsMenu.insertItem("Use %s as an image source" % cls)
-#					self.settingsMenu.setItemChecked(id, c.enabled)
-#					self.settingsMenu.setWhatsThis(id, c.__doc__)
-
-					for (key,value) in self.config.items(cls):
-						cfg[key] = value
-
-					for (key,desc) in cfgdesc.items():
-						id = self.settingsMenu.insertItem(desc[1])
-						self.moduleAttributeMap[id] = (c,key,desc)
-
-#					id = self.settingsMenu.insertItem("Use %s as an image source" % cls)
-					c.configure(cfg)
-#					self.sourceModules[id] = c
-				except:
-					raise
-
-			self.settingsMenu.insertSeparator()
-
-			for t in self.config.get("albumart", "targets").split(":"):
-				try:
-					(mod, cls) = t.split(".")
-					exec("from %s import %s" % (mod,cls))
-					exec("c = %s()" % cls)
-					albumart.addTarget(c)
-					id = self.settingsMenu.insertItem("Set image for %s" % cls)
-					self.settingsMenu.setItemChecked(id, c.enabled)
-					self.settingsMenu.setWhatsThis(id, c.__doc__)
-					self.targetModules[id] = c
-				except:
-					pass
-			"""
 		except:
-			raise
+			pass
 
 		# restore the previous directory
 		try:
@@ -192,8 +148,12 @@ class AlbumArt(AlbumArtDialog):
 			for (key,desc) in cfgdesc.items():
 				id = self.settingsMenu.insertItem(desc[1])
 				self.moduleAttributeMap[id] = (c,key,desc)
-				if desc[0]=="boolean" and self.config.getboolean(mod,key):
-					self.settingsMenu.setItemChecked(id, 1)
+				if desc[0]=="boolean":
+					if self.config.getboolean(mod,key):
+						self.settingsMenu.setItemChecked(id, 1)
+						cfg[key] = 1
+					else:
+						cfg[key] = 0
 
 			c.configure(cfg)
 			return c
@@ -209,27 +169,14 @@ class AlbumArt(AlbumArtDialog):
 			(mod,key,desc) = self.moduleAttributeMap[id]
 
 			if desc[0] == "boolean":
-				mod.__configuration__[key] = enabled
 				self.settingsMenu.setItemChecked(id, enabled)
+				mod.__configuration__[key] = enabled
 				mod.configure(mod.__configuration__)
-
-		"""
-		if self.sourceModules.has_key(id):
-			m = self.sourceModules[id]
-			if enabled:
-				albumart.addSource(m)
-			else:
-				albumart.removeSource(m)
-		else:
-			m = self.targetModules[id]
-			if enabled:
-				albumart.addTarget(m)
-			else:
-				albumart.removeTarget(m)
-
-		self.settingsMenu.setItemChecked(id, enabled)
-		m.setEnabled(enabled)
-		"""
+			elif desc[0] == "string":
+				(text,status) = QInputDialog.getText(desc[1], desc[2], QLineEdit.Normal, mod.__configuration__[key], self)
+				if status:
+					mod.__configuration__[key] = unicode(text)
+					mod.configure(mod.__configuration__)
 
 	def fileExit(self):
 		self.close()
