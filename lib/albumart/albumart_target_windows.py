@@ -4,42 +4,42 @@ import Image
 import os
 
 defaultConfig = {
-	"enabled":	1,
-	"filename":	"folder.jpg",
+  "enabled":   1,
+  "filename":  "folder.jpg",
 }
 
 configDesc = {
-	"enabled":	("boolean", "Set image for Windows Media Player, etc."),
+  "enabled":  ("boolean", "Set image for Windows Media Player, etc."),
 }
 
 class Windows(albumart.Target):
-	"""Windows Media Player."""
-	def __init__(self):
-		self.configure(defaultConfig)
+  """Windows Media Player."""
+  def __init__(self):
+    self.configure(defaultConfig)
 
-	def configure(self, config):
-		self.filename = config["filename"]
-		self.enabled = config["enabled"]
+  def configure(self, config):
+    self.filename = config["filename"]
+    self.enabled = config["enabled"]
 
-	def getCover(self, path):
-		if self.enabled:
-			if self.hasCover(path):
-				return os.path.join(path,self.filename)
+  def getCover(self, path):
+    if self.enabled:
+      if self.hasCover(path):
+        return os.path.join(path,self.filename)
 
-	def setCover(self, path, cover):
-		if self.enabled:
-			i = Image.open(cover)
-			i.save(os.path.join(path, self.filename), "JPEG")
+  def setCover(self, path, cover):
+    if self.enabled:
+      i = Image.open(cover)
+      i.save(os.path.join(path, self.filename), "JPEG")
 
-	def hasCover(self, path):
-		if self.enabled:
-			return os.path.isfile(os.path.join(path,self.filename))
-		return 0
+  def hasCover(self, path):
+    if self.enabled:
+      return os.path.isfile(os.path.join(path,self.filename))
+    return 0
 
-	def removeCover(self, path):
-		if not self.enabled: return
-		
-		try:
-			os.unlink(os.path.join(path, self.filename))
-		except OSError:
-			pass
+  def removeCover(self, path):
+    if not self.enabled: return
+    
+    try:
+      os.unlink(os.path.join(path, self.filename))
+    except OSError:
+      pass

@@ -201,7 +201,7 @@ class AlbumArtUi(AlbumArtDialog):
       c.configure(cfg)
       return c
     except Exception, x:
-      self.reportException(self.getQString(self.tr("Loading module '%s'")) % (id), x)
+      self.reportException(self.tr("Loading module '%s'") % (id), x)
       
   #
   # Reports the given exception to the user.
@@ -212,9 +212,9 @@ class AlbumArtUi(AlbumArtDialog):
   #
   def reportException(self, task, exception, silent = False):
     xcpt = traceback.format_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
-    msg = self.getQString(self.tr(
-            "%(task)s was interrupted by the following exception:\n<b>%(xcpt)s</b>\n")) % \
-            {"task" : task, "xcpt": xcpt}
+    msg = self.tr(
+            "%(task)s was interrupted by the following exception:\n%(xcpt)s\n") % \
+            {"task" : task, "xcpt": "".join(xcpt)}
     sys.stderr.write(msg)
     if not silent:
       QMessageBox.critical(self, version.__program__, msg)
@@ -362,7 +362,7 @@ class AlbumArtUi(AlbumArtDialog):
   #
   def walk(self, path):
     self.dir = path
-
+    
     self.pushSet.setEnabled(0)      
     self.fileOpenAction.setEnabled(0)
     self.pushDownload.setEnabled(0)
@@ -397,14 +397,14 @@ class AlbumArtUi(AlbumArtDialog):
     self.fileOpenAction.setEnabled(1)
     
   def helpAbout(self):
-    QMessageBox.information(self, version.__program__, self.getQString(self.tr("""\
+    QMessageBox.information(self, version.__program__, self.tr("""\
 %(app)s version %(version)s by %(author)s.
 http://kempele.fi/~skyostil/projects/albumart
 
 Amazon web api wrapper by Mark Pilgrim and Michael Josephson (http://www.josephson.org/projects/pyamazon/)
 Icons by Everaldo Coelho (http://www.everaldo.com) et al.
 PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
-""")) % \
+""") % \
     ({
       "app" : version.__program__, 
       "version" : version.__version__, 
@@ -632,7 +632,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       self.coverPreviewWindow.setPixmap(pixmap)
       self.coverPreviewWindow.setFixedSize(pixmap.width(), pixmap.height())
       self.coverPreviewWindow.setCaption(
-        self.getQString(self.tr("Cover image for album %(album)s")) % \
+        self.tr("Cover image for %(album)s") % \
         {"album" : self.getQString(self.selectedAlbum.text(0))})
       self.coverPreviewWindow.show()
     except Exception, x:
@@ -750,6 +750,12 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message(self.tr("Ready"), 5000)
 
+  #
+  # Overridden translation method that returns native Python strings
+  #  
+  def tr(self, identifier, context = None):
+    return self.getQString(QObject.tr(self, identifier, context))
+
   def coverview_dropped(self,a0,a1):
     if not self.selectedAlbum:
       return
@@ -757,14 +763,14 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     text = QString()
     if QTextDrag.decode(a0, text):
       try:
-        text=self.getQString(text)
-        text=urllib.unquote(text)
+        text = self.getQString(text)
+        text = urllib.unquote(text)
 
-        f=urllib.urlopen(text)
-        fn=tempfile.mktemp()
+        f = urllib.urlopen(text)
+        fn = tempfile.mktemp()
 
         # write to a temporary file
-        o=open(fn,"wb")
+        o = open(fn,"wb")
         o.write(f.read())
         o.close()
 
