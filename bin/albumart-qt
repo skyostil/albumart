@@ -4,7 +4,7 @@
 """
 QT-frontend for the album image downloader.
 
-Copyright (C) 2003 Sami Kyöstilä <skyostil@kempele.fi>
+Copyright (C) 2003, 2004 Sami Kyöstilä <skyostil@kempele.fi>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -598,7 +598,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
 
         def startProcess(self, process):
                 self.progressDialog = QProgressDialog(self, "progress", 1)
-                self.progressDialog.setCaption(str(process))
+                self.progressDialog.setCaption(process.__doc__)
                 self.thread = process
 
                 # looks like trolltech fixed their spelling in Qt 3
