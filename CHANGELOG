@@ -5,6 +5,8 @@
 	- Don't hang with large music collections.
 	- Drag and drop support enhanced.
 	- Removed support for Qt 2.3.
+	- Ability to write different ID3 picture types.
+	- Output images can be scaled smaller if needed.
 
 1.4.0:
 	- Album information is now also read from ID3v2 tags.
