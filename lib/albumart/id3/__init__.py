@@ -1,5 +1,5 @@
-# @(#) $Id: __init__.py,v 1.2 2004-05-13 18:41:52 skyostil Exp $
-__revision__ = "$Revision: 1.2 $"
+# @(#) $Id: __init__.py,v 1.3 2004-05-17 16:13:13 skyostil Exp $
+__revision__ = "$Revision: 1.3 $"
 
 import sys, re, os, warnings, struct
 import cStringIO as StringIO
@@ -204,7 +204,8 @@ class ID3v2(object):
                 if self.version[1] >= 4 and frameid != 'COM ':
                     framesize = binfuncs.synchsafe2dec(rawframesize)
                     (framesize23,) = struct.unpack('!I', rawframesize)
-                    print "2.4: %d vs 2.3: %d" % (framesize, framesize23,)
+                    if DEBUG_LEVEL >= 1:                    
+                        print "2.4: %d vs 2.3: %d" % (framesize, framesize23,)
                 else:
                     (framesize,) = struct.unpack('!I', rawframesize)
                     
