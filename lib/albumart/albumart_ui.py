@@ -273,13 +273,27 @@ class AlbumItem(QListViewItem):
 # A cover image item
 #    
 class CoverItem(QIconViewItem):
-  def __init__(self, parent, pixmap):
+  def __init__(self, parent, pixmap, path):
     QListViewItem.__init__(self, parent, "", pixmap)
     self.margin = 6
+    self.path = path
     self.setItemRect(QRect(0, 0,
                      self.pixmap().width() + self.margin * 2,
                      self.pixmap().height() + self.margin * 2))
-    
+                     
+  def __del__(self):
+    # delete the temporary file
+    try:
+      os.unlink(self.path)
+    except:
+      pass
+                     
+  #
+  # @returns the path for this item
+  #
+  def getPath(self):
+    return self.path
+                         
   def paintFocus(self, painter, colorGroup):
     pass
     
@@ -316,13 +330,18 @@ class AlbumArtUi(AlbumArtDialog):
     self.dir = ""
     self.dataPath = dataPath
     self.albums = {}
-    self.covers = []
 
     # tweak the ui
     self.settingsMenu = QPopupMenu()
     self.connect(self.settingsMenu,SIGNAL("activated(int)"), self.settingsMenuActivated)
     self.menubar.insertItem(self.tr("&Settings"), self.settingsMenu, -1, 3)
     self.dirlist.header().hide()
+    
+    # enable drag and drop for the album list
+    self.dirlist.__class__.dragObject = self.dirlist_dragObject
+    self.dirlist.__class__.dropEvent = self.dirlist_dropEvent
+    self.dirlist.__class__.dragEnterEvent = self.dirlist_dragEnterEvent
+    self.coverview.__class__.dragObject = self.coverview_dragObject
 
     self.loadIcons()
     self.show()
@@ -546,13 +565,6 @@ class AlbumArtUi(AlbumArtDialog):
     self.close()
 
   def closeEvent(self, ce):
-    # delete the downloaded covers
-    try:
-      for f in self.covers.values():
-        os.unlink(f)
-    except:
-      pass
-
     # save the configuration
     try:
       for mod in albumart.sources + albumart.targets:
@@ -822,7 +834,6 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     items = [file for file in self.getSelectedFiles() if not albumart.hasCover(file)]
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message("")
-    print items
     self.startProcess(AutoDownloadProcess(self, self.dir, items))
 
   #
@@ -857,6 +868,9 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       self.autoDownloadAction.addTo(menu)
       self.removeAction.addTo(menu)
       self.viewCoverAction.addTo(menu)
+      c = albumart.hasCover(item.getPath())
+      self.removeAction.setEnabled(c)
+      self.viewCoverAction.setEnabled(c)
       menu.exec_loop(point)
     
   #
@@ -900,6 +914,21 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     return files
 
   #
+  #  @returns a list of current (i.e. focused) media files to process
+  #
+  def getCurrentFiles(self):
+    # return each selected track's path
+    item = self.dirlist.currentItem()
+    files = [item.getPath()]
+    
+    if isinstance(item, AlbumItem):
+      trackItem = item.firstChild()
+      while trackItem:
+        files.append(trackItem.getPath())
+        trackItem = trackItem.nextSibling()
+    return files
+    
+  #
   # Reloads icons for the selected files
   #
   def refreshSelectedFiles(self):
@@ -939,12 +968,11 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
         image = image.smoothScale(256, 256 * float(image.height()) / float(image.width()))
         pixmap = QPixmap()
         pixmap.convertFromImage(image)
-        item = CoverItem(self.coverview, pixmap)
+        item = CoverItem(self.coverview, pixmap, coverfile)
       else:
         image = image.smoothScale(256, 256, QImage.ScaleMin)
-        item = CoverItem(self.coverview, QPixmap(image))
+        item = CoverItem(self.coverview, QPixmap(image), coverfile)
 
-      self.covers[item] = coverfile
       return 1
     return 0
 
@@ -982,20 +1010,11 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       if self.progressDialog:
         self.progressDialog.setLabelText(event.text)
     elif event.type() == ReloadEvent.id:
-      self.reloadAction_activated()
+      self.refreshSelectedFiles()
 
     del event
 
   def pushDownload_clicked(self):
-    # delete the previously downloaded covers
-    try:
-      for f in self.covers.values():
-        os.unlink(f)
-    except:
-      pass
-
-    self.covers = {}
-    
     self.coverview.clear()
     self.pushSet.setEnabled(0)
     self.pushDownload.setEnabled(0)
@@ -1010,16 +1029,23 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   def coverview_selectionChanged(self,a0):
     self.pushSet.setEnabled(1)
     self.selectedCover = a0
-    
+
+  def coverview_dragObject(self):
+    if self.coverview.currentItem():
+      d = QTextDrag(self.coverview.currentItem().getPath(), self.coverview)
+      d.setPixmap(self.coverview.currentItem().pixmap())
+      return d
+        
   def pushSet_clicked(self):
+    self.setCover(self.coverview.currentItem().getPath())
+    
+  def setCover(self, coverPath):
     self.setCursor(Qt.waitCursor)
     self.statusBar().message(self.tr("Setting cover images..."))
 
-    cover = self.covers[self.selectedCover]
-
     for path in self.getSelectedFiles():
       try:
-        albumart.setCover(path, cover)
+        albumart.setCover(path, coverPath)
       except Exception, x:
         self.reportException(self.tr("Setting the cover image"), x)
         
@@ -1027,10 +1053,65 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message(self.tr("Ready"), 5000)
     
+  def setCoverForCurrentFiles(self, coverPath):
+    self.setCursor(Qt.waitCursor)
+    self.statusBar().message(self.tr("Setting cover images..."))
+
+    for path in self.getCurrentFiles():
+      try:
+        albumart.setCover(path, coverPath)
+      except Exception, x:
+        self.reportException(self.tr("Setting the cover image"), x)
+        
+    self.refreshSelectedFiles()
+    self.setCursor(Qt.arrowCursor)
+    self.statusBar().message(self.tr("Ready"), 5000)
+
+  def dirlist_dragObject(self):
+    return self.dirlist.currentItem().getPath()
+    
+  #
+  # @returns a file name for the given cover drop event or None or error.
+  # Remember to clean up the file returned by this function.
+  #
+  def decodeDropEventAsCover(self, event):
+    if QTextDrag.canDecode(event):
+      s = QString()
+      if QTextDrag.decode(event, s):
+        url = urllib.unquote(self.getQString(s))
+        f = urllib.urlopen(url)
+        fn = tempfile.mktemp()
+
+        # write to a temporary file
+        o = open(fn,"wb")
+        o.write(f.read())
+        o.close()
+
+        # convert to JPEG
+        img = Image.open(fn)
+        img.load()
+        img = img.convert("RGB")
+        img.save(fn, "JPEG")
+        return fn
+  
+  def dirlist_dropEvent(self, event):
+    try:
+      fn = self.decodeDropEventAsCover(event)
+      if fn:
+        self.setCoverForCurrentFiles(fn)
+        os.unlink(fn)
+        event.accept(True)
+    except Exception, x:
+      self.reportException(self.tr("Setting the cover image"), x)
+  
+  def dirlist_dragEnterEvent(self, event):
+    if QTextDrag.canDecode(event):
+      event.accept()
+
   def viewCoverImage(self):
     # Try to load the current album cover image and display it in as new window
     try:
-      pixmap = getPixmapForPath(self.getSelectedFiles()[0])
+      pixmap = getPixmapForPath(self.dirlist.currentItem().getPath())
       global window
       window = QLabel(None)
       window.setPixmap(pixmap)
@@ -1055,26 +1136,10 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
         return self.getQString(QObject.tr(identifier, context))
     return self.getQString(QObject.tr(self, identifier, context))
 
-  def coverview_dropped(self,a0,a1):
-    text = QString()
-    if QTextDrag.decode(a0, text):
-      try:
-        text = self.getQString(text)
-        text = urllib.unquote(text)
-
-        f = urllib.urlopen(text)
-        fn = tempfile.mktemp()
-
-        # write to a temporary file
-        o = open(fn,"wb")
-        o.write(f.read())
-        o.close()
-
-        # convert to JPEG
-        img = Image.open(fn)
-        img.load()
-        img = img.convert("RGB")
-        img.save(fn, "JPEG")
+  def coverview_dropped(self, event, a1):
+    try:
+      fn = self.decodeDropEventAsCover(event)
+      if fn:
         self.addCoverToList(fn)
-      except Exception, x:
-        self.reportException(self.tr("Adding the cover image"), x)
+    except Exception, x:
+      self.reportException(self.tr("Adding the cover image"), x)
