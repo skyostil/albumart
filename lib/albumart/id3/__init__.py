@@ -1,5 +1,5 @@
-# @(#) $Id: __init__.py,v 1.1 2004-05-10 22:02:59 skyostil Exp $
-__revision__ = "$Revision: 1.1 $"
+# @(#) $Id: __init__.py,v 1.2 2004-05-13 18:41:52 skyostil Exp $
+__revision__ = "$Revision: 1.2 $"
 
 import sys, re, os, warnings, struct
 import cStringIO as StringIO
@@ -340,6 +340,7 @@ class ID3v2(object):
             fh2.write(fh.read())
             fh2.close()
             fh.close()
+            os.unlink(self.filename)
             os.rename(self.filename + '.temp', self.filename)
         else:
             fh.seek(0)

@@ -15,6 +15,7 @@ at your option) any later version.
 # first, find out where our program and data files are and set up sys.path accordingly.
 import os
 import sys
+import traceback
 import encodings
 
 def getBaseDir():
@@ -565,6 +566,9 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                 self.selectedCover=a0
 
         def pushSet_clicked(self):
+		self.setCursor(Qt.waitCursor)
+                self.statusBar().message("Setting cover images...")
+		
                 path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
                 cover = self.coverfiles[self.selectedCover]
 
@@ -574,7 +578,11 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
                         self.updateIcon()
                 except Exception,x:
+			traceback.print_exc(file=sys.stdout)
                         QMessageBox.critical(self, version.__program__,"The following error occured while setting the cover image:\n%s"%str(x))
+
+                self.statusBar().message("")
+		self.setCursor(Qt.arrowCursor)
 
         def coverview_dropped(self,a0,a1):
                 if not self.selectedAlbum:
