@@ -12,6 +12,8 @@ include share/pixmaps/*
 include share/applnk/Multimedia/albumart.desktop
 include share/apps/konqueror/servicemenus/albumart_set_cover_image.desktop
 include lib/albumart/*.py
+include lib/albumart/*.ui
+include lib/albumart/Makefile
 include lib/albumart/id3/*.py
 include debian/*
 include MANIFEST.in
