@@ -23,7 +23,7 @@ setup(
 	data_files=[
 		('bin',['bin/albumart-qt']),
 		('share/albumart',['share/albumart/cover.png','share/albumart/nocover.png']),
-		('share/applnk',['share/applnk/albumart.desktop']),
+		('share/applnk/Multimedia',['share/applnk/Multimedia/albumart.desktop']),
 		('share/pixmaps',['share/pixmaps/albumart.png']),
 		('lib/albumart',[
 			'lib/albumart/albumart.py',
