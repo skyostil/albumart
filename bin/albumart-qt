@@ -18,16 +18,16 @@ import sys
 import encodings
 
 def getBaseDir():
-	path = os.path.dirname(sys.argv[0])
-	if os.path.split(path)[-1]=='bin':
-		path=os.path.dirname(path)
-	return path
+        path = os.path.dirname(sys.argv[0])
+        if os.path.split(path)[-1]=='bin':
+                path=os.path.dirname(path)
+        return path
 
 def getLibDir():
-	return os.path.join(getBaseDir(),"lib","albumart")
+        return os.path.join(getBaseDir(),"lib","albumart")
 
 def getShareDir():
-	return os.path.join(getBaseDir(),"share","albumart")
+        return os.path.join(getBaseDir(),"share","albumart")
 
 sys.path = [getBaseDir(), getLibDir()] + sys.path
 
@@ -43,519 +43,583 @@ from qt import *
 
 # see if we're using an old Qt version
 if qVersion().split(".")[0]=="2":
-	from albumartdialog_qt230 import AlbumArtDialog
+        from albumartdialog_qt230 import AlbumArtDialog
 else:
-	# if the Qt version is older than 3.1, then use an alternate ui builder.
-	try:
-	        if map(int, qVersion().split("."))[1]<1:
-	                from albumartdialog_qt300 import AlbumArtDialog
-			sys.stderr.write("Warning: Your installed Qt version is too old (3.0.x). Please upgrade!\n")
-	        else:
-	                raise 1
-	except:
-	        from albumartdialog import AlbumArtDialog
+        # if the Qt version is older than 3.1, then use an alternate ui builder.
+        try:
+                if map(int, qVersion().split("."))[1]<1:
+                        from albumartdialog_qt300 import AlbumArtDialog
+                        sys.stderr.write("Warning: Your installed Qt version is too old (3.0.x). Please upgrade!\n")
+                else:
+                        raise 1
+        except:
+                from albumartdialog import AlbumArtDialog
 
 class CoverDownloadedEvent(QCustomEvent):
-	def __init__(self,thread,filename):
-		QCustomEvent.__init__(self,QEvent.User+0)
-		self.filename = filename
-		self.thread = thread
+        def __init__(self,thread,filename):
+                QCustomEvent.__init__(self,QEvent.User+0)
+                self.filename = filename
+                self.thread = thread
 
 class TaskFinishedEvent(QCustomEvent):
-	def __init__(self,thread):
-		QCustomEvent.__init__(self,QEvent.User+1)
-		self.thread = thread
+        def __init__(self,thread):
+                QCustomEvent.__init__(self,QEvent.User+1)
+                self.thread = thread
 
 class ExceptionEvent(QCustomEvent):
-	def __init__(self,x):
-		QCustomEvent.__init__(self,QEvent.User+2)
-		self.exception = x
+        def __init__(self,x):
+                QCustomEvent.__init__(self,QEvent.User+2)
+                self.exception = x
 
 class CoverDownloader(QThread):
-	def __init__(self,dialog,artist,album):
-		QThread.__init__(self)
-		self.dialog = dialog
-		self.artist = artist
-		self.album = album
+        def __init__(self,dialog,artist,album):
+                QThread.__init__(self)
+                self.dialog = dialog
+                self.artist = artist
+                self.album = album
 
-	def run(self):
-		try:
-			for c in albumart.getAvailableCovers(self.artist, self.album):
-				self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
-		except Exception,x:
-			self.postEvent(self.dialog, ExceptionEvent(x))
+        def run(self):
+                try:
+                        for c in albumart.getAvailableCovers(self.artist, self.album):
+                                self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
+                except Exception,x:
+                        self.postEvent(self.dialog, ExceptionEvent(x))
 
-		self.postEvent(self.dialog, TaskFinishedEvent(self))
+                self.postEvent(self.dialog, TaskFinishedEvent(self))
 
 class AlbumArt(AlbumArtDialog):
-	def __init__(self,parent = None,name = None,fl = 0):
-		AlbumArtDialog.__init__(self,parent,name,fl)
-		self.coverPixmap = QPixmap(os.path.join(getShareDir(),"cover.png"))
-		self.noCoverPixmap = QPixmap(os.path.join(getShareDir(),"nocover.png"))
-		self.config = ConfigParser.ConfigParser()
-		self.moduleAttributeMap = {}
-		self.dir = ""
+        def __init__(self,parent = None,name = None,fl = 0):
+                AlbumArtDialog.__init__(self,parent,name,fl)
+                self.config = ConfigParser.ConfigParser()
+                self.moduleAttributeMap = {}
+                self.iconSize = 64
+                self.dir = ""
 
-		# replace ugly icons without alpha channel
-		try:
-			self.fileOpenAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"fileopen.png"))))
-			self.fileExitAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"exit.png"))))
-			self.helpAboutAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"icon.png"))))
-			self.reloadAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"reload.png"))))
-			self.nextAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"1rightarrow.png"))))
-			self.previousAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"1leftarrow.png"))))
-			self.pushDownload.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"download.png"))))
-			self.pushSet.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"filesave.png"))))
-		except:
-			# if that doesn't work, never mind
-			pass
+                # load the configuration
+                try:
+                        fn = os.path.join(config.getConfigPath("albumart"), "config")
+                        self.config.read(fn)
 
-		# load the configuration
-		try:
-			fn = os.path.join(config.getConfigPath("albumart"), "config")
-			self.config.read(fn)
+                        if not self.config.has_section("albumart"):
+                                self.config.add_section("albumart")
 
-			if not self.config.has_section("albumart"):
-				self.config.add_section("albumart")
+                        self.config.set("albumart", "sources", "albumart_source_amazon.Amazon")
+                        self.config.set("albumart", "targets", "albumart_target_freedesktop.Freedesktop:albumart_target_windows.Windows:albumart_target_id3v2.ID3v2")
 
-			self.config.set("albumart", "sources", "albumart_source_amazon.Amazon:albumart_source_amazon_eu.Amazon")
-			self.config.set("albumart", "targets", "albumart_target_freedesktop.Freedesktop:albumart_target_windows.Windows")
+                        self.settingsMenu = QPopupMenu()
+                        self.connect(self.settingsMenu,SIGNAL("activated(int)"), self.settingsMenuActivated)
+                        self.menubar.insertItem("&Settings", self.settingsMenu, -1, 3)
 
-			self.settingsMenu = QPopupMenu()
-			self.connect(self.settingsMenu,SIGNAL("activated(int)"), self.settingsMenuActivated)
-			self.menubar.insertItem("&Settings", self.settingsMenu, -1, 2)
+                        # global settings
+#                       try:
+#                               self.showCoversAction.addTo(self.settingsMenu)
+#                       except:
+#                               pass
 
-			# global settings
-			try:
-				self.showCoversAction.addTo(self.settingsMenu)
-			except:
-				pass
+                        try:
+                                self.showCoversAction.setOn(self.config.getboolean("albumart", "showcovers"))
+                        except Exception,x:
+                                pass
 
-			try:
-				self.showCoversAction.setOn(self.config.getboolean("albumart", "showcovers"))
-			except Exception,x:
-				pass
+                        try:
+                                self.iconSize = self.config.getint("albumart", "iconsize")
+                        except Exception,x:
+                                pass
 
-			for s in self.config.get("albumart", "sources").split(":"):
-				mod = self.loadModule(s)
-				albumart.addSource(mod)
+                        if self.iconSize == 16:
+                                self.viewIcon_SizeSmallAction.setOn(1)
+                        elif self.iconSize == 32:
+                                self.viewIcon_SizeMediumAction.setOn(1);
+                        elif self.iconSize == 64:
+                                self.viewIcon_SizeLargeAction.setOn(1);
 
-			self.settingsMenu.insertSeparator()
+                        for s in self.config.get("albumart", "sources").split(":"):
+                                mod = self.loadModule(s)
+                                albumart.addSource(mod)
 
-			for t in self.config.get("albumart", "targets").split(":"):
-				mod = self.loadModule(t)
-				albumart.addTarget(mod)
-		except Exception,x:
-			sys.stderr.write("Unable to load configuration: %s\n" % str(x))
-			pass
+                        self.settingsMenu.insertSeparator()
 
-		self.show()
+                        for t in self.config.get("albumart", "targets").split(":"):
+                                mod = self.loadModule(t)
+                                albumart.addTarget(mod)
+                except Exception,x:
+                        sys.stderr.write("Unable to load configuration: %s\n" % str(x))
+                        pass
 
-		# restore the previous directory
-		try:
-			if len(sys.argv)>1:
-				path = sys.argv[1]
-			else:
-				path = self.config.get("albumart", "lastDirectory")
-			self.walk(path)
-		except:
-			pass
+                self.loadIcons()
+                self.show()
 
-	def loadModule(self,id):
-		try:
-			(mod, cls) = id.split(".")
-			exec("import %s" % (mod))
-			exec("cfg = %s.defaultConfig.copy()" % (mod))
-			exec("cfgdesc = %s.configDesc" % (mod))
-			exec("c = %s.%s()" % (mod,cls))
+                # restore the previous directory
+                try:
+                        if len(sys.argv)>1:
+                                path = sys.argv[1]
+                        else:
+                                path = self.config.get("albumart", "lastDirectory")
+                        self.walk(path)
+                except Exception, x:
+                        print x
+                        pass
 
-			# load configuration
-			try:
-				for (key,value) in self.config.items(mod):
-					cfg[key] = value
-			except:
-				pass
+        def scaleIconPixmap(self, pixmap):
+                try:
+                        pixmap.convertFromImage(pixmap.convertToImage().scale(self.iconSize,self.iconSize))
+                        return pixmap
+                except NameError:
+                        # for older Qt 2.x
+                        pixmap.convertFromImage(pixmap.convertToImage().smoothScale(self.iconSize,self.iconSize))
+                        return pixmap
 
-			c.__configuration__ = cfg
+        def loadIcons(self):
+                self.coverPixmap = QPixmap(os.path.join(getShareDir(),"cover.png"))
+                self.noCoverPixmap = QPixmap(os.path.join(getShareDir(),"nocover.png"))
 
-			for (key,desc) in cfgdesc.items():
-				i = self.settingsMenu.insertItem(desc[1])
-				self.moduleAttributeMap[i] = (c,key,desc)
+                self.coverPixmap = self.scaleIconPixmap(self.coverPixmap)
+                self.noCoverPixmap = self.scaleIconPixmap(self.noCoverPixmap)
 
-				try:
-					if desc[0]=="boolean":
-						if cfg[key]==1 or self.config.getboolean(mod,key):
-							self.settingsMenu.setItemChecked(i, 1)
-							cfg[key] = 1
-						else:
-							cfg[key] = 0
-				except:
-					pass
+                # replace ugly icons without alpha channel
+                try:
+                        self.fileOpenAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"fileopen.png"))))
+                        self.fileExitAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"exit.png"))))
+                        self.helpAboutAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"icon.png"))))
+                        self.reloadAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"reload.png"))))
+                        self.nextAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"1rightarrow.png"))))
+                        self.previousAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"1leftarrow.png"))))
+                        self.pushDownload.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"download.png"))))
+                        self.pushSet.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"filesave.png"))))
+                except:
+                        # if that doesn't work, never mind
+                        pass
 
-			c.configure(cfg)
-			return c
-		except Exception,x:
-			print x
-			sys.stderr.write("Unable to load module '%s'.\n" % id)
-			raise
+        def loadModule(self,id):
+                try:
+                        (mod, cls) = id.split(".")
+                        exec("import %s" % (mod))
+                        exec("cfg = %s.defaultConfig.copy()" % (mod))
+                        exec("cfgdesc = %s.configDesc" % (mod))
+                        exec("c = %s.%s()" % (mod,cls))
 
-	def showCoversAction_toggled(self, enabled):
-		self.config.set("albumart", "showcovers", enabled)
-		self.reloadAction_activated()
+                        # load configuration
+                        try:
+                                for (key,value) in self.config.items(mod):
+                                        cfg[key] = value
+                        except:
+                                pass
 
-	def settingsMenuActivated(self, id):
-		enabled = not self.settingsMenu.isItemChecked(id)
+                        c.__configuration__ = cfg
 
-		if self.moduleAttributeMap.has_key(id):
-			(mod,key,desc) = self.moduleAttributeMap[id]
+                        for (key,desc) in cfgdesc.items():
+                                i = self.settingsMenu.insertItem(desc[1])
+                                self.moduleAttributeMap[i] = (c,key,desc)
 
-			if desc[0] == "boolean":
-				self.settingsMenu.setItemChecked(id, enabled)
-				mod.__configuration__[key] = enabled
-				mod.configure(mod.__configuration__)
-			elif desc[0] == "string":
-				(text,status) = QInputDialog.getText(desc[1], desc[2], QLineEdit.Normal, mod.__configuration__[key], self)
-				if status:
-					mod.__configuration__[key] = unicode(text)
-					mod.configure(mod.__configuration__)
+                                try:
+                                        if desc[0]=="boolean":
+                                                if cfg[key]==1 or self.config.getboolean(mod,key):
+                                                        self.settingsMenu.setItemChecked(i, 1)
+                                                        cfg[key] = 1
+                                                else:
+                                                        cfg[key] = 0
+                                except:
+                                        pass
 
-	def fileExit(self):
-		self.close()
+                        c.configure(cfg)
+                        return c
+                except Exception,x:
+                        print x
+                        sys.stderr.write("Unable to load module '%s'.\n" % id)
+                        raise
 
-	def closeEvent(self, ce):
-		# delete the downloaded covers
-		try:
-			for f in self.covers:
-				os.unlink(f)
-		except:
-			pass
+        def showCoversAction_toggled(self, enabled):
+                self.config.set("albumart", "showcovers", enabled)
+                self.reloadAction_activated()
 
-		# save the configuration
-		try:
-			for mod in albumart.sources + albumart.targets:
-				for (key,value) in mod.__configuration__.items():
-					if not self.config.has_section(mod.__module__):
-						self.config.add_section(mod.__module__)
-					self.config.set(mod.__module__, key, value)
+        def iconSizeSmallAction_toggled(self, enabled):
+                if enabled:
+                        self.iconSize = 16
+                        self.config.set("albumart", "iconsize", self.iconSize)
+                        self.loadIcons()
+                        self.reloadAction_activated()
 
-			fn = os.path.join(config.getConfigPath("albumart"), "config")
-			self.config.write(open(fn,"w"))
-		except:
-			raise
+        def iconSizeMediumAction_toggled(self, enabled):
+                if enabled:
+                        self.iconSize = 32
+                        self.config.set("albumart", "iconsize", self.iconSize)
+                        self.loadIcons()
+                        self.reloadAction_activated()
 
-		ce.accept()
+        def iconSizeLargeAction_toggled(self, enabled):
+                if enabled:
+                        self.iconSize = 64
+                        self.config.set("albumart", "iconsize", self.iconSize)
+                        self.loadIcons()
+                        self.reloadAction_activated()
 
-	def getIconForPath(self, path):
-		"Returns a QPixmap that can be used as an icon for the given path."
+        def settingsMenuActivated(self, id):
+                enabled = not self.settingsMenu.isItemChecked(id)
 
-		if albumart.hasCover(path):
-			if self.showCoversAction and not self.showCoversAction.isOn():
-				return self.coverPixmap
+                if self.moduleAttributeMap.has_key(id):
+                        (mod,key,desc) = self.moduleAttributeMap[id]
 
-			pixmap = QPixmap(albumart.getCover(path))
-			image = pixmap.convertToImage()
-			if not image.isNull() and image.width()>1 and image.height()>1:
-				try:
-					image = image.scale(16,16)
-				except:
-					# for older Qt 2.x
-					image = image.smoothScale(16,16)
+                        if desc[0] == "boolean":
+                                self.settingsMenu.setItemChecked(id, enabled)
+                                mod.__configuration__[key] = enabled
+                                mod.configure(mod.__configuration__)
+                        elif desc[0] == "string":
+                                (text,status) = QInputDialog.getText(desc[1], desc[2], QLineEdit.Normal, mod.__configuration__[key], self)
+                                if status:
+                                        mod.__configuration__[key] = unicode(text)
+                                        mod.configure(mod.__configuration__)
 
-				pixmap.convertFromImage(image)
-				return pixmap
-			else:
-				return self.noCoverPixmap
-		return self.noCoverPixmap
+        def fileExit(self):
+                self.close()
 
-	def process(self, root, dirname, names):
-		# repaint every 10 items.
-		if self.dirlist.childCount()%10==0:
-			qApp.processEvents()
+        def closeEvent(self, ce):
+                # delete the downloaded covers
+                try:
+                        for f in self.covers:
+                                os.unlink(f)
+                except:
+                        pass
 
-		path = dirname
+                # save the configuration
+                try:
+                        for mod in albumart.sources + albumart.targets:
+                                for (key,value) in mod.__configuration__.items():
+                                        if not self.config.has_section(mod.__module__):
+                                                self.config.add_section(mod.__module__)
+                                        self.config.set(mod.__module__, key, value)
 
-		# filter out hidden directories
-		for d in dirname.split(os.sep):
-			if len(d) and d[0]==".":
-				return
+                        fn = os.path.join(config.getConfigPath("albumart"), "config")
+                        self.config.write(open(fn,"w"))
+                except:
+                        raise
 
-		# ugly portability hack
-		if len(root):
-			if "\\" in root:
-				if not root[-1] == "\\" : root+="\\"
-			else:
-				if not root[-1] == "/": root+="/"
+                ce.accept()
 
-		dirname=dirname.replace(root,"")
+        def getIconForPath(self, path):
+                "Returns a QPixmap that can be used as an icon for the given path."
 
-		if not len(dirname):
-			dirname="."
+                if albumart.hasCover(path):
+                        if self.showCoversAction and not self.showCoversAction.isOn():
+                                return self.coverPixmap
 
-		(artist,album)=albumart.guessArtistAndAlbum(dirname)
+                        filename = albumart.getCover(path)
 
-		item = QListViewItem(self.dirlist, dirname, artist, album)
-		item.setPixmap(0, self.getIconForPath(path))
+                        if filename:
+                                pixmap = QPixmap(filename)
+                                pixmap = self.scaleIconPixmap(pixmap)
+                                if pixmap.width()>1 and pixmap.height()>1:
+                                        return pixmap
+                                else:
+                                        return self.noCoverPixmap
+                        else:
+                                return self.noCoverPixmap
+                return self.noCoverPixmap
 
-	def walk(self,path):
-		self.dir = path
+        def process(self, root, dirname, names):
+                # repaint every 10 items.
+                if self.dirlist.childCount()%10==0:
+                        qApp.processEvents()
 
-		self.pushSet.setEnabled(0)
-		self.pushDownload.setEnabled(0)
-		self.artistEdit.setEnabled(0)
-		self.albumEdit.setEnabled(0)
-		self.artistEdit.clear()
-		self.removeAction.setEnabled(0)
-		self.albumEdit.clear()
-		self.coverview.setEnabled(0)
-		self.coverview.clear()
-		self.albumIcon.hide()
-		self.dirlist.setEnabled(1)
-		self.dirlist.clear()
+                path = dirname
 
-		self.statusBar().message("Reading directory...")
-		os.path.walk(path, self.process, path)
-		self.statusBar().message("Ready",5000)
+                # filter out hidden directories
+                for d in dirname.split(os.sep):
+                        if len(d) and d[0]==".":
+                                return
 
-		self.pushDownload.setEnabled(0)
+                # ugly portability hack
+                if len(root):
+                        if "\\" in root:
+                                if not root[-1] == "\\" : root+="\\"
+                        else:
+                                if not root[-1] == "/": root+="/"
 
-		try:
-			self.reloadAction.setEnabled(1)
-			self.nextAction.setEnabled(1)
-			self.previousAction.setEnabled(1)
-		except:
-			pass
+                dirname=dirname.replace(root,"")
 
-	def helpAbout(self):
-		QMessageBox.information(self, version.__program__, """%s version %s by %s.
+                if not len(dirname):
+                        dirname="."
+
+                (artist,album)=albumart.guessArtistAndAlbum(dirname)
+
+                item = QListViewItem(self.dirlist, dirname, artist, album)
+                item.setPixmap(0, self.getIconForPath(path))
+
+        def walk(self,path):
+                self.dir = path
+
+                self.pushSet.setEnabled(0)
+                self.pushDownload.setEnabled(0)
+                self.artistEdit.setEnabled(0)
+                self.albumEdit.setEnabled(0)
+                self.artistEdit.clear()
+                self.removeAction.setEnabled(0)
+                self.albumEdit.clear()
+                self.coverview.setEnabled(0)
+                self.coverview.clear()
+                self.albumIcon.setPixmap(QPixmap())
+                self.albumIcon.setEnabled(0)
+                self.dirlist.setEnabled(1)
+                self.dirlist.clear()
+
+                self.statusBar().message("Reading directory...")
+                os.path.walk(path, self.process, path)
+                self.statusBar().message("Ready",5000)
+
+                self.pushDownload.setEnabled(0)
+
+                try:
+                        self.reloadAction.setEnabled(1)
+                        self.nextAction.setEnabled(1)
+                        self.previousAction.setEnabled(1)
+                except:
+                        pass
+
+        def helpAbout(self):
+                QMessageBox.information(self, version.__program__, """%s version %s by %s.
 http://kempele.fi/~skyostil/projects/albumart
 
-Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).
-Icons by Everaldo Coelho (http://www.everaldo.com) et al.""" % (version.__program__,version.__version__,version.__author__))
+Amazon web api wrapper by Mark Pilgrim and Michael Josephson (http://www.josephson.org/projects/pyamazon/)
+Icons by Everaldo Coelho (http://www.everaldo.com) et al.
+PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
+""" %
+(version.__program__,version.__version__,version.__author__))
 
-	def fileOpen(self):
-		d=self.getQString(QFileDialog.getExistingDirectory(self.dir,self,"Choose a directory that contains one or more albums","Choose a directory", 1))
-		if d and len(d):
-			self.config.set("albumart", "lastDirectory", d)
-			self.walk(d)
+        def fileOpen(self):
+                d=self.getQString(QFileDialog.getExistingDirectory(self.dir,self,"Choose a directory that contains one or more albums","Choose a directory", 1))
+                if d and len(d):
+                        self.config.set("albumart", "lastDirectory", d)
+                        self.walk(d)
 
-	def reloadAction_activated(self):
-		self.walk(self.dir)
+        def reloadAction_activated(self):
+                self.walk(self.dir)
 
-	def removeAction_activated(self):
-		if QMessageBox.information(self, "Confirm deletion", "Are you sure you want to delete the selected cover image?", QMessageBox.Yes, QMessageBox.No+QMessageBox.Default+QMessageBox.Escape) == QMessageBox.Yes:
-			path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-			albumart.removeCover(path)
-			self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
-			self.updateIcon()
+        def removeAction_activated(self):
+                if QMessageBox.information(self, "Confirm deletion", "Are you sure you want to delete the selected cover image?", QMessageBox.Yes, QMessageBox.No+QMessageBox.Default+QMessageBox.Escape) == QMessageBox.Yes:
+                        path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+                        albumart.removeCover(path)
+                        self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
+                        self.updateIcon()
 
-	def nextAction_activated(self):
-		item = self.dirlist.selectedItem()
+        def nextAction_activated(self):
+                item = self.dirlist.selectedItem()
 
-		if not item:
-			item = self.dirlist.firstChild()
+                if not item:
+                        item = self.dirlist.firstChild()
 
-		while item:
-			item = item.itemBelow()
-			if not item: break
-			path = os.path.join(self.dir, self.getQString(item.text(0)))
-			if not albumart.hasCover(path):
-				self.dirlist.setSelected(item, 1)
-				self.dirlist.ensureItemVisible(item)
-				break
+                while item:
+                        item = item.itemBelow()
+                        if not item: break
+                        path = os.path.join(self.dir, self.getQString(item.text(0)))
+                        if not albumart.hasCover(path):
+                                self.dirlist.setSelected(item, 1)
+                                self.dirlist.ensureItemVisible(item)
+                                break
 
-	def previousAction_activated(self):
-		item = self.dirlist.selectedItem()
+        def previousAction_activated(self):
+                item = self.dirlist.selectedItem()
 
-		if not item:
-			item = self.dirlist.lastItem()
+                if not item:
+                        item = self.dirlist.lastItem()
 
-		while item:
-			item = item.itemAbove()
-			if not item: break
-			path = os.path.join(self.dir, self.getQString(item.text(0)))
-			if not albumart.hasCover(path):
-				self.dirlist.setSelected(item, 1)
-				self.dirlist.ensureItemVisible(item)
-				break
+                while item:
+                        item = item.itemAbove()
+                        if not item: break
+                        path = os.path.join(self.dir, self.getQString(item.text(0)))
+                        if not albumart.hasCover(path):
+                                self.dirlist.setSelected(item, 1)
+                                self.dirlist.ensureItemVisible(item)
+                                break
 
-	def dirlist_selectionChanged(self,a0):
-		self.selectedAlbum = a0
-		self.coverview.clear()
-		self.artistEdit.setText(a0.text(1))
-		self.albumEdit.setText(a0.text(2))
-		self.pushDownload.setEnabled(1)
-		self.removeAction.setEnabled(1)
-		self.pushSet.setEnabled(0)
-		self.artistEdit.setEnabled(1)
-		self.albumEdit.setEnabled(1)
-		self.coverview.setEnabled(1)
-		self.coverfiles = {}	# a map of listiview items to cover files
-		self.covers = []	# a list of downloaded covers
-		self.thread = None
-		self.statusBar().message("")
-		self.updateIcon()
+        def dirlist_selectionChanged(self,a0):
+                self.selectedAlbum = a0
+                self.coverview.clear()
+                self.artistEdit.setText(a0.text(1))
+                self.albumEdit.setText(a0.text(2))
+                self.pushDownload.setEnabled(1)
+                self.removeAction.setEnabled(1)
+                self.pushSet.setEnabled(0)
+                self.artistEdit.setEnabled(1)
+                self.albumEdit.setEnabled(1)
+                self.coverview.setEnabled(1)
+                self.coverfiles = {}    # a map of listiview items to cover files
+                self.covers = []        # a list of downloaded covers
+                self.thread = None
+                self.statusBar().message("")
+                self.updateIcon()
 
-	def getQString(self, qstring):
-		return unicode(qstring).encode("latin-1", "replace")
-#		return unicode(qstring)
+        def getQString(self, qstring):
+                return unicode(qstring).encode("latin-1", "replace")
+#               return unicode(qstring)
 
-	def updateIcon(self):
-		# Try to load the current album cover image and display it as the folder icon.
-		try:
-			self.albumIcon.hide()
-			path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+        def updateIcon(self):
+                # Try to load the current album cover image and display it as the folder icon.
+                try:
+                        self.albumIcon.setEnabled(0)
+                        self.albumIcon.setPixmap(QPixmap())
+                        path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
 
-			f = albumart.getCover(path)
+                        f = albumart.getCover(path)
 
-			if f:
-				pixmap = QPixmap(f)
-				image = pixmap.convertToImage()
-				if not image.isNull() and image.width()>1 and image.height()>1:
-					image = image.smoothScale(60,60)
-					pixmap.convertFromImage(image)
-					self.albumIcon.setPixmap(pixmap)
-					self.albumIcon.show()
-		except:
-			pass
+                        if f:
+                                pixmap = QPixmap(f)
+                                image = pixmap.convertToImage()
+                                if not image.isNull() and image.width()>1 and image.height()>1:
+                                        image = image.smoothScale(60,60)
+                                        pixmap.convertFromImage(image)
+                                        self.albumIcon.setPixmap(pixmap)
+                                        self.albumIcon.setEnabled(1)
+                except:
+                        pass
 
-	def albumIcon_clicked(self):
-		# Try to load the current album cover image and display it in as new window
-		try:
-			path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-			f = albumart.getCover(path)
-			if f:
-				self.coverPreviewWindow = QLabel(None)
-				self.coverPreviewWindow.setPixmap(QPixmap(f))
-				self.coverPreviewWindow.show()
-		except:
-			pass
+        def albumIcon_clicked(self):
+                # Try to load the current album cover image and display it in as new window
+                try:
+                        path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+                        f = albumart.getCover(path)
+                        if f:
+                                pixmap = QPixmap(f)
+                                self.coverPreviewWindow = QLabel(None)
+                                self.coverPreviewWindow.setPixmap(pixmap)
+                                self.coverPreviewWindow.setFixedSize(pixmap.width(), pixmap.height())
+                                self.coverPreviewWindow.setCaption("Cover image for " + self.getQString(self.selectedAlbum.text(0)))
+                                self.coverPreviewWindow.show()
+                except:
+                        pass
 
-	def addCoverToList(self,coverfile):
-		# if we're running on Qt 2, convert the image to a png.
-		if qVersion().split(".")[0]=='2':
-			newcoverfile = coverfile + ".png"
-			i = Image.open(coverfile)
-			i.save(newcoverfile, "PNG")
-			del i
-			os.unlink(coverfile)
-			coverfile = newcoverfile
+        def addCoverToList(self,coverfile):
+                # if we're running on Qt 2, convert the image to a png.
+                if qVersion().split(".")[0]=='2':
+                        newcoverfile = coverfile + ".png"
+                        i = Image.open(coverfile)
+                        i.save(newcoverfile, "PNG")
+                        del i
+                        os.unlink(coverfile)
+                        coverfile = newcoverfile
 
-		image = QImage(coverfile)
+                image = QImage(coverfile)
 
-		if not image.isNull() and image.width()>1 and image.height()>1:
-			# if we're running on Qt 2, do the scaling a bit differently
-			if qVersion().split(".")[0]=='2':
-				image = image.smoothScale(256,256 * float(image.height())/float(image.width()))
-				pixmap = QPixmap()
-				pixmap.convertFromImage(image)
-				item = QIconViewItem(self.coverview, None, pixmap)
-			else:
-				image = image.smoothScale(256,256,QImage.ScaleMin)
-				item = QIconViewItem(self.coverview, None, QPixmap(image))
+                if not image.isNull() and image.width()>1 and image.height()>1:
+                        # if we're running on Qt 2, do the scaling a bit differently
+                        if qVersion().split(".")[0]=='2':
+                                image = image.smoothScale(256,256 * float(image.height())/float(image.width()))
+                                pixmap = QPixmap()
+                                pixmap.convertFromImage(image)
+                                item = QIconViewItem(self.coverview, None, pixmap)
+                        else:
+                                image = image.smoothScale(256,256,QImage.ScaleMin)
+                                item = QIconViewItem(self.coverview, None, QPixmap(image))
 
-			self.coverfiles[item] = coverfile
-			return 1
-		return 0
+                        self.coverfiles[item] = coverfile
+                        return 1
+                return 0
 
-	def customEvent(self,event):
-		if event.type()==QEvent.User+0:
-			# if the message was sent by an older thread, ignore it.
-			if self.thread != event.thread:
-				return
+        def customEvent(self,event):
+                if event.type()==QEvent.User+0:
+                        # if the message was sent by an older thread, ignore it.
+                        if self.thread != event.thread:
+                                return
 
-			self.covers.append(event.filename)
-			self.addCoverToList(event.filename)
-			self.statusBar().message("%d covers found. Looking for more..." % len(self.coverfiles.keys()))
-		elif event.type()==QEvent.User+1:
-			# if the message was sent by an older thread, ignore it.
-			if self.thread != event.thread:
-				return
+                        self.covers.append(event.filename)
+                        self.addCoverToList(event.filename)
+                        self.statusBar().message("%d covers found. Looking for more..." % len(self.coverfiles.keys()))
+                elif event.type()==QEvent.User+1:
+                        # if the message was sent by an older thread, ignore it.
+                        if self.thread != event.thread:
+                                return
 
-			self.thread.wait()
-			self.thread = None
-			self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
+                        self.thread.wait()
+                        self.thread = None
+                        self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
 
-			if not len(self.coverfiles.keys()):
-				QMessageBox.information(self, version.__program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
+                        if not len(self.coverfiles.keys()):
+                                QMessageBox.information(self, version.__program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
 
-			self.pushDownload.setEnabled(1)
-		elif event.type()==QEvent.User+2:
-			QMessageBox.critical(self, version.__program__,"The following error occured while downloading cover images:\n%s"%str(event.exception))
+                        self.pushDownload.setEnabled(1)
+                elif event.type()==QEvent.User+2:
+                        QMessageBox.critical(self, version.__program__,"The following error occured while downloading cover images:\n%s"%str(event.exception))
 
-		del event
+                del event
 
-	def pushDownload_clicked(self):
-		# delete the previously downloaded covers
-		try:
-			for f in self.covers:
-				os.unlink(f)
-		except:
-			pass
+        def pushDownload_clicked(self):
+                # delete the previously downloaded covers
+                try:
+                        for f in self.covers:
+                                os.unlink(f)
+                except:
+                        pass
 
-		self.coverview.clear()
-		self.pushSet.setEnabled(0)
-		self.pushDownload.setEnabled(0)
-		self.coverfiles = {}
-		self.covers = []
+                self.coverview.clear()
+                self.pushSet.setEnabled(0)
+                self.pushDownload.setEnabled(0)
+                self.coverfiles = {}
+                self.covers = []
 
-		# start the downloader thread
-		self.statusBar().message("Searching for covers...")
-		self.thread = CoverDownloader(self,self.getQString(self.artistEdit.text()), self.getQString(self.albumEdit.text()))
-		self.thread.start()
+                # start the downloader thread
+                self.statusBar().message("Searching for covers...")
+                self.thread = CoverDownloader(self,self.getQString(self.artistEdit.text()), self.getQString(self.albumEdit.text()))
+                self.thread.start()
 
-	def coverview_selectionChanged(self,a0):
-		self.pushSet.setEnabled(1)
-		self.selectedCover=a0
+        def coverview_selectionChanged(self,a0):
+                self.pushSet.setEnabled(1)
+                self.selectedCover=a0
 
-	def pushSet_clicked(self):
-		path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-		cover = self.coverfiles[self.selectedCover]
+        def pushSet_clicked(self):
+                path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+                cover = self.coverfiles[self.selectedCover]
 
-		try:
-			albumart.setCover(path,cover)
-			self.pushSet.setEnabled(0)
-			self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
-			self.updateIcon()
-		except Exception,x:
-			QMessageBox.critical(self, version.__program__,"The following error occured while setting the cover image:\n%s"%str(x))
+                try:
+                        albumart.setCover(path,cover)
+                        self.pushSet.setEnabled(0)
+                        self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
+                        self.updateIcon()
+                except Exception,x:
+                        QMessageBox.critical(self, version.__program__,"The following error occured while setting the cover image:\n%s"%str(x))
 
-	def coverview_dropped(self,a0,a1):
-		if not self.selectedAlbum:
-			return
+        def coverview_dropped(self,a0,a1):
+                if not self.selectedAlbum:
+                        return
 
-		text = QString()
-		if QTextDrag.decode(a0, text):
-			try:
-				text=self.getQString(text)
-				text=urllib.unquote(text)
+                text = QString()
+                if QTextDrag.decode(a0, text):
+                        try:
+                                text=self.getQString(text)
+                                text=urllib.unquote(text)
 
-				f=urllib.urlopen(text)
-				fn=tempfile.mktemp()
-				o=open(fn,"wb")
-				o.write(f.read())
-				o.close()
-				self.addCoverToList(fn)
-				self.covers.append(fn)
-			except Exception,x:
-				QMessageBox.critical(self, version.__program__,"The following error occured while adding the cover image:\n%s"%str(x))
-				raise
+                                f=urllib.urlopen(text)                                
+                                fn=tempfile.mktemp()
+                                
+                                # write to a temporary file
+                                o=open(fn,"wb")
+                                o.write(f.read())
+                                o.close()
+                                
+                                # convert to JPEG
+                                img = Image.open(fn)
+                                img.load()
+                                img = img.convert("RGB")
+                                img.save(fn, "JPEG")
+                                self.addCoverToList(fn)
+                                self.covers.append(fn)
+                        except Exception,x:
+                                QMessageBox.critical(self, version.__program__,"The following error occured while adding the cover image:\n%s"%str(x))
+                                raise
 
 if __name__=="__main__":
-	app = QApplication(sys.argv)
-	mainwin = AlbumArt()
-	app.setMainWidget(mainwin)
+        app = QApplication(sys.argv)
+        mainwin = AlbumArt()
+        app.setMainWidget(mainwin)
 
- 	if "--help" in sys.argv or "-h" in sys.argv:
-		print """Assings cover images to directories holding albums.
+        if "--help" in sys.argv or "-h" in sys.argv:
+                print """Assings cover images to directories holding albums.
 Usage:
-%s	[directory]""" % sys.argv[0]
-		sys.exit(1)
+%s      [directory]""" % sys.argv[0]
+                sys.exit(1)
 
-	mainwin.show()
+        mainwin.show()
 
-	try:
-		app.exec_loop()
-	except:
-		pass
+        try:
+                app.exec_loop()
+        except:
+                pass
 
-	sys.exit(0)
+        sys.exit(0)

@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>AlbumArtDialog</class>
 <widget class="QMainWindow">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>651</width>
-            <height>477</height>
+            <height>479</height>
         </rect>
     </property>
     <property name="caption">
@@ -81,52 +81,96 @@
             </widget>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout1</cstring>
+                    <cstring>layout7</cstring>
                 </property>
-                <grid>
+                <vbox>
                     <property name="name">
                         <cstring>unnamed</cstring>
                     </property>
-                    <widget class="QLabel" row="1" column="0">
+                    <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>textLabel1_2</cstring>
+                            <cstring>layout6</cstring>
                         </property>
-                        <property name="text">
-                            <string>&lt;p align="right"&gt;Album:&lt;/p&gt;</string>
-                        </property>
+                        <grid>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QPushButton" row="0" column="2" rowspan="2" colspan="1">
+                                <property name="name">
+                                    <cstring>albumIcon</cstring>
+                                </property>
+                                <property name="sizePolicy">
+                                    <sizepolicy>
+                                        <hsizetype>0</hsizetype>
+                                        <vsizetype>0</vsizetype>
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>64</width>
+                                        <height>64</height>
+                                    </size>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>64</width>
+                                        <height>64</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string></string>
+                                </property>
+                                <property name="flat">
+                                    <bool>false</bool>
+                                </property>
+                            </widget>
+                            <widget class="QLabel" row="1" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1_2</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;p align="right"&gt;Album:&lt;/p&gt;</string>
+                                </property>
+                            </widget>
+                            <widget class="QLayoutWidget" row="0" column="1" rowspan="2" colspan="1">
+                                <property name="name">
+                                    <cstring>layout4</cstring>
+                                </property>
+                                <grid>
+                                    <property name="name">
+                                        <cstring>unnamed</cstring>
+                                    </property>
+                                    <widget class="QLineEdit" row="0" column="0">
+                                        <property name="name">
+                                            <cstring>artistEdit</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                    </widget>
+                                    <widget class="QLineEdit" row="1" column="0">
+                                        <property name="name">
+                                            <cstring>albumEdit</cstring>
+                                        </property>
+                                        <property name="enabled">
+                                            <bool>false</bool>
+                                        </property>
+                                    </widget>
+                                </grid>
+                            </widget>
+                            <widget class="QLabel" row="0" column="0">
+                                <property name="name">
+                                    <cstring>textLabel1</cstring>
+                                </property>
+                                <property name="text">
+                                    <string>&lt;p align="right"&gt;Artist:&lt;/p&gt;</string>
+                                </property>
+                            </widget>
+                        </grid>
                     </widget>
-                    <widget class="QPushButton" row="3" column="0" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>pushDownload</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>false</bool>
-                        </property>
-                        <property name="text">
-                            <string>&amp;Download Covers</string>
-                        </property>
-                        <property name="accel">
-                            <string>Alt+D</string>
-                        </property>
-                        <property name="iconSet">
-                            <iconset>image1</iconset>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="3" column="2" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>pushSet</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>false</bool>
-                        </property>
-                        <property name="text">
-                            <string>&amp;Set as Cover</string>
-                        </property>
-                        <property name="iconSet">
-                            <iconset>image2</iconset>
-                        </property>
-                    </widget>
-                    <widget class="QIconView" row="2" column="0" rowspan="1" colspan="4">
+                    <widget class="QIconView">
                         <property name="name">
                             <cstring>coverview</cstring>
                         </property>
@@ -152,62 +196,68 @@
                             <bool>false</bool>
                         </property>
                     </widget>
-                    <widget class="QLineEdit" row="1" column="1" rowspan="1" colspan="2">
+                    <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>albumEdit</cstring>
+                            <cstring>layout5</cstring>
                         </property>
-                        <property name="enabled">
-                            <bool>false</bool>
-                        </property>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <spacer>
+                                <property name="name">
+                                    <cstring>spacer3</cstring>
+                                </property>
+                                <property name="orientation">
+                                    <enum>Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>Expanding</enum>
+                                </property>
+                                <property name="sizeHint">
+                                    <size>
+                                        <width>91</width>
+                                        <height>31</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>pushDownload</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Download Covers</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+D</string>
+                                </property>
+                                <property name="iconSet">
+                                    <iconset>image1</iconset>
+                                </property>
+                            </widget>
+                            <widget class="QPushButton">
+                                <property name="name">
+                                    <cstring>pushSet</cstring>
+                                </property>
+                                <property name="enabled">
+                                    <bool>false</bool>
+                                </property>
+                                <property name="text">
+                                    <string>&amp;Set as Cover</string>
+                                </property>
+                                <property name="accel">
+                                    <string>Alt+S</string>
+                                </property>
+                                <property name="iconSet">
+                                    <iconset>image2</iconset>
+                                </property>
+                            </widget>
+                        </hbox>
                     </widget>
-                    <widget class="QLabel" row="0" column="0">
-                        <property name="name">
-                            <cstring>textLabel1</cstring>
-                        </property>
-                        <property name="text">
-                            <string>&lt;p align="right"&gt;Artist:&lt;/p&gt;</string>
-                        </property>
-                    </widget>
-                    <widget class="QPushButton" row="0" column="3" rowspan="2" colspan="1">
-                        <property name="name">
-                            <cstring>albumIcon</cstring>
-                        </property>
-                        <property name="sizePolicy">
-                            <sizepolicy>
-                                <hsizetype>0</hsizetype>
-                                <vsizetype>0</vsizetype>
-                                <horstretch>0</horstretch>
-                                <verstretch>0</verstretch>
-                            </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                            <size>
-                                <width>64</width>
-                                <height>64</height>
-                            </size>
-                        </property>
-                        <property name="maximumSize">
-                            <size>
-                                <width>64</width>
-                                <height>64</height>
-                            </size>
-                        </property>
-                        <property name="text">
-                            <string></string>
-                        </property>
-                        <property name="flat">
-                            <bool>false</bool>
-                        </property>
-                    </widget>
-                    <widget class="QLineEdit" row="0" column="1" rowspan="1" colspan="2">
-                        <property name="name">
-                            <cstring>artistEdit</cstring>
-                        </property>
-                        <property name="enabled">
-                            <bool>false</bool>
-                        </property>
-                    </widget>
-                </grid>
+                </vbox>
             </widget>
         </widget>
     </grid>
@@ -226,6 +276,15 @@
         <action name="nextAction"/>
         <action name="previousAction"/>
         <action name="removeAction"/>
+    </item>
+    <item text="&amp;View" name="View">
+        <action name="showCoversAction"/>
+        <action name="viewIcon_SizeAction"/>
+        <item text="Icon &amp;Size" name="viewIcon_SizeAction_2" accel="">
+            <action name="viewIcon_SizeSmallAction"/>
+            <action name="viewIcon_SizeMediumAction"/>
+            <action name="viewIcon_SizeLargeAction"/>
+        </item>
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpAboutAction"/>
@@ -368,20 +427,6 @@
     </action>
     <action>
         <property name="name">
-            <cstring>showCoversAction</cstring>
-        </property>
-        <property name="toggleAction">
-            <bool>true</bool>
-        </property>
-        <property name="text">
-            <string>Show covers in directory list</string>
-        </property>
-        <property name="menuText">
-            <string>Show &amp;covers in directory list</string>
-        </property>
-    </action>
-    <action>
-        <property name="name">
             <cstring>removeAction</cstring>
         </property>
         <property name="enabled">
@@ -398,6 +443,96 @@
         </property>
         <property name="statusTip">
             <string>Delete the cover image for the currently selected folder</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewIcon_SizeAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Icon &amp;Size</string>
+        </property>
+        <property name="menuText">
+            <string>Icon &amp;Size</string>
+        </property>
+    </action>
+    <actiongroup>
+        <property name="name">
+            <cstring>SizeActionGroup</cstring>
+        </property>
+        <property name="text">
+            <string>SizeActionGroup</string>
+        </property>
+        <property name="usesDropDown">
+            <bool>true</bool>
+        </property>
+	<action>
+		<property name="name">
+		<cstring>viewIcon_SizeSmallAction</cstring>
+		</property>
+		<property name="toggleAction">
+		<bool>true</bool>
+		</property>
+		<property name="text">
+		<string>&amp;Small</string>
+		</property>
+		<property name="menuText">
+		<string>&amp;Small</string>
+		</property>
+		<property name="toolTip">
+		<string>Small icons</string>
+		</property>
+	</action>
+	<action>
+		<property name="name">
+		<cstring>viewIcon_SizeMediumAction</cstring>
+		</property>
+		<property name="toggleAction">
+		<bool>true</bool>
+		</property>
+		<property name="text">
+		<string>&amp;Medium</string>
+		</property>
+		<property name="menuText">
+		<string>&amp;Medium</string>
+		</property>
+		<property name="toolTip">
+		<string>Medium icons</string>
+		</property>
+	</action>
+	<action>
+		<property name="name">
+		<cstring>viewIcon_SizeLargeAction</cstring>
+		</property>
+		<property name="text">
+		<string>&amp;Large</string>
+		</property>
+		<property name="toggleAction">
+		<bool>true</bool>
+		</property>
+		<property name="menuText">
+		<string>&amp;Large</string>
+		</property>
+		<property name="toolTip">
+		<string>Large icons</string>
+		</property>
+	</action>
+    </actiongroup>
+    <action>
+        <property name="name">
+            <cstring>showCoversAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="text">
+            <string>Show &amp;Cover Images in List</string>
+        </property>
+        <property name="menuText">
+            <string>Show &amp;Cover Images in List</string>
         </property>
     </action>
 </actions>
@@ -507,16 +642,34 @@
         <slot>previousAction_activated()</slot>
     </connection>
     <connection>
+        <sender>removeAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>removeAction_activated()</slot>
+    </connection>
+    <connection>
         <sender>showCoversAction</sender>
         <signal>toggled(bool)</signal>
         <receiver>AlbumArtDialog</receiver>
         <slot>showCoversAction_toggled(bool)</slot>
     </connection>
     <connection>
-        <sender>removeAction</sender>
-        <signal>activated()</signal>
+        <sender>viewIcon_SizeSmallAction</sender>
+        <signal>toggled(bool)</signal>
         <receiver>AlbumArtDialog</receiver>
-        <slot>removeAction_activated()</slot>
+        <slot>iconSizeSmallAction_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>viewIcon_SizeMediumAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>iconSizeMediumAction_toggled(bool)</slot>
+    </connection>
+    <connection>
+        <sender>viewIcon_SizeLargeAction</sender>
+        <signal>toggled(bool)</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>iconSizeLargeAction_toggled(bool)</slot>
     </connection>
 </connections>
 <tabstops>
@@ -550,6 +703,9 @@
     <slot>previousAction_activated()</slot>
     <slot>showCoversAction_toggled(bool)</slot>
     <slot>removeAction_activated()</slot>
+    <slot>iconSizeSmallAction_toggled(bool)</slot>
+    <slot>iconSizeMediumAction_toggled(bool)</slot>
+    <slot>iconSizeLargeAction_toggled(bool)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
