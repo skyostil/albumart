@@ -17,6 +17,7 @@ import os
 import amazon
 import shutil
 import ConfigParser
+import Image
 
 class Source:
 	"""A virtual base class that defines an album cover source."""
@@ -105,7 +106,7 @@ def guessArtistAndAlbum(path):
 
 def hasCover(path):
 	"""Returns true if the specified path has an album image set."""
-	return os.path.isfile(os.path.join(path,"folder.jpg")) and os.path.isfile(os.path.join(path,".folder.png"))
+	return os.path.isfile(os.path.join(path,"folder.jpg")) or os.path.isfile(os.path.join(path,".folder.png"))
 
 # A wrapper around a file to work around the fact that
 # ConfigParser writes keys in lowercase.
@@ -129,8 +130,10 @@ def setCover(path,cover):
 		# ignore chmod-errors
 		if not n.errno==1: raise
 
-	os.spawnl(os.P_WAIT, "/usr/bin/convert", "/usr/bin/convert", coverfile, coverfile_png)
-	#os.system("convert '%s' '%s'" % (coverfile, coverfile_png))
+	i = Image.open(coverfile)
+	i.save(coverfile_png, "PNG")
+#	os.spawnl(os.P_WAIT, "/usr/bin/convert", "/usr/bin/convert", coverfile, coverfile_png)
+#	os.system("convert '%s' '%s'" % (coverfile, coverfile_png))
 
 	# .directory-file entry
 	cf=ConfigParser.ConfigParser()

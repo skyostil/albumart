@@ -16,12 +16,18 @@ import sys
 import albumart
 import urllib
 import tempfile
+import Image
 from qt import *
-from albumartdialog import AlbumArtDialog
+
+# see if we're using an old Qt version
+if qVersion().split(".")[0]=="2":
+	from albumartdialog_qt230 import AlbumArtDialog
+else:
+	from albumartdialog import AlbumArtDialog
 
 __program__ = "Album Cover Art Downloader"
 __author__ = "Sami Kyöstilä <skyostil@kempele.fi>"
-__version__ = "1.0"
+__version__ = "1.1"
 __copyright__ = "Copyright (c) 2003 Sami Kyöstilä"
 __license__ = "GPL"
 
@@ -44,9 +50,16 @@ class AlbumArt(AlbumArtDialog):
 	def process(self, root, dirname, names):
 		path = dirname
 		if dirname == root: return
-		if not root[-1] == os.sep: root+=os.sep
+
+		# ugly portability hack
+		if "\\" in root:
+			if not root[-1] == "\\" : root+="\\"
+		else:
+			if not root[-1] == "/": root+="/"
+			
 		dirname=dirname.replace(root,"")
-		(artist,album)=albumart.guessArtistAndAlbum(dirname.replace(root,""))
+
+		(artist,album)=albumart.guessArtistAndAlbum(dirname)
 
 		item = QListViewItem(self.dirlist, dirname, artist, album)
 		if albumart.hasCover(path):
@@ -56,6 +69,7 @@ class AlbumArt(AlbumArtDialog):
 
 	def walk(self,path):
 		self.dir = path
+		self.dirlist.clear()
 		os.path.walk(path, self.process, path)
 		self.dirlist.setEnabled(1)
 
@@ -78,12 +92,32 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 		self.artistEdit.setEnabled(1)
 		self.albumEdit.setEnabled(1)
 		self.coverview.setEnabled(1)
+		self.coverfiles = {}
+		self.covers = []
 
 	def addCoverToList(self,coverfile):
+		# if we're running on Qt 2, convert the image to a png.
+		if qVersion().split(".")[0]=='2':
+			newcoverfile = coverfile + ".png"
+			i = Image.open(coverfile)
+			i.save(newcoverfile, "PNG")
+			del i
+			os.unlink(coverfile)
+			coverfile = newcoverfile
+			
 		image = QImage(coverfile)
+		
 		if not image.isNull() and image.width()>1 and image.height()>1:
-			image = image.smoothScale(256,256,QImage.ScaleMin)
-			item = QIconViewItem(self.coverview, None, QPixmap(image))
+			# if we're running on Qt 2, do the scaling a bit differently
+			if qVersion().split(".")[0]=='2':
+				image = image.smoothScale(256,256 * float(image.height())/float(image.width()))
+				pixmap = QPixmap()
+				pixmap.convertFromImage(image)
+				item = QIconViewItem(self.coverview, None, pixmap)
+			else:
+				image = image.smoothScale(256,256,QImage.ScaleMin)
+				item = QIconViewItem(self.coverview, None, QPixmap(image))
+				
 			self.coverfiles[item] = coverfile
 			return 1
 		return 0
@@ -101,7 +135,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 			self.covers = albumart.getAvailableCovers(self.artistEdit.text(), self.albumEdit.text())
 		except Exception,x:
 			QMessageBox.critical(self, __program__,"The following error occured while downloading cover images:\n%s"%str(x))
-			self.covers = None
+			self.covers = []
 		self.pushSet.setEnabled(0)
 		self.coverfiles = {}
 
@@ -122,6 +156,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 		cover = self.coverfiles[self.selectedCover]
 
 		try:
+			print path, cover
 			albumart.setCover(path,cover)
 			self.pushSet.setEnabled(0)
 			self.selectedAlbum.setPixmap(0,self.coverPixmap)
@@ -129,10 +164,15 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 			QMessageBox.critical(self, __program__,"The following error occured while setting the cover image:\n%s"%str(x))
 
 	def coverview_dropped(self,a0,a1):
+		if not self.selectedAlbum:
+			return
+		
 		text = QString()
 		if QTextDrag.decode(a0, text):
 			try:
 				text=str(text)
+				text=urllib.unquote(text)
+					
 				f=urllib.urlopen(text)
 				fn=tempfile.mktemp()
 				o=open(fn,"wb")
