@@ -2852,7 +2852,7 @@ class AlbumArtDialog(QMainWindow):
         self.editMenu = QPopupMenu(self)
         self.nextAction.addTo(self.editMenu)
         self.previousAction.addTo(self.editMenu)
-	self.removeAction.addTo(self.editMenu)
+        self.removeAction.addTo(self.editMenu)
         self.menubar.insertItem(QString("&Edit"),self.editMenu,2)
 
         self.helpMenu = QPopupMenu(self)
