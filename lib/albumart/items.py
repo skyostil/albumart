@@ -26,7 +26,7 @@ class TrackItem(QListViewItem):
     m = self.listView().itemMargin()
     painter.drawPixmap(m, 0, self.pixmap(0))
     painter.drawText(2 * m + self.pixmap(0).width(), m, 
-                     width, self.height(), 0, self.name)
+                     width, self.height(), Qt.AlignVCenter, self.name)
     
   def paintFocus(self, painter, colorGroup, rect):
     pass
@@ -176,18 +176,20 @@ class AlbumItem(QListViewItem):
 
 class CoverItem(QIconViewItem):
   """A cover image item"""
-  def __init__(self, parent, pixmap, path):
+  def __init__(self, parent, pixmap, path, delete = False):
     QListViewItem.__init__(self, parent, "", pixmap)
     self.margin = 6
     self.path = path
+    self.delete = delete
     self.setItemRect(QRect(0, 0,
                      self.pixmap().width() + self.margin * 2,
                      self.pixmap().height() + self.margin * 2))
 
   def __del__(self):
-    # delete the temporary file
+    # delete the temporary file if needed
     try:
-      os.unlink(self.path)
+      if self.delete:
+        os.unlink(self.path)
     except:
       pass
                      

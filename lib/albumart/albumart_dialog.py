@@ -59,6 +59,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.albums = {}
     self.modules = []
     self.cachePath = os.path.join(config.getConfigPath("albumart"), "cache")
+    self.currentCoverItems = []
 
     # tweak the ui
     self.dirlist.header().hide()
@@ -282,62 +283,63 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
   def walk(self, path):
     """Walk the given path and fill the album list with all the albums found."""
-    self.dir = path
-
-    # update the widget states
-    self.setCursor(Qt.waitCursor)
-    self.fileOpenAction.setEnabled(0)
-    self.reloadAction.setEnabled(0)
-    self.stopAction.setEnabled(1)
-
-    # clear the db
-    self.albums = {}
-    self.stopped = False
-
-    # check the cache
     try:
-      (cachePath, cacheTime, cacheAlbums) = pickle.load(open(self.cachePath, "rb"))
-    except:
-      cachePath = None
-
-    if cachePath == path and os.stat(path).st_mtime <= cacheTime:
-      self.albums = cacheAlbums
-    else:
-      # no cache -> must walk the tree
-      lastRepaintTime = time.time()
-      for root, dirs, files in os.walk(path):
-        if self.stopped:
-          break
-        for n in files:
+      self.dir = path
+  
+      # update the widget states
+      self.setCursor(Qt.waitCursor)
+      self.fileOpenAction.setEnabled(0)
+      self.reloadAction.setEnabled(0)
+      self.stopAction.setEnabled(1)
+  
+      # clear the db
+      self.albums = {}
+      self.stopped = False
+  
+      # check the cache
+      try:
+        (cachePath, cacheTime, cacheAlbums) = pickle.load(open(self.cachePath, "rb"))
+      except:
+        cachePath = None
+  
+      if cachePath == path and os.stat(path).st_mtime <= cacheTime:
+        self.albums = cacheAlbums
+      else:
+        # no cache -> must walk the tree
+        lastRepaintTime = time.time()
+        for root, dirs, files in os.walk(path):
           if self.stopped:
             break
-          if os.path.splitext(n)[1].lower() in albumart.mediaExtensions:
-            # update status bar often enough
-            if time.time() > lastRepaintTime + 0.2:
-              self.statusBar().message(self.tr("Reading %s") % n)
-              lastRepaintTime = time.time()
-              qApp.processEvents()
-
-            p = os.path.join(root, n)
-            (artist, album) = albumart.guessArtistAndAlbum(p)
-
-            # get the album for this track
-            if not (artist, album) in self.albums:
-              self.albums[(artist, album)] = []
-
-            # add the track to the album
-            self.albums[(artist, album)].append(p)
-      # save a fresh copy to the cache
-      pickle.dump((path, time.time(), self.albums), open(self.cachePath, "wb"))
-
-    self.refreshAlbumList()
-    self.statusBar().message(self.tr("%d albums found. Ready.") % len(self.albums), 5000)
-
-    self.stopped = False
-    self.stopAction.setEnabled(0)
-    self.reloadAction.setEnabled(1)
-    self.fileOpenAction.setEnabled(1)
-    self.setCursor(Qt.arrowCursor)
+          for n in files:
+            if self.stopped:
+              break
+            if os.path.splitext(n)[1].lower() in albumart.mediaExtensions:
+              # update status bar often enough
+              if time.time() > lastRepaintTime + 0.2:
+                self.statusBar().message(self.tr("Reading %s") % n)
+                lastRepaintTime = time.time()
+                qApp.processEvents()
+  
+              p = os.path.join(root, n)
+              (artist, album) = albumart.guessArtistAndAlbum(p)
+  
+              # get the album for this track
+              if not (artist, album) in self.albums:
+                self.albums[(artist, album)] = []
+  
+              # add the track to the album
+              self.albums[(artist, album)].append(p)
+        # save a fresh copy to the cache
+        pickle.dump((path, time.time(), self.albums), open(self.cachePath, "wb"))
+    finally:
+      self.refreshAlbumList()
+      self.statusBar().message(self.tr("%d albums found. Ready.") % len(self.albums))
+  
+      self.stopped = False
+      self.stopAction.setEnabled(0)
+      self.reloadAction.setEnabled(1)
+      self.fileOpenAction.setEnabled(1)
+      self.setCursor(Qt.arrowCursor)
 
   def refreshAlbumList(self):
     """Refreshes the album list according to the current search string."""
@@ -476,11 +478,43 @@ class AlbumArtDialog(AlbumArtDialogBase):
     flag = len(self.getSelectedItems()) > 0
     self.autoDownloadAction.setEnabled(flag)
     self.removeAction.setEnabled(flag)
+    self.viewCoverAction.setEnabled(flag)
 
   def dirlist_currentChanged(self, a0):
     self.artistEdit.setText(a0.getArtistName())
     self.albumEdit.setText(a0.getAlbumName())
-    self.thread = None
+    # clean up the previous cover items
+    for item in self.currentCoverItems:
+      try:
+        self.coverview.takeItem(item)
+      except:
+        pass
+    self.currentCoverItems = []
+    # add new ones for this item
+    [self.currentCoverItems.append(self.addCoverToList(f)) \
+     for f in self.scanItemForCovers(a0)]
+      
+  def scanItemForCovers(self, item):
+    """Scans the given item for cover images and the
+       resulting list of filenames."""
+    files = []
+    if albumart.hasCover(item.getPath()):
+      files.append(albumart.getCover(item.getPath()))
+    if os.path.isdir(item.getPath()):
+      for f in os.listdir(item.getPath()):
+        try:
+          # don't add the built-in defaults
+          if f in [".folder.png", "folder.jpg"]:
+            continue
+          f = os.path.join(item.getPath(), f)
+          if f in files:
+            continue
+          i = QImage(f)
+          if not i.isNull():
+            files.append(f)
+        except:
+          pass
+    return files    
 
   def dirlist_contextMenuRequested(self, item, point, column):
     if item:
@@ -525,18 +559,17 @@ class AlbumArtDialog(AlbumArtDialogBase):
         trackItem = trackItem.nextSibling()
     return items
 
-  def addCoverToList(self, coverfile):
-    """Adds the given cover to the list of available album covers."""
+  def addCoverToList(self, coverfile, delete = False):
+    """Adds the given cover to the list of available album covers.
+       @returns the cover item or None on error."""
     try:
       image = QImage(coverfile)
     except IOError:
-      return 0
+      return None
 
     if not image.isNull() and image.width() > 1 and image.height() > 1:
       image = image.smoothScale(256, 256, QImage.ScaleMin)
-      item = CoverItem(self.coverview, QPixmap(image), coverfile)
-      return 1
-    return 0
+      return CoverItem(self.coverview, QPixmap(image), coverfile, delete)
 
   def customEvent(self, event):
     """Handle events from processes"""
@@ -546,7 +579,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         return
       
     if event.type() == CoverDownloadedEvent.id:
-      self.addCoverToList(event.filename)
+      self.addCoverToList(event.filename, delete = True)
     elif event.type() == TaskFinishedEvent.id:
       self.thread.wait()
       self.thread = None
@@ -664,7 +697,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       if fn:
         event.accept(True)
 
-        item = self.dirlist.itemAt(self.dirlist.contentsToViewport(event.pos()))
+        item = self.dirlist.itemAt(event.pos())
         if item:
           items = [item]
           if isinstance(item, AlbumItem):
@@ -708,7 +741,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     try:
       fn = self.decodeDropEventAsCover(event)
       if fn:
-        self.addCoverToList(fn)
+        self.addCoverToList(fn, delete = True)
     except Exception, x:
       self.reportException(self.tr("Adding the cover image"), x)
 

@@ -11,12 +11,14 @@ defaultConfig = {
   "enabled":        1,
   "licensenumber":  "D1ESMA5AOEZB24",
   "locale":         "us",
+  "proxy":          amazon.getProxy() or "",
 }
 
 configDesc = {
   "enabled":        ("boolean", "Enable"),
   "locale":         ("stringlist",  "Country",
                      ["us", "uk", "de", "jp"]),
+  "proxy":          ("string",  "Proxy server")
 }
 
 class Amazon(albumart.Source):
@@ -32,6 +34,9 @@ class Amazon(albumart.Source):
     l = config["locale"]
     if l and len(l):
       amazon.setLocale(l)
+    l = config["proxy"]
+    if l and len(l):
+      amazon.setProxy(l)
 
   def findAlbum(self,name):
     if self.enabled:

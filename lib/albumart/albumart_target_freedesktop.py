@@ -62,10 +62,12 @@ class Freedesktop(albumart.Target):
   def getCover(self, path):
     if self.enabled:
       if self.hasCover(path):
-        return os.path.join(path,self.filename)
+        return os.path.join(path, self.filename)
 
   def setCover(self, path, cover):
-    if not self.enabled:
+    target = os.path.join(path, self.filename)
+  
+    if not self.enabled or target == cover:
       return
 
     # check that it is not a file
@@ -78,7 +80,7 @@ class Freedesktop(albumart.Target):
     if self.scale:
       i = i.resize((self.scale, self.scale), resample = 1)
 
-    i.save(os.path.join(path, self.filename), "PNG")
+    i.save(target, "PNG")
 
     # .directory-file entry
     cf=MyParser()

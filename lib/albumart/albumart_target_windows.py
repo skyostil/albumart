@@ -42,14 +42,15 @@ class Windows(albumart.Target):
         return os.path.join(path, self.filename)
 
   def setCover(self, path, cover):
-    if self.enabled and not os.path.isfile(path):
+    target = os.path.join(path, self.filename)
+    if self.enabled and not os.path.isfile(path) and not cover == target:
       i = Image.open(cover)
 
       # scale it
       if self.scale:
         i = i.resize((self.scale, self.scale), resample = 1)
 
-      i.save(os.path.join(path, self.filename), "JPEG")
+      i.save(target, "JPEG")
 
   def hasCover(self, path):
     if self.enabled and not os.path.isfile(path):

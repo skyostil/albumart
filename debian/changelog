@@ -1,3 +1,17 @@
+albumart (1.5.0-1) stable; urgency=low
+
+  * User interface overhauled.
+  * Group music by albums rather than directories.
+  * Don't change mp3 modification times.
+  * Don't hang with large music collections.
+  * Drag and drop support enhanced.
+  * Removed support for Qt 2.3.
+  * Ability to write different ID3 picture types.
+  * Output images can be scaled smaller if needed.
+  * Added collection caching for faster startup.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Mon, 21 Feb 2005 22:39:00 +0200 
+
 albumart (1.4.0-1) stable; urgency=low
 
   * Album information is now also read from ID3v2 tags.
