@@ -73,46 +73,46 @@
                     <attribute name="id">
                         <number>0</number>
                     </attribute>
-                    <widget class="QLayoutWidget">
+                    <hbox>
                         <property name="name">
-                            <cstring>layout19</cstring>
+                            <cstring>unnamed</cstring>
                         </property>
-                        <property name="geometry">
-                            <rect>
-                                <x>87</x>
-                                <y>50</y>
-                                <width>130</width>
-                                <height>150</height>
-                            </rect>
-                        </property>
-                        <vbox>
+                        <widget class="QLayoutWidget">
                             <property name="name">
-                                <cstring>unnamed</cstring>
+                                <cstring>layout19</cstring>
                             </property>
-                            <widget class="QLabel">
+                            <vbox>
                                 <property name="name">
-                                    <cstring>pixmapLabel1</cstring>
+                                    <cstring>unnamed</cstring>
                                 </property>
-                                <property name="pixmap">
-                                    <pixmap>image0</pixmap>
-                                </property>
-                                <property name="scaledContents">
-                                    <bool>false</bool>
-                                </property>
-                            </widget>
-                            <widget class="QLabel">
-                                <property name="name">
-                                    <cstring>version</cstring>
-                                </property>
-                                <property name="text">
-                                    <string></string>
-                                </property>
-                                <property name="alignment">
-                                    <set>AlignCenter</set>
-                                </property>
-                            </widget>
-                        </vbox>
-                    </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>pixmapLabel1</cstring>
+                                    </property>
+                                    <property name="pixmap">
+                                        <pixmap>image0</pixmap>
+                                    </property>
+                                    <property name="scaledContents">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>AlignCenter</set>
+                                    </property>
+                                </widget>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>version</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string></string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </vbox>
+                        </widget>
+                    </hbox>
                 </widget>
             </widget>
         </widget>
