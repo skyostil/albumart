@@ -32,13 +32,15 @@ __copyright__ = "Copyright (c) 2003 Sami Kyöstilä"
 __license__ = "GPL"
 
 class CoverDownloadedEvent(QCustomEvent):
-	def __init__(self,filename):
+	def __init__(self,thread,filename):
 		QCustomEvent.__init__(self,QEvent.User+0)
 		self.filename = filename
+		self.thread = thread
 
 class TaskFinishedEvent(QCustomEvent):
-	def __init__(self):
+	def __init__(self,thread):
 		QCustomEvent.__init__(self,QEvent.User+1)
+		self.thread = thread
 
 class ExceptionEvent(QCustomEvent):
 	def __init__(self,x):
@@ -55,11 +57,11 @@ class CoverDownloader(QThread):
 	def run(self):
 		try:
 			for c in albumart.getAvailableCovers(self.artist, self.album):
-				self.postEvent(self.dialog, CoverDownloadedEvent(c))
+				self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
 		except Exception,x:
 			self.postEvent(self.dialog, ExceptionEvent(x))
 
-		self.postEvent(self.dialog, TaskFinishedEvent())
+		self.postEvent(self.dialog, TaskFinishedEvent(self))
 
 class AlbumArt(AlbumArtDialog):
 	def __init__(self,parent = None,name = None,fl = 0):
@@ -155,10 +157,18 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 
 	def customEvent(self,event):
 		if event.type()==QEvent.User+0:
+			# if the message was sent by an older thread, ignore it.
+			if self.thread != event.thread:
+				return
+
 			self.covers.append(event.filename)
 			self.addCoverToList(event.filename)
 			self.statusBar().message("%d covers found. Looking for more..." % len(self.coverfiles.keys()))
 		elif event.type()==QEvent.User+1:
+			# if the message was sent by an older thread, ignore it.
+			if self.thread != event.thread:
+				return
+
 			self.thread.wait()
 			self.thread = None			
 			self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
@@ -173,9 +183,6 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 		del event
 
 	def pushDownload_clicked(self):
-		if self.thread:
-			return
-
 		# delete the previously downloaded covers
 		try:
 			for f in self.covers:
