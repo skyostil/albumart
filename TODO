@@ -1,6 +1,6 @@
 - more image sources (images.google.com?)
 - target for directory drag & drop
-- move the various processes into their own threads
+- move the various processes into their own threads - DONE 1.3
 - remember last directory - DONE 1.2
 - make sure we save the images in a proper format - DONE 1.2
 

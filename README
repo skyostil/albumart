@@ -26,16 +26,7 @@
    In addition, some portable music players can show the cover               
    image if it is embedded in the MP3 file.                                  
                                                                              
-   Note that since the program doesn't make any use of ID3-tags              
-   or similar, the artist and album names are guessed from the               
-   pathname only. If your directories have utterly                           
-   incomprehensible names, don't worry, as you can still type                
-   in the artist and album names manually.                                   
-                                                                             
-   Usage                                                                     
-                                                                             
-   Once you have the prerequisites sorted out, go ahead and run              
-   albumart-qt. It is the QT frontend to the program.                        
+ Usage                                                                     
                                                                              
    Click File | Open and navigate to the directory containing                
    the albums you want to find cover images for. The program                 
@@ -61,8 +52,22 @@
                                                                              
    Go ahead and choose a suitable cover from the list. Finally,              
    click Set as Cover to confirm your choice.                                
-                                                                             
-   Internals                                                                 
+
+ Command line options
+
+   -h, --help
+          Show summary of options.
+
+   -d, --download
+          Download covers for the given path.
+
+   -x, --delete
+          Remove covers below the given path.
+
+   -s, --synchronize
+          Synchronizes all covers below the given path.
+
+ Internals                                                                 
                                                                              
    The cover images are in one or more of the following places:              
                                                                              
@@ -71,7 +76,7 @@
        Konqueror, etc.                                                       
      * ID3v2 APIC frame, which is embedded into the MP3 files.               
                                                                              
-   Troubleshooting                                                           
+ Troubleshooting                                                           
                                                                              
    The following message means that your installed Python                    
    interpreter is too old. It should be at least version 2.2,                

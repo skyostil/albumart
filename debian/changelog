@@ -1,10 +1,14 @@
 albumart (1.4.0-1) stable; urgency=low
 
- * Album information is now also read from ID3v2 tags.
- * All the automated processes now process each file separately rather
-   than working on a directory basis.
- * Command line mode for automatic processing.
- * New win32 installer.
+  * Album information is now also read from ID3v2 tags.
+  * All the automated processes now process each file separately rather
+    than working on a directory basis.
+  * Command line mode for automatic processing.
+  * New win32 installer.
+  * Removed support for Qt 3.0.0.
+  * Improved album and artist guessing.
+ 
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Mon, 6 Sep 2004 20:39:00 +0200 
                       
 albumart (1.3.1-1) stable; urgency=low
 
