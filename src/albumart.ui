@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>651</width>
-            <height>479</height>
+            <height>483</height>
         </rect>
     </property>
     <property name="caption">
@@ -275,6 +275,8 @@
     <item text="&amp;Edit" name="EditMenu">
         <action name="nextAction"/>
         <action name="previousAction"/>
+        <action name="autoDownloadAction"/>
+        <action name="synchronizeAction"/>
         <action name="removeAction"/>
     </item>
     <item text="&amp;View" name="View">
@@ -469,57 +471,57 @@
         <property name="usesDropDown">
             <bool>true</bool>
         </property>
-	<action>
-		<property name="name">
-		<cstring>viewIcon_SizeSmallAction</cstring>
-		</property>
-		<property name="toggleAction">
-		<bool>true</bool>
-		</property>
-		<property name="text">
-		<string>&amp;Small</string>
-		</property>
-		<property name="menuText">
-		<string>&amp;Small</string>
-		</property>
-		<property name="toolTip">
-		<string>Small icons</string>
-		</property>
-	</action>
-	<action>
-		<property name="name">
-		<cstring>viewIcon_SizeMediumAction</cstring>
-		</property>
-		<property name="toggleAction">
-		<bool>true</bool>
-		</property>
-		<property name="text">
-		<string>&amp;Medium</string>
-		</property>
-		<property name="menuText">
-		<string>&amp;Medium</string>
-		</property>
-		<property name="toolTip">
-		<string>Medium icons</string>
-		</property>
-	</action>
-	<action>
-		<property name="name">
-		<cstring>viewIcon_SizeLargeAction</cstring>
-		</property>
-		<property name="text">
-		<string>&amp;Large</string>
-		</property>
-		<property name="toggleAction">
-		<bool>true</bool>
-		</property>
-		<property name="menuText">
-		<string>&amp;Large</string>
-		</property>
-		<property name="toolTip">
-		<string>Large icons</string>
-		</property>
-	</action>
+        <action>
+            <property name="name">
+                <cstring>viewIcon_SizeSmallAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>&amp;Small</string>
+            </property>
+            <property name="menuText">
+                <string>&amp;Small</string>
+            </property>
+            <property name="toolTip">
+                <string>Small icons</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>viewIcon_SizeMediumAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>&amp;Medium</string>
+            </property>
+            <property name="menuText">
+                <string>&amp;Medium</string>
+            </property>
+            <property name="toolTip">
+                <string>Medium icons</string>
+            </property>
+        </action>
+        <action>
+            <property name="name">
+                <cstring>viewIcon_SizeLargeAction</cstring>
+            </property>
+            <property name="toggleAction">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>&amp;Large</string>
+            </property>
+            <property name="menuText">
+                <string>&amp;Large</string>
+            </property>
+            <property name="toolTip">
+                <string>Large icons</string>
+            </property>
+        </action>
     </actiongroup>
     <action>
         <property name="name">
@@ -533,6 +535,28 @@
         </property>
         <property name="menuText">
             <string>Show &amp;Cover Images in List</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>autoDownloadAction</cstring>
+        </property>
+        <property name="text">
+            <string>Download &amp;missing cover images</string>
+        </property>
+        <property name="menuText">
+            <string>Download &amp;missing cover images</string>
+        </property>
+        <property name="toolTip">
+            <string>Download missing cover images</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>synchronizeAction</cstring>
+        </property>
+        <property name="text">
+            <string>Synchronize cover images for all targets</string>
         </property>
     </action>
 </actions>
@@ -671,6 +695,18 @@
         <receiver>AlbumArtDialog</receiver>
         <slot>iconSizeLargeAction_toggled(bool)</slot>
     </connection>
+    <connection>
+        <sender>autoDownloadAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>autoDownloadAction_activated()</slot>
+    </connection>
+    <connection>
+        <sender>synchronizeAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>synchronizeAction_activated()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>dirlist</tabstop>
@@ -703,6 +739,8 @@
     <slot>previousAction_activated()</slot>
     <slot>showCoversAction_toggled(bool)</slot>
     <slot>removeAction_activated()</slot>
+    <slot>autoDownloadAction_activated()</slot>
+    <slot>synchronizeAction_activated()</slot>
     <slot>iconSizeSmallAction_toggled(bool)</slot>
     <slot>iconSizeMediumAction_toggled(bool)</slot>
     <slot>iconSizeLargeAction_toggled(bool)</slot>

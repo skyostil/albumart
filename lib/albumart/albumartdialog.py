@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '../../src/albumart.ui'
 #
-# Created: ti touko  11 00:25:44 2004
+# Created: pe touko  14 20:00:01 2004
 #      by: The PyQt User Interface Compiler (pyuic) 3.11
 #
 # WARNING! All changes made in this file will be lost!
@@ -2854,6 +2854,8 @@ class AlbumArtDialog(QMainWindow):
         self.viewIcon_SizeLargeAction.setToggleAction(1)
         self.showCoversAction = QAction(self,"showCoversAction")
         self.showCoversAction.setToggleAction(1)
+        self.autoDownloadAction = QAction(self,"autoDownloadAction")
+        self.synchronizeAction = QAction(self,"synchronizeAction")
 
 
         self.toolBar = QToolBar(QString(""),self,Qt.DockTop)
@@ -2877,6 +2879,8 @@ class AlbumArtDialog(QMainWindow):
         self.EditMenu = QPopupMenu(self)
         self.nextAction.addTo(self.EditMenu)
         self.previousAction.addTo(self.EditMenu)
+        self.autoDownloadAction.addTo(self.EditMenu)
+        self.synchronizeAction.addTo(self.EditMenu)
         self.removeAction.addTo(self.EditMenu)
         self.menubar.insertItem(QString(""),self.EditMenu,2)
 
@@ -2896,7 +2900,7 @@ class AlbumArtDialog(QMainWindow):
 
         self.languageChange()
 
-        self.resize(QSize(651,479).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(651,483).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.connect(self.fileOpenAction,SIGNAL("activated()"),self.fileOpen)
@@ -2917,6 +2921,8 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.viewIcon_SizeSmallAction,SIGNAL("toggled(bool)"),self.iconSizeSmallAction_toggled)
         self.connect(self.viewIcon_SizeMediumAction,SIGNAL("toggled(bool)"),self.iconSizeMediumAction_toggled)
         self.connect(self.viewIcon_SizeLargeAction,SIGNAL("toggled(bool)"),self.iconSizeLargeAction_toggled)
+        self.connect(self.autoDownloadAction,SIGNAL("activated()"),self.autoDownloadAction_activated)
+        self.connect(self.synchronizeAction,SIGNAL("activated()"),self.synchronizeAction_activated)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)
@@ -2976,6 +2982,10 @@ class AlbumArtDialog(QMainWindow):
         self.viewIcon_SizeLargeAction.setToolTip(self.__tr("Large icons"))
         self.showCoversAction.setText(self.__tr("Show &Cover Images in List"))
         self.showCoversAction.setMenuText(self.__tr("Show &Cover Images in List"))
+        self.autoDownloadAction.setText(self.__tr("Download &missing cover images"))
+        self.autoDownloadAction.setMenuText(self.__tr("Download &missing cover images"))
+        self.autoDownloadAction.setToolTip(self.__tr("Download missing cover images"))
+        self.synchronizeAction.setText(self.__tr("Synchronize cover images for all targets"))
         self.toolBar.setLabel(self.__tr("Tools"))
         if self.menubar.findItem(1):
             self.menubar.findItem(1).setText(self.__tr("&File"))
@@ -3053,6 +3063,12 @@ class AlbumArtDialog(QMainWindow):
 
     def removeAction_activated(self):
         print "AlbumArtDialog.removeAction_activated(): Not implemented yet"
+
+    def autoDownloadAction_activated(self):
+        print "AlbumArtDialog.autoDownloadAction_activated(): Not implemented yet"
+
+    def synchronizeAction_activated(self):
+        print "AlbumArtDialog.synchronizeAction_activated(): Not implemented yet"
 
     def iconSizeSmallAction_toggled(self,a0):
         print "AlbumArtDialog.iconSizeSmallAction_toggled(bool): Not implemented yet"
