@@ -23,7 +23,14 @@ from qt import *
 if qVersion().split(".")[0]=="2":
 	from albumartdialog_qt230 import AlbumArtDialog
 else:
-	from albumartdialog import AlbumArtDialog
+	# if the Qt version is older than 3.1, then use an alternate ui builder.
+	try:
+	        if map(int, qVersion().split("."))[1]<1:
+	                from albumartdialog_qt300 import AlbumArtDialog
+	        else:
+	                raise 1
+	except:
+	        from albumartdialog import AlbumArtDialog
 
 __program__ = "Album Cover Art Downloader"
 __author__ = "Sami Kyöstilä <skyostil@kempele.fi>"
