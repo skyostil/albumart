@@ -349,8 +349,12 @@ class AlbumArt(AlbumArtDialog):
 
                         # load configuration
                         try:
-                                for (key,value) in self.config.items(mod):
-                                        cfg[key] = value
+                                if sys.version_info[:2] == (2,2):
+                                    for key in self.config.options(mod):
+                                          cfg[key] = self.config.get(mod,key)
+                                else:
+                                    for (key,value) in self.config.items(mod):
+                                          cfg[key] = value
                         except:
                                 pass
 

@@ -6,7 +6,7 @@ import os
 
 defaultConfig = {
 	"enabled":	1,
-	"relpaths": 1,
+	"relpaths":     1,
 	"filename":	".folder.png",
 }
 
@@ -22,16 +22,16 @@ class MyParser(ConfigParser.ConfigParser):
 	def write(self, fp):
 		# this is overrided to make no use of white spaces around '='.
 		"""Write an .ini-format representation of the configuration state."""
-		if self._defaults:
+		if self.defaults():
 			fp.write("[%s]\n" % DEFAULTSECT)
-			for (key, value) in self._defaults.items():
+			for (key, value) in self.defaults().items():
 				fp.write("%s=%s\n" % (key, str(value).replace('\n', '\n\t')))
 			fp.write("\n")
-		for section in self._sections:
+		for section in self.sections():
 			fp.write("[%s]\n" % section)
-			for (key, value) in self._sections[section].items():
+			for key in self.options(section):
 				if key != "__name__":
-					fp.write("%s=%s\n" % (key, str(value).replace('\n', '\n\t')))
+					fp.write("%s=%s\n" % (key, self.get(section,key).replace('\n', '\n\t')))
 		fp.write("\n")
 
 class Freedesktop(albumart.Target):
@@ -44,7 +44,7 @@ class Freedesktop(albumart.Target):
 		self.enabled = config["enabled"]
 		
 		try:
-			self.relpaths = config["relpaths"]
+			self.relpaths = (config["relpaths"] == "1")
 		except:
 			self.relpaths = 1
 
@@ -67,11 +67,11 @@ class Freedesktop(albumart.Target):
 			pass
 		if not cf.has_section("Desktop Entry"):
 			cf.add_section("Desktop Entry")
-			
+                        
 		if self.relpaths or os.name == "nt":
 			cf.set("Desktop Entry", "Icon", os.path.join(".", self.filename))
 		else:
-			cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))		
+			cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))
 		cf.write(open(os.path.join(path,".directory"),"w"))
 
 	def removeCover(self, path):
