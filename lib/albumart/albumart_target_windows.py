@@ -1,4 +1,7 @@
 # -*- coding: iso-8859-1 -*-
+
+"""Set image for Windows Media Player, Windows Explorer, etc."""
+
 import albumart
 import Image
 import os
@@ -9,11 +12,12 @@ defaultConfig = {
 }
 
 configDesc = {
-  "enabled":  ("boolean", "Set image for Windows Media Player, etc."),
+  "enabled":  ("boolean", "Enable"),
+  "filename": ("string", "File name for image")
 }
 
 class Windows(albumart.Target):
-  """Windows Media Player."""
+  """Windows Media Player"""
   def __init__(self):
     self.configure(defaultConfig)
 

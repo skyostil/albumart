@@ -1,4 +1,7 @@
 # -*- coding: iso-8859-1 -*-
+
+"""Write images to ID3v2 tags in MP3 files."""
+
 import albumart
 import glob
 import os
@@ -8,14 +11,17 @@ import Image
 
 defaultConfig = {
   "enabled":      1,
+  "tag":          "APIC",
 }
 
 configDesc = {
-  "enabled":      ("boolean", "Save image directly into MP3 files (ID3v2 tag)"),
+  "enabled":      ("boolean", "Save image directly into MP3 files"),
+  "tag":          ("stringlist", "Tag to save image to",
+                   ["APIC"]),
 }
 
 class ID3v2(albumart.Target):
-  """ID3v2 APIC tag"""
+  """MP3 files"""
   def __init__(self):
     self.configure(defaultConfig)
     self.tempfile = tempfile.mktemp(".jpg")

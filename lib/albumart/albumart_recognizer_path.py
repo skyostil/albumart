@@ -1,4 +1,7 @@
 # -*- coding: iso-8859-1 -*-
+
+"""Guess album and artist from the path."""
+
 import albumart
 import re
 import os
@@ -32,7 +35,7 @@ patterns = [
 ]
 
 class PathRecognizer(albumart.Recognizer):
-  """Guess album and artist from the path."""
+  """Path name"""
   def __init__(self):
     self.configure(defaultConfig)
 

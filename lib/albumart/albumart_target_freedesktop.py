@@ -1,4 +1,7 @@
 # -*- coding: iso-8859-1 -*-
+
+"""Save image in Freedesktop.org's desktop file standard (for KDE, GNOME, etc.)"""
+
 import albumart
 import Image
 import ConfigParser
@@ -11,8 +14,8 @@ defaultConfig = {
 }
 
 configDesc = {
-  "enabled":  ("boolean", "Set image for Freedesktop (KDE, Gnome, etc.)"),
-  "relpaths":  ("boolean", "Use relative paths for Freedesktop"),
+  "enabled":   ("boolean", "Enable Freedesktop.org"),
+  "relpaths":  ("boolean", "Use relative paths"),
 }
 
 class MyParser(ConfigParser.ConfigParser):
@@ -36,7 +39,7 @@ class MyParser(ConfigParser.ConfigParser):
     fp.write("\n")
 
 class Freedesktop(albumart.Target):
-  """Freedesktop.org's desktop file standard (for KDE, GNOME, etc.)"""
+  """Freedesktop.org"""
   def __init__(self):
     self.configure(defaultConfig)
 

@@ -1,4 +1,7 @@
 # -*- coding: iso-8859-1 -*-
+
+"""Guess album and artist from ID3v2 tags."""
+
 import albumart
 import id3   # PyID3, see http://icepick.info/projects/pyid3/
 import os
@@ -11,7 +14,7 @@ configDesc = {
 }
 
 class ID3v2Recognizer(albumart.Recognizer):
-  """Guess album and artist from ID3v2 tags."""
+  """ID3v2 tags"""
   def __init__(self):
     self.configure(defaultConfig)
 
