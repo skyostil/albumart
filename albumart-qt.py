@@ -127,6 +127,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 		self.coverfiles = {}	# a map of listiview items to cover files
 		self.covers = []	# a list of downloaded covers
 		self.thread = None
+		self.statusBar().message("")
 
 	def addCoverToList(self,coverfile):
 		# if we're running on Qt 2, convert the image to a png.
