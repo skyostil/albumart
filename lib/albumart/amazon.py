@@ -54,15 +54,16 @@ Other usage notes:
 """
 
 __author__ = "Mark Pilgrim (f8dy@diveintomark.org)"
-__version__ = "0.5"
-__cvsversion__ = "$Revision: 1.1 $"[11:-2]
-__date__ = "$Date: 2003-06-03 16:26:13 $"[7:-2]
+__version__ = "0.63"
+__cvsversion__ = "$Revision: 1.2 $"[11:-2]
+__date__ = "$Date: 2004-04-26 08:51:11 $"[7:-2]
 __copyright__ = "Copyright (c) 2002 Mark Pilgrim"
 __license__ = "Python"
 # Powersearch and return object type fix by Joseph Reagle <geek@goatee.net>
+# Locale support by Michael Josephson <mike@josephson.org>
 
 from xml.dom import minidom
-import os, sys, getopt, cgi, urllib
+import os, sys, getopt, cgi, urllib, string
 try:
     import timeoutsocket # http://www.timo-tasi.org/python/timeoutsocket.py
     timeoutsocket.setDefaultSocketTimeout(10)
@@ -71,6 +72,7 @@ except ImportError:
 
 LICENSE_KEY = None
 HTTP_PROXY = None
+LOCALE = "us"
 
 # don't touch the rest of these constants
 class AmazonError(Exception): pass
@@ -88,6 +90,12 @@ _licenseLocations = (
     (lambda key: _contentsOf(_getScriptDir(), _amazonfile1), '%s in the amazon.py directory' % _amazonfile1),
     (lambda key: _contentsOf(_getScriptDir(), _amazonfile2), '%s in the amazon.py directory' % _amazonfile2)
     )
+_supportedLocales = {
+        "us" : (None, "xml.amazon.com"),   
+        "uk" : ("uk", "xml-eu.amazon.com"),
+        "de" : ("de", "xml-eu.amazon.com"),
+        "jp" : ("jp", "xml.amazon.com")
+    }
 
 ## administrative functions
 def version():
@@ -97,6 +105,20 @@ released %(__date__)s
 """ % globals()
 
 ## utility functions
+
+def setLocale(locale):
+    """set locale"""
+    global LOCALE
+    if _supportedLocales.has_key(locale):
+        LOCALE = locale
+    else:
+        raise AmazonError, ("Unsupported locale. Locale must be one of: %s" %
+            string.join(_supportedLocales, ", "))
+        
+def getLocale():
+    """get locale"""
+    return LOCALE
+
 def setLicense(license_key):
     """set license key"""
     global LICENSE_KEY
@@ -174,15 +196,16 @@ def unmarshal(element):
     return rc
 
 def buildURL(search_type, keyword, product_line, type, page, license_key):
-    url = "http://xml.amazon.com/onca/xml?v=1.0&f=xml&t=webservices-20"
+    url = "http://" + _supportedLocales[LOCALE][1] + "/onca/xml3?f=xml&t=webservices-20"
     url += "&dev-t=%s" % license_key.strip()
     url += "&type=%s" % type
+    if _supportedLocales[LOCALE][0]:
+        url += "&locale=%s" % _supportedLocales[LOCALE][0]
     if page:
         url += "&page=%s" % page
     if product_line:
         url += "&mode=%s" % product_line
     url += "&%s=%s" % (search_type, urllib.quote(keyword))
-    print url
     return url
 
 
