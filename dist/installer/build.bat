@@ -2,3 +2,4 @@
 @mkdir distalbumart-qt-w32\share
 @mkdir distalbumart-qt-w32\share\albumart
 @copy ..\..\share\albumart\*.png distalbumart-qt-w32\share\albumart
+@copy ..\..\README distalbumart-qt-w32
