@@ -53,6 +53,10 @@ class Freedesktop(albumart.Target):
 		w=MyWriter(os.path.join(path,".directory"),"w")
 		cf.write(w)
 
+	def removeCover(self, path):
+		if not self.enabled: return
+		os.unlink(os.path.join(path, self.filename))
+
 	def hasCover(self, path):
 		if self.enabled:
 			return os.path.isfile(os.path.join(path,self.filename))

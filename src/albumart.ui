@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>651</width>
-            <height>469</height>
+            <height>477</height>
         </rect>
     </property>
     <property name="caption">
@@ -225,6 +225,7 @@
     <item text="&amp;Edit" name="EditMenu">
         <action name="nextAction"/>
         <action name="previousAction"/>
+        <action name="removeAction"/>
     </item>
     <item text="&amp;Help" name="helpMenu">
         <action name="helpAboutAction"/>
@@ -310,7 +311,7 @@
             <string>Reload</string>
         </property>
         <property name="menuText">
-            <string>Reload</string>
+            <string>&amp;Reload</string>
         </property>
         <property name="toolTip">
             <string>Refresh directory view</string>
@@ -333,7 +334,7 @@
             <string>Go to next album without cover</string>
         </property>
         <property name="menuText">
-            <string>Go to next album without cover</string>
+            <string>Go to &amp;next album without cover</string>
         </property>
         <property name="toolTip">
             <string>Places the cursor over the next album that has no cover image</string>
@@ -356,7 +357,7 @@
             <string>Go to previous album without cover</string>
         </property>
         <property name="menuText">
-            <string>Go to previous album without cover</string>
+            <string>Go to &amp;previous album without cover</string>
         </property>
         <property name="toolTip">
             <string>Places the cursor over the previous album that has no cover image</string>
@@ -374,6 +375,29 @@
         </property>
         <property name="text">
             <string>Show covers in directory list</string>
+        </property>
+        <property name="menuText">
+            <string>Show &amp;covers in directory list</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>removeAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Delete cover image...</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Delete cover image...</string>
+        </property>
+        <property name="toolTip">
+            <string>Delete the cover image for the currently selected folder</string>
+        </property>
+        <property name="statusTip">
+            <string>Delete the cover image for the currently selected folder</string>
         </property>
     </action>
 </actions>
@@ -488,6 +512,12 @@
         <receiver>AlbumArtDialog</receiver>
         <slot>showCoversAction_toggled(bool)</slot>
     </connection>
+    <connection>
+        <sender>removeAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>removeAction_activated()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>dirlist</tabstop>
@@ -519,6 +549,7 @@
     <slot>nextAction_activated()</slot>
     <slot>previousAction_activated()</slot>
     <slot>showCoversAction_toggled(bool)</slot>
+    <slot>removeAction_activated()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

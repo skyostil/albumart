@@ -2829,6 +2829,8 @@ class AlbumArtDialog(QMainWindow):
         self.previousAction.setIconSet(QIconSet(image7))
         self.showCoversAction = QAction(self,"showCoversAction")
         self.showCoversAction.setToggleAction(1)
+        self.removeAction = QAction(self,"removeAction")
+        self.removeAction.setEnabled(0)
 
         self.toolBar = QToolBar("",self)
 
@@ -2850,6 +2852,7 @@ class AlbumArtDialog(QMainWindow):
         self.editMenu = QPopupMenu(self)
         self.nextAction.addTo(self.editMenu)
         self.previousAction.addTo(self.editMenu)
+	self.removeAction.addTo(self.editMenu)
         self.menubar.insertItem(QString("&Edit"),self.editMenu,2)
 
         self.helpMenu = QPopupMenu(self)
@@ -2874,6 +2877,7 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.nextAction,SIGNAL("activated()"),self.nextAction_activated)
         self.connect(self.previousAction,SIGNAL("activated()"),self.previousAction_activated)
         self.connect(self.showCoversAction,SIGNAL("toggled(bool)"),self.showCoversAction_toggled)
+        self.connect(self.removeAction,SIGNAL("activated()"),self.removeAction_activated)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)
@@ -2899,18 +2903,19 @@ class AlbumArtDialog(QMainWindow):
         self.helpAboutAction.setMenuText(self.tr("&About"))
         self.toolBar.setLabel(self.tr("Tools"))
         self.reloadAction.setText(self.tr("Reload"))
-        self.reloadAction.setMenuText(self.tr("Reload"))
+        self.reloadAction.setMenuText(self.tr("&Reload"))
         self.reloadAction.setToolTip(self.tr("Refresh directory view"))
         self.reloadAction.setAccel(Qt.Key_F5)
         self.nextAction.setText(self.tr("Go to next album without cover"))
-        self.nextAction.setMenuText(self.tr("Go to next album without cover"))
+        self.nextAction.setMenuText(self.tr("Go to &next album without cover"))
         self.nextAction.setToolTip(self.tr("Places the cursor over the next album that has no cover image"))
         self.nextAction.setAccel(Qt.CTRL+Qt.Key_Right)
         self.previousAction.setText(self.tr("Go to previous album without cover"))
-        self.previousAction.setMenuText(self.tr("Go to previous album without cover"))
+        self.previousAction.setMenuText(self.tr("Go to &previous album without cover"))
         self.previousAction.setToolTip(self.tr("Places the cursor over the previous album that has no cover image"))
         self.previousAction.setAccel(Qt.CTRL+Qt.Key_Left)
-        self.showCoversAction.setText(self.tr("Show covers in directory list"))
+        self.showCoversAction.setText(self.tr("Show &covers in directory list"))
+        self.removeAction.setText(self.tr("&Delete cover image..."))
 
     def fileNew(self):
         print "AlbumArtDialog.fileNew(): Not implemented yet"

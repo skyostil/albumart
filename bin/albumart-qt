@@ -49,6 +49,7 @@ else:
 	try:
 	        if map(int, qVersion().split("."))[1]<1:
 	                from albumartdialog_qt300 import AlbumArtDialog
+			sys.stderr.write("Warning: Your installed Qt version is too old (3.0.x). Please upgrade!\n")
 	        else:
 	                raise 1
 	except:
@@ -303,6 +304,7 @@ class AlbumArt(AlbumArtDialog):
 		self.artistEdit.setEnabled(0)
 		self.albumEdit.setEnabled(0)
 		self.artistEdit.clear()
+		self.removeAction.setEnabled(0)
 		self.albumEdit.clear()
 		self.coverview.setEnabled(0)
 		self.coverview.clear()
@@ -338,6 +340,13 @@ Icons by Everaldo Coelho (http://www.everaldo.com) et al.""" % (version.__progra
 
 	def reloadAction_activated(self):
 		self.walk(self.dir)
+
+	def removeAction_activated(self):
+		if QMessageBox.information(self, "Confirm deletion", "Are you sure you want to delete the selected cover image?", QMessageBox.Yes, QMessageBox.No+QMessageBox.Default+QMessageBox.Escape) == QMessageBox.Yes:
+			path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+			albumart.removeCover(path)
+			self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
+			self.updateIcon()
 
 	def nextAction_activated(self):
 		item = self.dirlist.selectedItem()
@@ -375,6 +384,7 @@ Icons by Everaldo Coelho (http://www.everaldo.com) et al.""" % (version.__progra
 		self.artistEdit.setText(a0.text(1))
 		self.albumEdit.setText(a0.text(2))
 		self.pushDownload.setEnabled(1)
+		self.removeAction.setEnabled(1)
 		self.pushSet.setEnabled(0)
 		self.artistEdit.setEnabled(1)
 		self.albumEdit.setEnabled(1)
@@ -504,7 +514,7 @@ Icons by Everaldo Coelho (http://www.everaldo.com) et al.""" % (version.__progra
 		try:
 			albumart.setCover(path,cover)
 			self.pushSet.setEnabled(0)
-			self.selectedAlbum.setPixmap(0,self.coverPixmap)
+			self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
 			self.updateIcon()
 		except Exception,x:
 			QMessageBox.critical(self, version.__program__,"The following error occured while setting the cover image:\n%s"%str(x))

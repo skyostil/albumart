@@ -32,9 +32,6 @@ class Source(Module):
 	def getCover(self, name):
 		"""Download an album cover image for the given list of matches. Returns a list of file names."""
 		pass
-#	def setEnabled(self, enabled):
-#		"""Enables or disables this module."""
-#		pass
 
 class Target(Module):
 	"""A virtual base class that defines an album cover target."""
@@ -44,12 +41,12 @@ class Target(Module):
 	def setCover(self, path, cover):
 		"""Assigns a cover image to the given path."""
 		pass
+	def removeCover(path):
+		"""Removes the album image for the given path."""
+		pass
 	def hasCover(self, path):
 		"""Returns 1 if the given path has an associated cover image and 0 otherwise."""
 		return 0
-#	def setEnabled(self, enabled):
-#		"""Enables or disables this module."""
-#		pass
 
 # the sources to use
 #from albumart_source_amazon import Amazon
@@ -138,7 +135,6 @@ def guessArtistAndAlbum(path):
 
 def hasCover(path):
 	"""Returns true if the specified path has an album image set."""
-#	return os.path.isfile(os.path.join(path,"folder.jpg")) or os.path.isfile(os.path.join(path,".folder.png"))
 	for t in targets:
 		if t.hasCover(path):
 			return 1
@@ -149,51 +145,14 @@ def setCover(path,cover):
 	for t in targets:
 		t.setCover(path, cover)
 
-	# windows xp
-#	coverfile = os.path.join(path,"folder.jpg")
-
-	# freedesktop.org .desktop-file standard
-#	coverfile_png = os.path.join(path,".folder.png")
-
-	# We used to just copy over the image...
-#	try:
-#		shutil.copy(cover,coverfile)
-#	except OSError, n:
-#		# ignore chmod-errors
-#		if not n.errno==1: raise
-
-	# but now we make sure it is in the proper format.
-#	i = Image.open(cover)
-#	i.save(coverfile, "JPG")
-#	i.save(coverfile_png, "PNG")
-
-	# we used to do this with ImageMagick:
-#	os.spawnl(os.P_WAIT, "/usr/bin/convert", "/usr/bin/convert", coverfile, coverfile_png)
-#	os.system("convert '%s' '%s'" % (coverfile, coverfile_png))
-
-
 def getCover(path):
 	"""Returns an album cover image file for the given path, or None if no image is found."""
 	for t in targets:
 		c = t.getCover(path)
 		if c: return c
 	return None
-#	if os.path.isfile(os.path.join(path,"folder.jpg")):
-#		return os.path.join(path,"folder.jpg")
-#	if os.path.isfile(os.path.join(path,".folder.png")):
-#		return os.path.join(path,".folder.png")
-#	return None
 
-
-#def process(root, dirname, names):
-#	if dirname == root: return
-#	if not root[:-1] == os.sep: root+=os.sep
-#	dirname=dirname.replace(root,"")
-#	(artist,album)=guessArtistAndAlbum(dirname.replace(root,""))
-#	print artist, album
-
-#def walk(path):
-#	os.path.walk(path, process, path)
-
-#if __name__=="__main__":
-#	walk(".")
+def removeCover(path):
+	"""Removes the album image for the given path."""
+	for t in targets:
+		t.removeCover(path)

@@ -9,11 +9,11 @@ defaultConfig = {
 }
 
 configDesc = {
-	"enabled":	("boolean", "Set image for Windows"),
+	"enabled":	("boolean", "Set image for Windows Media Player, etc."),
 }
 
 class Windows(albumart.Target):
-	"""Windows XP(tm) Explorer."""
+	"""Windows Media Player."""
 	def __init__(self):
 		self.configure(defaultConfig)
 
@@ -35,3 +35,7 @@ class Windows(albumart.Target):
 		if self.enabled:
 			return os.path.isfile(os.path.join(path,self.filename))
 		return 0
+
+	def removeCover(self, path):
+		if not self.enabled: return
+		os.unlink(os.path.join(path, self.filename))

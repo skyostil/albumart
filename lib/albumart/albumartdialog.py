@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '../../src/albumart.ui'
 #
-# Created: ke loka   8 22:08:21 2003
+# Created: ke loka   15 16:44:40 2003
 #      by: The PyQt User Interface Compiler (pyuic) 3.8
 #
 # WARNING! All changes made in this file will be lost!
@@ -2833,6 +2833,8 @@ class AlbumArtDialog(QMainWindow):
         self.previousAction.setIconSet(QIconSet(self.image7))
         self.showCoversAction = QAction(self,"showCoversAction")
         self.showCoversAction.setToggleAction(1)
+        self.removeAction = QAction(self,"removeAction")
+        self.removeAction.setEnabled(0)
 
 
         self.toolBar = QToolBar(QString(""),self,Qt.DockTop)
@@ -2856,6 +2858,7 @@ class AlbumArtDialog(QMainWindow):
         self.EditMenu = QPopupMenu(self)
         self.nextAction.addTo(self.EditMenu)
         self.previousAction.addTo(self.EditMenu)
+        self.removeAction.addTo(self.EditMenu)
         self.menubar.insertItem(QString(""),self.EditMenu,2)
 
         self.helpMenu = QPopupMenu(self)
@@ -2865,7 +2868,7 @@ class AlbumArtDialog(QMainWindow):
 
         self.languageChange()
 
-        self.resize(QSize(651,469).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(651,477).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.connect(self.fileOpenAction,SIGNAL("activated()"),self.fileOpen)
@@ -2882,6 +2885,7 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.nextAction,SIGNAL("activated()"),self.nextAction_activated)
         self.connect(self.previousAction,SIGNAL("activated()"),self.previousAction_activated)
         self.connect(self.showCoversAction,SIGNAL("toggled(bool)"),self.showCoversAction_toggled)
+        self.connect(self.removeAction,SIGNAL("activated()"),self.removeAction_activated)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)
@@ -2911,18 +2915,23 @@ class AlbumArtDialog(QMainWindow):
         self.helpAboutAction.setMenuText(self.__tr("&About"))
         self.helpAboutAction.setAccel(QString.null)
         self.reloadAction.setText(self.__tr("Reload"))
-        self.reloadAction.setMenuText(self.__tr("Reload"))
+        self.reloadAction.setMenuText(self.__tr("&Reload"))
         self.reloadAction.setToolTip(self.__tr("Refresh directory view"))
         self.reloadAction.setAccel(self.__tr("F5"))
         self.nextAction.setText(self.__tr("Go to next album without cover"))
-        self.nextAction.setMenuText(self.__tr("Go to next album without cover"))
+        self.nextAction.setMenuText(self.__tr("Go to &next album without cover"))
         self.nextAction.setToolTip(self.__tr("Places the cursor over the next album that has no cover image"))
         self.nextAction.setAccel(self.__tr("Ctrl+Right"))
         self.previousAction.setText(self.__tr("Go to previous album without cover"))
-        self.previousAction.setMenuText(self.__tr("Go to previous album without cover"))
+        self.previousAction.setMenuText(self.__tr("Go to &previous album without cover"))
         self.previousAction.setToolTip(self.__tr("Places the cursor over the previous album that has no cover image"))
         self.previousAction.setAccel(self.__tr("Ctrl+Left"))
         self.showCoversAction.setText(self.__tr("Show covers in directory list"))
+        self.showCoversAction.setMenuText(self.__tr("Show &covers in directory list"))
+        self.removeAction.setText(self.__tr("Delete cover image..."))
+        self.removeAction.setMenuText(self.__tr("&Delete cover image..."))
+        self.removeAction.setToolTip(self.__tr("Delete the cover image for the currently selected folder"))
+        self.removeAction.setStatusTip(self.__tr("Delete the cover image for the currently selected folder"))
         self.toolBar.setLabel(self.__tr("Tools"))
         self.menubar.findItem(1).setText(self.__tr("&File"))
         self.menubar.findItem(2).setText(self.__tr("&Edit"))
@@ -2991,6 +3000,9 @@ class AlbumArtDialog(QMainWindow):
 
     def showCoversAction_toggled(self,a0):
         print "AlbumArtDialog.showCoversAction_toggled(bool): Not implemented yet"
+
+    def removeAction_activated(self):
+        print "AlbumArtDialog.removeAction_activated(): Not implemented yet"
 
     def __tr(self,s,c = None):
         return qApp.translate("AlbumArtDialog",s,c)
