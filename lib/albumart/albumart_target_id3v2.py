@@ -90,7 +90,6 @@ class ID3v2(albumart.Target):
                                 if frame.id != "APIC":
                                         newframes.append(frame)
                         id3v2.frames = newframes
-                        frame.unsynchronisation = True
                         id3v2.save()
 
         def hasCover(self, path):

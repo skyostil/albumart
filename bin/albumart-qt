@@ -37,6 +37,9 @@ sys.path = [getBaseDir(), getLibDir()] + sys.path
 import albumart
 import version
 import config
+from event import *
+from process import *
+
 
 import urllib
 import tempfile
@@ -58,6 +61,7 @@ else:
         except:
                 from albumartdialog import AlbumArtDialog
 
+"""
 class CoverDownloadedEvent(QCustomEvent):
         id = QEvent.User
         def __init__(self,thread,filename):
@@ -240,6 +244,7 @@ class SynchronizeProcess(Process):
 
                 self.triggerReload()
                 self.setComplete()
+"""
 
 class AlbumArt(AlbumArtDialog):
         def __init__(self,parent = None,name = None,fl = 0):
@@ -523,6 +528,7 @@ class AlbumArt(AlbumArtDialog):
                 self.albumEdit.setEnabled(0)
                 self.artistEdit.clear()
                 self.removeAction.setEnabled(0)
+                self.removeAllAction.setEnabled(1)
                 self.albumEdit.clear()
                 self.coverview.setEnabled(0)
                 self.coverview.clear()
@@ -572,13 +578,11 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         self.walk(self.dir)
 
         def removeAction_activated(self):
-                if QMessageBox.information(self, "Confirm deletion", "Are you sure you want to delete the selected cover image?", QMessageBox.Yes, QMessageBox.No+QMessageBox.Default+QMessageBox.Escape) == QMessageBox.Yes:
-                        path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-
-
+                if QMessageBox.information(self, "Confirm deletion", "Are you sure you want to delete the selected cover image?", QMessageBox.Yes+QMessageBox.Default, QMessageBox.No+QMessageBox.Escape) == QMessageBox.Yes:
                         self.setCursor(Qt.waitCursor)
                         self.statusBar().message("Deleting selected cover image...")
-
+                        
+                        path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
                         try:
                                 albumart.removeCover(path)
                                 self.updateIcon()
@@ -589,6 +593,34 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
 
                         self.setCursor(Qt.arrowCursor)
                         self.statusBar().message("Ready",5000)
+
+        def removeAllAction_activated(self):
+                if QMessageBox.information(self, "Confirm deletion", "Are you really sure you want to delete <b>all</b> the cover images?", QMessageBox.Yes, QMessageBox.No+QMessageBox.Default+QMessageBox.Escape) == QMessageBox.Yes:
+                        self.setCursor(Qt.waitCursor)
+                        self.statusBar().message("Deleting cover images...")
+
+                        item = self.dirlist.firstChild()
+                        
+                        errors = []
+                        while item:
+                                path = os.path.join(self.dir, self.getQString(item.text(0)))
+                                print path
+                                if albumart.hasCover(path):
+                                        try:
+                                                albumart.removeCover(path)
+                                        except Exception,x:
+                                                traceback.print_exc(file=sys.stdout)
+                                                errors.append(str(x))
+                                item = item.itemBelow()
+                                qApp.processEvents()
+                                
+                        self.setCursor(Qt.arrowCursor)
+                        self.statusBar().message("Ready",5000)                        
+                        self.reloadAction_activated()
+                        
+                        if len(errors):
+                                errors = "\n".join(errors)
+                                QMessageBox.critical(self, version.__program__,"The following error(s) occured while removing the cover images:\n%s"%errors)
 
         def nextAction_activated(self):
                 item = self.dirlist.selectedItem()
@@ -668,7 +700,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                 self.startProcess(SynchronizeProcess(self, self.dir, items))
 
         def dirlist_selectionChanged(self,a0):
-		# delete downloaded covers
+                # delete downloaded covers
                 try:
                         for f in self.covers:
                                 os.unlink(f)

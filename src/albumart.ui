@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.2" stdsetdef="1">
 <class>AlbumArtDialog</class>
 <widget class="QMainWindow">
     <property name="name">
@@ -9,7 +9,7 @@
             <x>0</x>
             <y>0</y>
             <width>651</width>
-            <height>483</height>
+            <height>489</height>
         </rect>
     </property>
     <property name="caption">
@@ -278,6 +278,7 @@
         <action name="autoDownloadAction"/>
         <action name="synchronizeAction"/>
         <action name="removeAction"/>
+        <action name="removeAllAction"/>
     </item>
     <item text="&amp;View" name="View">
         <action name="showCoversAction"/>
@@ -559,6 +560,20 @@
             <string>Synchronize cover images for all targets</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>removeAllAction</cstring>
+        </property>
+        <property name="enabled">
+            <bool>false</bool>
+        </property>
+        <property name="text">
+            <string>Delete all cover images under the current directory</string>
+        </property>
+        <property name="menuText">
+            <string>&amp;Delete all cover images...</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -707,6 +722,12 @@
         <receiver>AlbumArtDialog</receiver>
         <slot>synchronizeAction_activated()</slot>
     </connection>
+    <connection>
+        <sender>removeAllAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>removeAllAction_activated()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>dirlist</tabstop>
@@ -744,6 +765,7 @@
     <slot>iconSizeSmallAction_toggled(bool)</slot>
     <slot>iconSizeMediumAction_toggled(bool)</slot>
     <slot>iconSizeLargeAction_toggled(bool)</slot>
+    <slot>removeAllAction_activated()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
