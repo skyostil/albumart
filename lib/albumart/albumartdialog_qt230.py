@@ -2838,6 +2838,8 @@ class AlbumArtDialog(QMainWindow):
         self.viewIcon_SizeLargeAction = QAction(self.SizeActionGroup,"viewIcon_SizeLargeAction")
         self.viewIcon_SizeLargeAction.setToggleAction(1)
         self.viewIcon_SizeLargeAction.setText("Large")
+        self.autoDownloadAction = QAction(self.SizeActionGroup,"autoDownloadAction")
+        self.autoDownloadAction.setText("Download missing cover images automatically")
 
         self.toolBar = QToolBar("",self)
 
@@ -2868,6 +2870,7 @@ class AlbumArtDialog(QMainWindow):
         self.nextAction.addTo(self.editMenu)
         self.previousAction.addTo(self.editMenu)
         self.removeAction.addTo(self.editMenu)
+        self.autoDownloadAction.addTo(self.editMenu)
         self.menubar.insertItem(QString("&Edit"),self.editMenu,2)
 
         self.menubar.insertItem(QString("&View"),self.View,3)
@@ -2898,6 +2901,7 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.viewIcon_SizeSmallAction,SIGNAL("toggled(bool)"),self.iconSizeSmallAction_toggled)
         self.connect(self.viewIcon_SizeMediumAction,SIGNAL("toggled(bool)"),self.iconSizeMediumAction_toggled)
         self.connect(self.viewIcon_SizeLargeAction,SIGNAL("toggled(bool)"),self.iconSizeLargeAction_toggled)
+        self.connect(self.autoDownloadAction,SIGNAL("activated()"),self.autoDownloadAction_activated)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)

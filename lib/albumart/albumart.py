@@ -76,7 +76,7 @@ def removeTarget(target):
 	global targets
 	targets.remove(target)
 
-def getAvailableCovers(artist,album):
+def getAvailableCovers(artist,album,requireExactMatch=0):
 	"""
 	Downloads a set of cover images for the given artist/album pair and returns an iterator for the list of file names.
 
@@ -86,13 +86,15 @@ def getAvailableCovers(artist,album):
 			[do something with the image]
 	"""
 
-	covers = []
 	for s in sources:
 		results = []
 
 		try:
 			results+=s.findAlbum("%s %s" % (artist,album))
 		except TypeError:
+                        if requireExactMatch:
+                            return
+                        
 			try:
 				results+=s.findAlbum("%s" % (album))
 			except TypeError:
@@ -133,11 +135,27 @@ def guessArtistAndAlbum(path):
 
 	return (artist,album)
 
+def synchronizeCovers(path):
+        """Makes sure all the cover image targets for the given path
+           have the same image."""
+
+        image = getCover(path)
+        if image:
+        	for t in targets:
+                        try:
+                                if not t.hasCover(path):
+                                        t.setCover(path, image)
+                        except:
+                                pass
+
 def hasCover(path):
 	"""Returns true if the specified path has an album image set."""
 	for t in targets:
-		if t.hasCover(path):
-			return 1
+                try:
+        		if t.hasCover(path):
+                                return 1
+                except:
+                        pass
 	return 0
 
 def setCover(path,cover):
