@@ -38,4 +38,8 @@ class Windows(albumart.Target):
 
 	def removeCover(self, path):
 		if not self.enabled: return
-		os.unlink(os.path.join(path, self.filename))
+		
+		try:
+			os.unlink(os.path.join(path, self.filename))
+		except OSError:
+			pass

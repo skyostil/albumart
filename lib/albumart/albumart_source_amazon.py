@@ -28,7 +28,7 @@ class Amazon(albumart.Source):
 			amazon.setLicense(l)
 		l = config["locale"]
 		if l and len(l):
-			amazon.setLocalel)
+			amazon.setLocale(l)
 
 	def findAlbum(self,name):
 		if self.enabled:

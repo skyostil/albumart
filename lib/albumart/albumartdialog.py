@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file '../../src/albumart.ui'
 #
-# Created: ke loka   15 16:44:40 2003
-#      by: The PyQt User Interface Compiler (pyuic) 3.8
+# Created: ti touko  11 00:25:44 2004
+#      by: The PyQt User Interface Compiler (pyuic) 3.11
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -2763,24 +2763,41 @@ class AlbumArtDialog(QMainWindow):
         self.dirlist.setAllColumnsShowFocus(1)
         self.dirlist.setRootIsDecorated(0)
 
-        LayoutWidget = QWidget(self.splitter2,"layout1")
-        layout1 = QGridLayout(LayoutWidget,1,1,11,6,"layout1")
+        LayoutWidget = QWidget(self.splitter2,"layout7")
+        layout7 = QVBoxLayout(LayoutWidget,11,6,"layout7")
+
+        layout6 = QGridLayout(None,1,1,0,6,"layout6")
+
+        self.albumIcon = QPushButton(LayoutWidget,"albumIcon")
+        self.albumIcon.setSizePolicy(QSizePolicy(0,0,0,0,self.albumIcon.sizePolicy().hasHeightForWidth()))
+        self.albumIcon.setMinimumSize(QSize(64,64))
+        self.albumIcon.setMaximumSize(QSize(64,64))
+        self.albumIcon.setFlat(0)
+
+        layout6.addMultiCellWidget(self.albumIcon,0,1,2,2)
 
         self.textLabel1_2 = QLabel(LayoutWidget,"textLabel1_2")
 
-        layout1.addWidget(self.textLabel1_2,1,0)
+        layout6.addWidget(self.textLabel1_2,1,0)
 
-        self.pushDownload = QPushButton(LayoutWidget,"pushDownload")
-        self.pushDownload.setEnabled(0)
-        self.pushDownload.setIconSet(QIconSet(self.image1))
+        layout4 = QGridLayout(None,1,1,0,6,"layout4")
 
-        layout1.addMultiCellWidget(self.pushDownload,3,3,0,1)
+        self.artistEdit = QLineEdit(LayoutWidget,"artistEdit")
+        self.artistEdit.setEnabled(0)
 
-        self.pushSet = QPushButton(LayoutWidget,"pushSet")
-        self.pushSet.setEnabled(0)
-        self.pushSet.setIconSet(QIconSet(self.image2))
+        layout4.addWidget(self.artistEdit,0,0)
 
-        layout1.addMultiCellWidget(self.pushSet,3,3,2,3)
+        self.albumEdit = QLineEdit(LayoutWidget,"albumEdit")
+        self.albumEdit.setEnabled(0)
+
+        layout4.addWidget(self.albumEdit,1,0)
+
+        layout6.addMultiCellLayout(layout4,0,1,1,1)
+
+        self.textLabel1 = QLabel(LayoutWidget,"textLabel1")
+
+        layout6.addWidget(self.textLabel1,0,0)
+        layout7.addLayout(layout6)
 
         self.coverview = QIconView(LayoutWidget,"coverview")
         self.coverview.setEnabled(0)
@@ -2789,30 +2806,22 @@ class AlbumArtDialog(QMainWindow):
         self.coverview.setItemsMovable(0)
         self.coverview.setWordWrapIconText(0)
         self.coverview.setShowToolTips(0)
+        layout7.addWidget(self.coverview)
 
-        layout1.addMultiCellWidget(self.coverview,2,2,0,3)
+        layout5 = QHBoxLayout(None,0,6,"layout5")
+        spacer3 = QSpacerItem(91,31,QSizePolicy.Expanding,QSizePolicy.Minimum)
+        layout5.addItem(spacer3)
 
-        self.albumEdit = QLineEdit(LayoutWidget,"albumEdit")
-        self.albumEdit.setEnabled(0)
+        self.pushDownload = QPushButton(LayoutWidget,"pushDownload")
+        self.pushDownload.setEnabled(0)
+        self.pushDownload.setIconSet(QIconSet(self.image1))
+        layout5.addWidget(self.pushDownload)
 
-        layout1.addMultiCellWidget(self.albumEdit,1,1,1,2)
-
-        self.textLabel1 = QLabel(LayoutWidget,"textLabel1")
-
-        layout1.addWidget(self.textLabel1,0,0)
-
-        self.albumIcon = QPushButton(LayoutWidget,"albumIcon")
-        self.albumIcon.setSizePolicy(QSizePolicy(0,0,0,0,self.albumIcon.sizePolicy().hasHeightForWidth()))
-        self.albumIcon.setMinimumSize(QSize(64,64))
-        self.albumIcon.setMaximumSize(QSize(64,64))
-        self.albumIcon.setFlat(0)
-
-        layout1.addMultiCellWidget(self.albumIcon,0,1,3,3)
-
-        self.artistEdit = QLineEdit(LayoutWidget,"artistEdit")
-        self.artistEdit.setEnabled(0)
-
-        layout1.addMultiCellWidget(self.artistEdit,0,0,1,2)
+        self.pushSet = QPushButton(LayoutWidget,"pushSet")
+        self.pushSet.setEnabled(0)
+        self.pushSet.setIconSet(QIconSet(self.image2))
+        layout5.addWidget(self.pushSet)
+        layout7.addLayout(layout5)
 
         AlbumArtDialogLayout.addWidget(self.splitter2,0,0)
 
@@ -2831,10 +2840,20 @@ class AlbumArtDialog(QMainWindow):
         self.previousAction = QAction(self,"previousAction")
         self.previousAction.setEnabled(0)
         self.previousAction.setIconSet(QIconSet(self.image7))
-        self.showCoversAction = QAction(self,"showCoversAction")
-        self.showCoversAction.setToggleAction(1)
         self.removeAction = QAction(self,"removeAction")
         self.removeAction.setEnabled(0)
+        self.viewIcon_SizeAction = QAction(self,"viewIcon_SizeAction")
+        self.viewIcon_SizeAction.setToggleAction(1)
+        self.SizeActionGroup = QActionGroup(self,"SizeActionGroup")
+        self.SizeActionGroup.setUsesDropDown(1)
+        self.viewIcon_SizeSmallAction = QAction(self.SizeActionGroup,"viewIcon_SizeSmallAction")
+        self.viewIcon_SizeSmallAction.setToggleAction(1)
+        self.viewIcon_SizeMediumAction = QAction(self.SizeActionGroup,"viewIcon_SizeMediumAction")
+        self.viewIcon_SizeMediumAction.setToggleAction(1)
+        self.viewIcon_SizeLargeAction = QAction(self.SizeActionGroup,"viewIcon_SizeLargeAction")
+        self.viewIcon_SizeLargeAction.setToggleAction(1)
+        self.showCoversAction = QAction(self,"showCoversAction")
+        self.showCoversAction.setToggleAction(1)
 
 
         self.toolBar = QToolBar(QString(""),self,Qt.DockTop)
@@ -2861,14 +2880,23 @@ class AlbumArtDialog(QMainWindow):
         self.removeAction.addTo(self.EditMenu)
         self.menubar.insertItem(QString(""),self.EditMenu,2)
 
+        self.View = QPopupMenu(self)
+        self.showCoversAction.addTo(self.View)
+        self.viewIcon_SizeAction_2 = QPopupMenu(self)
+        self.View.setAccel(QString.null,self.View.insertItem(self.viewIcon_SizeAction.iconSet(),self.__tr("Icon &Size"),self.viewIcon_SizeAction_2))
+        self.viewIcon_SizeSmallAction.addTo(self.viewIcon_SizeAction_2)
+        self.viewIcon_SizeMediumAction.addTo(self.viewIcon_SizeAction_2)
+        self.viewIcon_SizeLargeAction.addTo(self.viewIcon_SizeAction_2)
+        self.menubar.insertItem(QString(""),self.View,3)
+
         self.helpMenu = QPopupMenu(self)
         self.helpAboutAction.addTo(self.helpMenu)
-        self.menubar.insertItem(QString(""),self.helpMenu,3)
+        self.menubar.insertItem(QString(""),self.helpMenu,4)
 
 
         self.languageChange()
 
-        self.resize(QSize(651,477).expandedTo(self.minimumSizeHint()))
+        self.resize(QSize(651,479).expandedTo(self.minimumSizeHint()))
         self.clearWState(Qt.WState_Polished)
 
         self.connect(self.fileOpenAction,SIGNAL("activated()"),self.fileOpen)
@@ -2884,8 +2912,11 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.reloadAction,SIGNAL("activated()"),self.reloadAction_activated)
         self.connect(self.nextAction,SIGNAL("activated()"),self.nextAction_activated)
         self.connect(self.previousAction,SIGNAL("activated()"),self.previousAction_activated)
-        self.connect(self.showCoversAction,SIGNAL("toggled(bool)"),self.showCoversAction_toggled)
         self.connect(self.removeAction,SIGNAL("activated()"),self.removeAction_activated)
+        self.connect(self.showCoversAction,SIGNAL("toggled(bool)"),self.showCoversAction_toggled)
+        self.connect(self.viewIcon_SizeSmallAction,SIGNAL("toggled(bool)"),self.iconSizeSmallAction_toggled)
+        self.connect(self.viewIcon_SizeMediumAction,SIGNAL("toggled(bool)"),self.iconSizeMediumAction_toggled)
+        self.connect(self.viewIcon_SizeLargeAction,SIGNAL("toggled(bool)"),self.iconSizeLargeAction_toggled)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)
@@ -2899,12 +2930,13 @@ class AlbumArtDialog(QMainWindow):
         self.dirlist.header().setLabel(0,self.__tr("Directory"))
         self.dirlist.header().setLabel(1,self.__tr("Artist"))
         self.dirlist.header().setLabel(2,self.__tr("Album"))
+        self.albumIcon.setText(QString.null)
         self.textLabel1_2.setText(self.__tr("<p align=\"right\">Album:</p>"))
+        self.textLabel1.setText(self.__tr("<p align=\"right\">Artist:</p>"))
         self.pushDownload.setText(self.__tr("&Download Covers"))
         self.pushDownload.setAccel(self.__tr("Alt+D"))
         self.pushSet.setText(self.__tr("&Set as Cover"))
-        self.textLabel1.setText(self.__tr("<p align=\"right\">Artist:</p>"))
-        self.albumIcon.setText(QString.null)
+        self.pushSet.setAccel(self.__tr("Alt+S"))
         self.fileOpenAction.setText(self.__tr("Open"))
         self.fileOpenAction.setMenuText(self.__tr("&Open..."))
         self.fileOpenAction.setAccel(self.__tr("Ctrl+O"))
@@ -2926,16 +2958,34 @@ class AlbumArtDialog(QMainWindow):
         self.previousAction.setMenuText(self.__tr("Go to &previous album without cover"))
         self.previousAction.setToolTip(self.__tr("Places the cursor over the previous album that has no cover image"))
         self.previousAction.setAccel(self.__tr("Ctrl+Left"))
-        self.showCoversAction.setText(self.__tr("Show covers in directory list"))
-        self.showCoversAction.setMenuText(self.__tr("Show &covers in directory list"))
         self.removeAction.setText(self.__tr("Delete cover image..."))
         self.removeAction.setMenuText(self.__tr("&Delete cover image..."))
         self.removeAction.setToolTip(self.__tr("Delete the cover image for the currently selected folder"))
         self.removeAction.setStatusTip(self.__tr("Delete the cover image for the currently selected folder"))
+        self.viewIcon_SizeAction.setText(self.__tr("Icon &Size"))
+        self.viewIcon_SizeAction.setMenuText(self.__tr("Icon &Size"))
+        self.SizeActionGroup.setText(self.__tr("SizeActionGroup"))
+        self.viewIcon_SizeSmallAction.setText(self.__tr("&Small"))
+        self.viewIcon_SizeSmallAction.setMenuText(self.__tr("&Small"))
+        self.viewIcon_SizeSmallAction.setToolTip(self.__tr("Small icons"))
+        self.viewIcon_SizeMediumAction.setText(self.__tr("&Medium"))
+        self.viewIcon_SizeMediumAction.setMenuText(self.__tr("&Medium"))
+        self.viewIcon_SizeMediumAction.setToolTip(self.__tr("Medium icons"))
+        self.viewIcon_SizeLargeAction.setText(self.__tr("&Large"))
+        self.viewIcon_SizeLargeAction.setMenuText(self.__tr("&Large"))
+        self.viewIcon_SizeLargeAction.setToolTip(self.__tr("Large icons"))
+        self.showCoversAction.setText(self.__tr("Show &Cover Images in List"))
+        self.showCoversAction.setMenuText(self.__tr("Show &Cover Images in List"))
         self.toolBar.setLabel(self.__tr("Tools"))
-        self.menubar.findItem(1).setText(self.__tr("&File"))
-        self.menubar.findItem(2).setText(self.__tr("&Edit"))
-        self.menubar.findItem(3).setText(self.__tr("&Help"))
+        if self.menubar.findItem(1):
+            self.menubar.findItem(1).setText(self.__tr("&File"))
+        if self.menubar.findItem(2):
+            self.menubar.findItem(2).setText(self.__tr("&Edit"))
+        self.View.changeItem(self.View.idAt(1),self.__tr("Icon &Size"))
+        if self.menubar.findItem(3):
+            self.menubar.findItem(3).setText(self.__tr("&View"))
+        if self.menubar.findItem(4):
+            self.menubar.findItem(4).setText(self.__tr("&Help"))
 
 
     def fileNew(self):
@@ -3003,6 +3053,15 @@ class AlbumArtDialog(QMainWindow):
 
     def removeAction_activated(self):
         print "AlbumArtDialog.removeAction_activated(): Not implemented yet"
+
+    def iconSizeSmallAction_toggled(self,a0):
+        print "AlbumArtDialog.iconSizeSmallAction_toggled(bool): Not implemented yet"
+
+    def iconSizeMediumAction_toggled(self,a0):
+        print "AlbumArtDialog.iconSizeMediumAction_toggled(bool): Not implemented yet"
+
+    def iconSizeLargeAction_toggled(self,a0):
+        print "AlbumArtDialog.iconSizeLargeAction_toggled(bool): Not implemented yet"
 
     def __tr(self,s,c = None):
         return qApp.translate("AlbumArtDialog",s,c)

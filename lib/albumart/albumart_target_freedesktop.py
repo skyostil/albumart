@@ -6,6 +6,7 @@ import os
 
 defaultConfig = {
 	"enabled":	1,
+	"relpaths": 1,
 	"filename":	".folder.png",
 }
 
@@ -13,13 +14,25 @@ configDesc = {
 	"enabled":	("boolean", "Set image for Freedesktop (KDE, Gnome, etc.)"),
 }
 
-# A wrapper around a file to work around the fact that
-# ConfigParser writes keys in lowercase.
-class MyWriter(file):
-	def write(self,data):
-		if data.startswith("icon ="):
-			data = "Icon =" + data[6:]
-		file.write(self,data)
+class MyParser(ConfigParser.ConfigParser):
+	def optionxform(self, option):
+		# we override this method cause we don't want lowercase options.
+		return option
+
+	def write(self, fp):
+		# this is overrided to make no use of white spaces around '='.
+		"""Write an .ini-format representation of the configuration state."""
+		if self._defaults:
+			fp.write("[%s]\n" % DEFAULTSECT)
+			for (key, value) in self._defaults.items():
+				fp.write("%s=%s\n" % (key, str(value).replace('\n', '\n\t')))
+			fp.write("\n")
+		for section in self._sections:
+			fp.write("[%s]\n" % section)
+			for (key, value) in self._sections[section].items():
+				if key != "__name__":
+					fp.write("%s=%s\n" % (key, str(value).replace('\n', '\n\t')))
+		fp.write("\n")
 
 class Freedesktop(albumart.Target):
 	"""Freedesktop.org's desktop file standard (for KDE, GNOME, etc.)"""
@@ -29,6 +42,11 @@ class Freedesktop(albumart.Target):
 	def configure(self, config):
 		self.filename = config["filename"]
 		self.enabled = config["enabled"]
+		
+		try:
+			self.relpaths = config["relpaths"]
+		except:
+			self.relpaths = 1
 
 	def getCover(self, path):
 		if self.enabled:
@@ -42,20 +60,40 @@ class Freedesktop(albumart.Target):
 		i.save(os.path.join(path, self.filename), "PNG")
 
 		# .directory-file entry
-		cf=ConfigParser.ConfigParser()
+		cf=MyParser()
 		try:
 			cf.read(os.path.join(path,".directory"))
 		except:
 			pass
 		if not cf.has_section("Desktop Entry"):
 			cf.add_section("Desktop Entry")
-		cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))
-		w=MyWriter(os.path.join(path,".directory"),"w")
-		cf.write(w)
+			
+		if self.relpaths:
+			cf.set("Desktop Entry", "Icon", os.path.join(".", self.filename))
+		else:
+			cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))		
+		cf.write(open(os.path.join(path,".directory"),"w"))
 
 	def removeCover(self, path):
 		if not self.enabled: return
-		os.unlink(os.path.join(path, self.filename))
+		
+		try:
+			os.unlink(os.path.join(path, self.filename))
+		except OSError:
+			pass
+
+		# .directory-file entry
+		cf=MyParser()
+		try:
+			cf.read(os.path.join(path,".directory"))
+		except:
+			pass
+			
+		try:
+			cf.remove_option("Desktop Entry", "Icon")
+			cf.write(open(os.path.join(path,".directory"),"w"))
+		except:
+			pass
 
 	def hasCover(self, path):
 		if self.enabled:
