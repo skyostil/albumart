@@ -13,3 +13,10 @@ Name=AlbumArt
 X-KDE-StartupNotify=true
 X-DCOP-ServiceType=Unique
 Categories=Qt;KDE;AudioVideo;Graphics
+ServiceTypes=inode/directory
+Actions=set_album_cover
+
+[Desktop Action set_album_cover]
+Name=Set an album cover image
+Name[fi]=Aseta albumin kansikuva
+Exec=albumart-qt %f
