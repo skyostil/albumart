@@ -9,5 +9,6 @@ mkdir %DIST%\share\albumart
 :mkdir %DIST%\lib
 :mkdir %DIST%\lib\albumart
 copy ..\..\share\albumart\*.png %DIST%\share\albumart
+copy ..\..\README %DIST%\Readme.txt
 :copy ..\..\lib\albumart\albumart_source*.py %DIST%\lib\albumart
 :copy ..\..\lib\albumart\albumart_target*.py %DIST%\lib\albumart

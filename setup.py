@@ -4,11 +4,13 @@ from distutils.core import setup
 import os
 import sys
 
-if os.name=='nt':
-	import py2exe
-        scr=['bin/albumart-qt']
-else:
-        scr=None
+#if os.name=='nt':
+#        import py2exe
+#        scr=['bin/albumart-qt']
+#else:
+#        scr=None
+
+scr=None
 
 setup(
 	name="albumart", 
