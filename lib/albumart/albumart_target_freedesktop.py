@@ -68,7 +68,7 @@ class Freedesktop(albumart.Target):
 		if not cf.has_section("Desktop Entry"):
 			cf.add_section("Desktop Entry")
 			
-		if self.relpaths:
+		if self.relpaths or os.name == "nt":
 			cf.set("Desktop Entry", "Icon", os.path.join(".", self.filename))
 		else:
 			cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))		
