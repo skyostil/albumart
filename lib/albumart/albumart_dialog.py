@@ -20,6 +20,7 @@ import urllib
 import tempfile
 import Image
 import ConfigParser
+import cPickle as pickle
 from qt import *
 
 # local imports
@@ -57,6 +58,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.dataPath = dataPath
     self.albums = {}
     self.modules = []
+    self.cachePath = os.path.join(config.getConfigPath("albumart"), "cache")
 
     # tweak the ui
     self.dirlist.header().hide()
@@ -214,25 +216,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.config.set("albumart", "hide_albums_with_covers", enabled)
     self.refreshAlbumList()
 
-  def setIconSize(self, pixels):
-    """Sets the album cover icons to the given pixel size."""
-    self.iconSize = pixels
-    self.config.set("albumart", "iconsize", self.iconSize)
-    self.loadIcons()
-    self.reloadAction_activated()
-
-  def iconSizeSmallAction_toggled(self, enabled):
-    if enabled:
-      self.setIconSize(16)
-
-  def iconSizeMediumAction_toggled(self, enabled):
-    if enabled:
-      self.setIconSize(32)
-
-  def iconSizeLargeAction_toggled(self, enabled):
-    if enabled:
-      self.setIconSize(64)
-
   def settingsMenuActivated(self, id):
     enabled = not self.settingsMenu.isItemChecked(id)
 
@@ -312,29 +295,41 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.albums = {}
     self.stopped = False
 
-    lastRepaintTime = time.time()
-    for root, dirs, files in os.walk(path):
-      if self.stopped:
-        break
-      for n in files:
+    # check the cache
+    try:
+      (cachePath, cacheTime, cacheAlbums) = pickle.load(open(self.cachePath, "rb"))
+    except:
+      cachePath = None
+
+    if cachePath == path and os.stat(path).st_mtime <= cacheTime:
+      self.albums = cacheAlbums
+    else:
+      # no cache -> must walk the tree
+      lastRepaintTime = time.time()
+      for root, dirs, files in os.walk(path):
         if self.stopped:
           break
-        if os.path.splitext(n)[1].lower() in albumart.mediaExtensions:
-          # update status bar often enough
-          if time.time() > lastRepaintTime + 0.2:
-            self.statusBar().message(self.tr("Reading %s") % n)
-            lastRepaintTime = time.time()
-            qApp.processEvents()
+        for n in files:
+          if self.stopped:
+            break
+          if os.path.splitext(n)[1].lower() in albumart.mediaExtensions:
+            # update status bar often enough
+            if time.time() > lastRepaintTime + 0.2:
+              self.statusBar().message(self.tr("Reading %s") % n)
+              lastRepaintTime = time.time()
+              qApp.processEvents()
 
-          p = os.path.join(root, n)
-          (artist, album) = albumart.guessArtistAndAlbum(p)
+            p = os.path.join(root, n)
+            (artist, album) = albumart.guessArtistAndAlbum(p)
 
-          # get the album for this track
-          if not (artist, album) in self.albums:
-            self.albums[(artist, album)] = []
+            # get the album for this track
+            if not (artist, album) in self.albums:
+              self.albums[(artist, album)] = []
 
-          # add the track to the album
-          self.albums[(artist, album)].append(p)
+            # add the track to the album
+            self.albums[(artist, album)].append(p)
+      # save a fresh copy to the cache
+      pickle.dump((path, time.time(), self.albums), open(self.cachePath, "wb"))
 
     self.refreshAlbumList()
     self.statusBar().message(self.tr("%d albums found. Ready.") % len(self.albums), 5000)
@@ -397,6 +392,12 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.walk(d)
 
   def reloadAction_activated(self):
+    # invalidate the cache
+    try:
+      os.unlink(self.cachePath)
+    except:
+      pass
+
     if len(self.dir):
       self.walk(self.dir)
 

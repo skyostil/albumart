@@ -7,6 +7,7 @@
 	- Removed support for Qt 2.3.
 	- Ability to write different ID3 picture types.
 	- Output images can be scaled smaller if needed.
+	- Added collection caching for faster startup.
 
 1.4.0:
 	- Album information is now also read from ID3v2 tags.
