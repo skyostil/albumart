@@ -118,7 +118,7 @@ class AlbumArt(AlbumArtDialog):
 			if not self.config.has_section("albumart"):
 				self.config.add_section("albumart")
 
-			self.config.set("albumart", "sources", "albumart_source_amazon.Amazon")
+			self.config.set("albumart", "sources", "albumart_source_amazon.Amazon:albumart_source_amazon_eu.Amazon")
 			self.config.set("albumart", "targets", "albumart_target_freedesktop.Freedesktop:albumart_target_windows.Windows")
 
 			self.settingsMenu = QPopupMenu()
