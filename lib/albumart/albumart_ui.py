@@ -79,11 +79,13 @@ def resizePixmap(pixmap, size, width = None, height = None):
   if not pixmap.isNull() and pixmap.width() > 0 and pixmap.height() > 0:
     if not width and not height:
       width = height = size
+    p = QPixmap()
     try:
-      pixmap.convertFromImage(pixmap.convertToImage().scale(width, height))
+      p.convertFromImage(pixmap.convertToImage().scale(width, height))
     except AttributeError:
       # for older Qt 2.x
-      pixmap.convertFromImage(pixmap.convertToImage().smoothScale(width, height))
+      p.convertFromImage(pixmap.convertToImage().smoothScale(width, height))
+    pixmap = p
   return pixmap
   
 #
@@ -675,10 +677,7 @@ class AlbumArtUi(AlbumArtDialog):
     
     # update the widget states
     self.fileOpenAction.setEnabled(0)
-    self.removeAction.setEnabled(0)
-    self.removeAllAction.setEnabled(1)
-    self.autoDownloadAction.setEnabled(0)
-    self.synchronizeAction.setEnabled(0)
+    self.reloadAction.setEnabled(0)
     self.dirlist.clear()
     
     # clear the db
@@ -690,10 +689,6 @@ class AlbumArtUi(AlbumArtDialog):
     self.setCursor(Qt.arrowCursor)
 
     self.reloadAction.setEnabled(1)
-    self.nextAction.setEnabled(1)
-    self.previousAction.setEnabled(1)
-    self.autoDownloadAction.setEnabled(1)
-    self.synchronizeAction.setEnabled(1)
     self.fileOpenAction.setEnabled(1)
     
   def helpAbout(self):
@@ -735,37 +730,18 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       self.setCursor(Qt.waitCursor)
       self.statusBar().message("Deleting selected cover image...")
       
-      path = os.path.join(self.dir,self.getQString(self.selectedItem.path(0)))
-      try:
-        albumart.removeCover(path)
-        self.updateIcon()
-        self.selectedItem.setPixmap(0,self.getIconForPath(path))
-      except Exception, x:
-        self.reportException(self.tr("Removing the cover"), x)
+      for path in self.getSelectedFiles():
+        try:
+          albumart.removeCover(path)
+        except Exception, x:
+          self.reportException(self.tr("Removing the cover"), x)
 
+      self.refreshSelectedFiles()
       self.setCursor(Qt.arrowCursor)
       self.statusBar().message("Ready",5000)
 
-  def removeAllAction_activated(self):
-    if QMessageBox.information(self,
-         self.tr("Confirm deletion"),
-         self.tr("Are you really sure you want to delete <b>all</b> the cover images?"),
-         QMessageBox.Yes,
-         QMessageBox.No + QMessageBox.Default + QMessageBox.Escape) == QMessageBox.Yes:
-      item = self.dirlist.firstChild()
-      items = []
-  
-      self.setCursor(Qt.waitCursor)
-      self.statusBar().message(self.tr("Preparing deletion..."))
-      while item:
-        path = os.path.join(self.dir, self.getQString(item.text(0)))
-        items.append(path)
-        item = item.itemBelow()
-        qApp.processEvents();
-  
-      self.setCursor(Qt.arrowCursor)
-      self.statusBar().message("")
-      self.startProcess(DeleteProcess(self, self.dir, items))
+  def selectAllAction_activated(self):
+    self.dirlist.selectAll(True)
 
   #
   # Focus the next album without a cover
@@ -840,19 +816,13 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   #
   def autoDownloadAction_activated(self):
     item = self.dirlist.firstChild()
-    items = []
 
     self.setCursor(Qt.waitCursor)
     self.statusBar().message(self.tr("Preparing automatic download..."))
-    while item:
-      path = os.path.join(self.dir, self.getQString(item.text(0)))
-      if not albumart.hasCover(path):
-        items.append(path)
-      item = item.itemBelow()
-      qApp.processEvents();
-
+    items = [file for file in self.getSelectedFiles() if not albumart.hasCover(file)]
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message("")
+    print items
     self.startProcess(AutoDownloadProcess(self, self.dir, items))
 
   #
@@ -881,6 +851,14 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.albumEdit.setText(a0.getAlbumName())
     self.thread = None
 
+  def dirlist_contextMenuRequested(self, item, point, column):
+    if item:
+      menu = QPopupMenu()
+      self.autoDownloadAction.addTo(menu)
+      self.removeAction.addTo(menu)
+      self.viewCoverAction.addTo(menu)
+      menu.exec_loop(point)
+    
   #
   # @returns a python string representation of the given QString
   #
@@ -1049,8 +1027,18 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message(self.tr("Ready"), 5000)
     
-  def updateIcon(self):
-    print "FIXME"
+  def viewCoverImage(self):
+    # Try to load the current album cover image and display it in as new window
+    try:
+      pixmap = getPixmapForPath(self.getSelectedFiles()[0])
+      global window
+      window = QLabel(None)
+      window.setPixmap(pixmap)
+      window.setFixedSize(pixmap.width(), pixmap.height())
+      window.show()
+    except Exception, x:
+      self.reportException(self.tr("Loading the album cover"), x)
+    
     
   def setFilter(self, filterString):
     filterString = self.getQString(filterString)

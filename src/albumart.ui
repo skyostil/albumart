@@ -339,7 +339,7 @@
         <action name="autoDownloadAction"/>
         <action name="synchronizeAction"/>
         <action name="removeAction"/>
-        <action name="removeAllAction"/>
+        <action name="selectAllAction"/>
     </item>
     <item text="&amp;View" name="View">
         <action name="showCoversAction"/>
@@ -420,7 +420,7 @@
             <cstring>reloadAction</cstring>
         </property>
         <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="iconSet">
             <iconset>image6</iconset>
@@ -443,7 +443,7 @@
             <cstring>nextAction</cstring>
         </property>
         <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="iconSet">
             <iconset>image7</iconset>
@@ -466,7 +466,7 @@
             <cstring>previousAction</cstring>
         </property>
         <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="iconSet">
             <iconset>image8</iconset>
@@ -489,7 +489,7 @@
             <cstring>removeAction</cstring>
         </property>
         <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="iconSet">
             <iconset>image9</iconset>
@@ -526,7 +526,7 @@
             <cstring>autoDownloadAction</cstring>
         </property>
         <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="iconSet">
             <iconset>image10</iconset>
@@ -538,7 +538,7 @@
             <string>Download &amp;missing cover images</string>
         </property>
         <property name="toolTip">
-            <string>Download missing cover images</string>
+            <string>Download missing cover images for selected items</string>
         </property>
     </action>
     <action>
@@ -554,16 +554,33 @@
     </action>
     <action>
         <property name="name">
-            <cstring>removeAllAction</cstring>
+            <cstring>selectAllAction</cstring>
         </property>
         <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
         </property>
         <property name="text">
-            <string>Delete all cover images under the current directory</string>
+            <string>Select &amp;All</string>
         </property>
         <property name="menuText">
-            <string>&amp;Delete all cover images...</string>
+            <string>Select &amp;All</string>
+        </property>
+        <property name="toolTip">
+            <string>Select all items</string>
+        </property>
+        <property name="accel">
+            <string>Ctrl+A</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewCoverAction</cstring>
+        </property>
+        <property name="iconSet">
+            <iconset>image11</iconset>
+        </property>
+        <property name="text">
+            <string>View cover image</string>
         </property>
     </action>
 </actions>
@@ -600,6 +617,9 @@
     </image>
     <image name="image10">
         <data format="PNG" length="925">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000036449444154388db5d5cf4f9c4518c0f1efccbcfbb2bff821db9a488ba434b616d4c4484dfc91d053af5efc03bc341a4fad670f9ed483171bafa6876a0ddaa431da56538dd2c4201283556001a1a5b0c0d25d28bb0becbbeffbce8c875da4cb0fe1e2739bcc339ff7996726efc0ff14a26e94fc048c7d0963dfc00a77ffd5d620b94670f33ac14dfbe8945397a8e451d510fdecec6ba73b5b9a5ca84bdd19958ae6c6d77fbceeada6ce1230b8372c4567aaa3fd898f3fe8a62152bf99dd4229989c2a368e0cb69e81ff8223528898238a157082bd0b1654e7224e4d57db9c1db0a3b0aea2e081b37fc1380e682140c99d73f515d7e032a87d6021c051100a09cebeb044ba9252592077e65641a01258ee2f1846c703161fda0354ec28544452f0406eab58005e00c3338681bf42327321614963f4015ba15c41d1abbfe0c6c2f432f44f41360fb62cb051853460cb0abb6b2b7abe52c0538083b1c764448adc1a34a8eac9173c98c8c342012a1adcb824a87dd518c095e0c60ed173f519b0022822987550f2ed443276b1e5b1246039f47823d90a180dbe86b25f4d6f8e55772c04ac21f12d4803321e17f6f099f3687dde6a0b62bd42f6daab0e22ecb704e9aed39da74e9c6a43588136106aa884d0e0c0865f6ba3006babad315a128616d572149c364cc9c77af72cdef41d4a632b8accd5a520d9fdc3fc82ff7c221e6d3fded12ca2aec07520a2aaf75f6c36dc6ec1a181d008d0161b06186f42b3fecb75e6aebc457e605a01f0e0a7651d6fff7e2e4787b6ced3cf9e6c150d11895343375d63411bd035d83702e3570857fe0c6cfee74bcc5c7987fce02c80faf718730325936cff2e93b7895c91175fe84a0937a290d54231660b0e0d041abcf21a1b99df2b66eec6874c5f7e8fd5d1954d6e0b0678f0ab6f5bbb6f2d2d6fac4f65e97dee444ac5a20ec6d4838186e2ea0ab9c9df0a66eacb0b4c7c7a918d6cf951aa1e0658bc6d0956071edad4dfe98cee3dfe6473a2311125d4e087e08796f9f92c774706efebf1cfcf91bed487f6f57666270c509a85fc9dd1b544d7d0d8acffcae1d664aaa5298e175846d2b3363d3c30acc7bf38c764df8fecf113dc1d06f08b70efdb19aff164ffe4a2ed8944636d6353593b3674fb96495f7e93bbdf0cef85c2f6a769af78f9fd23aaa5f32353ca6cd8c9be77591a5a3cd0ba03c5915e97a663fbbf83b5f807dc9b94b71b242ecc0000000049454e44ae426082</data>
+    </image>
+    <image name="image11">
+        <data format="PNG" length="920">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b0000035f49444154388d8d955d681c5518869fefcc6c76bb9bbfe68f36d1b65813c1d8926ad42a46bd106a6fbc10570944d42b157bd39b08d6825e94482efc09081554bcb0374d41a928546f1230694d555a5a9214bb04da6805b36d13f3d3dd9d339f17339b9d4db6a62f0c73ce30e799f7bcdf3967e4c2d41515112ac9f32c9eb5f856595ec901f0d4e3f7577e798d5c11a1f3bebb00f055f1ada280b53eb97c01ebf9143ccbdcf50552c904a3e3937a277053d6191a5a6d8b088e3188115cc70120e63ab4dfd3cae8f8a4de397870106666705f7a1101e25b9a31c6e03a0ec6090c26e255d4d7a5b8bbad69437809dcdf0f99cb90b98cdbfd2054c5404024700f108fbb2437c5686aaca563e7ff3b978bd357b59831005d5dc1fdef6b2ccfcca2aa78d632fecbe46ddded7fe6a17599bb65bd868652fbc60d8c11ac558c18baf77400e0fbca5c7601cf5a5495c9a94cc58fad827d55c8664183c100e26b1883e21843c1b3dccae551146304df076e1346c9b102e1840e7f135d2c4e788faf1b7c72621168e4c8d9c532fc3fd7321170080ddc0a03e9ca4ea21a4857577cded2178d22dc1851bdd72b6c0ec73ae124ac0f9b62b0653374df0bad3bf742c36370fd347f65ced0fa5a4029db206b4b1b8f417d32b86a12d0be15766f87e63aa84b41630dd0d8030f7c088d3d413f9459c35a2d5cd1e5cd6578e513e5ca1cccce058e5d073c0b2b7960fe1c4cbd0bf3e7827ea8b2e52622e4f2798a054b25e0ada30aa7b671f89872282dc463908cc36fb3d0540331e7275273232cad14f8330bf595c0aa8a440239f019cc2f09cf3d0c3a2d1c1956be3820bcfc71f0eee0abc2721e6a1205560a905d80ceb56011215ff0ca62e97b1a766d87ef7e85980343fb84b12978bf174ebc2df47fa50cf70b5b1ba0a536a8c3ba8c55b52c5f80379f85e36370e6124cfc019fff08bd3dc16a78a1a79a4fdf10462e42df4741610f7e5921630de1d14577621cbe1e297de4501ab635c1e94b303cbec8b15178a41d720578e21d881e39ab60cfb3a806f0a29aeb8238b2ff06a7dccd25f8e17738fe3374b441c10b0afcfc5ed8b5a36cb225b03106d70555c3c9894506d2d5ecdf036d0d3079158e9e82a55bf06427bcbe0fea53509b84445590edee1d303d1b011b237cfbfd18d6fa94fe7dc1d1d97550c3167cc0c67a34d296e8d48b6ae93bbfe1af6723fd077d5b3f904fa7058f0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -694,10 +714,10 @@
         <slot>synchronizeAction_activated()</slot>
     </connection>
     <connection>
-        <sender>removeAllAction</sender>
+        <sender>selectAllAction</sender>
         <signal>activated()</signal>
         <receiver>AlbumArtDialog</receiver>
-        <slot>removeAllAction_activated()</slot>
+        <slot>selectAllAction_activated()</slot>
     </connection>
     <connection>
         <sender>albumEdit</sender>
@@ -747,6 +767,18 @@
         <receiver>filterEdit</receiver>
         <slot>clear()</slot>
     </connection>
+    <connection>
+        <sender>dirlist</sender>
+        <signal>contextMenuRequested(QListViewItem*,const QPoint&amp;,int)</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>dirlist_contextMenuRequested(QListViewItem*,const QPoint&amp;,int)</slot>
+    </connection>
+    <connection>
+        <sender>viewCoverAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialog</receiver>
+        <slot>viewCoverImage()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>dirlist</tabstop>
@@ -783,9 +815,11 @@
     <slot>iconSizeSmallAction_toggled(bool)</slot>
     <slot>iconSizeMediumAction_toggled(bool)</slot>
     <slot>iconSizeLargeAction_toggled(bool)</slot>
-    <slot>removeAllAction_activated()</slot>
+    <slot>selectAllAction_activated()</slot>
     <slot>queryEdited()</slot>
     <slot>setFilter(const QString&amp;)</slot>
+    <slot>dirlist_contextMenuRequested(QListViewItem* , const QPoint&amp;, int col)</slot>
+    <slot>viewCoverImage()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

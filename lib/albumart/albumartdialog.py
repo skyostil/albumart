@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '../../src/albumart.ui'
 #
-# Created: la helmi  26 16:40:32 2005
+# Created: su helmi  27 04:34:27 2005
 #      by: The PyQt User Interface Compiler (pyuic) 3.13
 #
 # WARNING! All changes made in this file will be lost!
@@ -1102,6 +1102,84 @@ image10_data = \
     "\xbf\x83\xb5\xf8\x07\xdc\x9b\x94\xb7\x1b\x24\x2e" \
     "\xcc\x00\x00\x00\x00\x49\x45\x4e\x44\xae\x42\x60" \
     "\x82"
+image11_data = \
+    "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d" \
+    "\x49\x48\x44\x52\x00\x00\x00\x16\x00\x00\x00\x16" \
+    "\x08\x06\x00\x00\x00\xc4\xb4\x6c\x3b\x00\x00\x03" \
+    "\x5f\x49\x44\x41\x54\x38\x8d\x8d\x95\x5d\x68\x1c" \
+    "\x55\x18\x86\x9f\xef\xcc\x6c\x76\xbb\x9b\xbf\xe6" \
+    "\x8f\x36\xd1\xb6\x58\x13\xc1\xd8\x92\x6a\xd4\x2a" \
+    "\x46\xbd\x10\x6a\x6f\xbc\x10\x57\x09\x44\xd4\x2b" \
+    "\x15\x7b\xd3\x9b\x08\xd6\x82\x5e\x94\x48\x2e\xfc" \
+    "\x09\x08\x15\x54\xbc\xb0\x37\x4d\x41\xa9\x28\x54" \
+    "\x6f\x12\x30\x69\x4d\x55\x5a\x5a\x92\x14\xbb\x04" \
+    "\xda\x68\x05\xb3\x6d\x13\xf3\xd3\xdd\x9d\x33\x9f" \
+    "\x17\x33\x9b\x9d\x4d\xb6\xa6\x2f\x0c\x73\xce\x30" \
+    "\xe7\x99\xf7\xbc\xdf\x39\x67\xe4\xc2\xd4\x15\x15" \
+    "\x11\x2a\xc9\xf3\x2c\x9e\xb5\xf8\x56\x59\x5e\xc9" \
+    "\x01\xf0\xd4\xe3\xf7\x57\x7e\x79\x8d\x5c\x11\xa1" \
+    "\xf3\xbe\xbb\x00\xf0\x55\xf1\xad\xa2\x80\xb5\x3e" \
+    "\xb9\x7c\x01\xeb\xf9\x14\x3c\xcb\xdc\xf5\x05\x52" \
+    "\xc9\x04\xa3\xe3\x93\x7a\x27\x70\x53\xd6\x19\x1a" \
+    "\x5a\x6d\x8b\x08\x8e\x31\x88\x11\x5c\xc7\x01\x20" \
+    "\xe6\x3a\xb4\xdf\xd3\xca\xe8\xf8\xa4\xde\x39\x78" \
+    "\x70\x10\x66\x66\x70\x5f\x7a\x11\x01\xe2\x5b\x9a" \
+    "\x31\xc6\xe0\x3a\x0e\xc6\x09\x0c\x26\xe2\x55\xd4" \
+    "\xd7\xa5\xb8\xbb\xad\x69\x43\x78\x09\xdc\xdf\x0f" \
+    "\x99\xcb\x90\xb9\x8c\xdb\xfd\x20\x54\xc5\x40\x40" \
+    "\x24\x70\x0f\x10\x8f\xbb\x24\x37\xc5\x68\x6a\xac" \
+    "\xa5\x63\xe7\xff\x3b\x97\x8b\xd3\x57\xb5\x98\x31" \
+    "\x00\x5d\x5d\xc1\xfd\xef\x6b\x2c\xcf\xcc\xa2\xaa" \
+    "\x78\xd6\x32\xfe\xcb\xe4\x6d\xdd\xed\x7f\xe6\xa1" \
+    "\x75\x99\xbb\x65\xbd\x86\x86\x52\xfb\xc6\x0d\x8c" \
+    "\x11\xac\x55\x8c\x18\xba\xf7\x74\x00\xe0\xfb\xca" \
+    "\x5c\x76\x01\xcf\x5a\x54\x95\xc9\xa9\x4c\xc5\x8f" \
+    "\xad\x82\x7d\x55\xc8\x66\x41\x83\xc1\x00\xe2\x6b" \
+    "\x18\x83\xe2\x18\x43\xc1\xb3\xdc\xca\xe5\x51\x14" \
+    "\x63\x04\xdf\x07\x6e\x13\x46\xc9\xb1\x02\xe1\x84" \
+    "\x0e\x7f\x13\x5d\x2c\x4e\x78\x8f\xaf\x1b\x7c\x72" \
+    "\x62\x11\x68\xe4\xc8\xd9\xc5\x32\xfc\x3f\xd7\x32" \
+    "\x11\x70\x08\x0d\xdc\x0a\x03\xe9\xca\x4e\xa2\x1a" \
+    "\x48\x57\x57\x7c\xde\xd2\x17\x8d\x22\xdc\x18\x51" \
+    "\xbd\xd7\x2b\x6c\x0e\xc7\x3a\xe1\x24\xac\x0f\x9b" \
+    "\x62\xb0\x65\x33\x74\xdf\x0b\xad\x3b\xf7\x42\xc3" \
+    "\x63\x70\xfd\x34\x7f\x65\xce\xd0\xfa\x5a\x40\x29" \
+    "\xdb\x20\x6b\x4b\x1b\x8f\x41\x7d\x32\xb8\x6a\x12" \
+    "\xd0\xbe\x15\x76\x6f\x87\xe6\x3a\xa8\x4b\x41\x63" \
+    "\x0d\xd0\xd8\x03\x0f\x7c\x08\x8d\x3d\x41\x3f\x94" \
+    "\x59\xc3\x5a\x2d\x5c\xd1\xe5\xcd\x65\x78\xe5\x13" \
+    "\xe5\xca\x1c\xcc\xce\x05\x8e\x5d\x07\x3c\x0b\x2b" \
+    "\x79\x60\xfe\x1c\x4c\xbd\x0b\xf3\xe7\x82\x7e\xa8" \
+    "\xb2\xe5\x26\x22\xe4\xf2\x79\x8a\x05\x4b\x25\xe0" \
+    "\xad\xa3\x0a\xa7\xb6\x71\xf8\x98\x72\x28\x2d\xc4" \
+    "\x63\x90\x8c\xc3\x6f\xb3\xd0\x54\x03\x31\xe7\x27" \
+    "\x52\x73\x23\x2c\xad\x14\xf8\x33\x0b\xf5\x95\xc0" \
+    "\xaa\x8a\x44\x02\x39\xf0\x19\xcc\x2f\x09\xcf\x3d" \
+    "\x0c\x3a\x2d\x1c\x19\x56\xbe\x38\x20\xbc\xfc\x71" \
+    "\xf0\xee\xe0\xab\xc2\x72\x1e\x6a\x12\x05\x56\x0a" \
+    "\x90\x5d\x80\xce\xb5\x60\x11\x21\x5f\xf0\xca\x62" \
+    "\xe9\x7b\x1a\x76\x6d\x87\xef\x7e\x85\x98\x03\x43" \
+    "\xfb\x84\xb1\x29\x78\xbf\x17\x4e\xbc\x2d\xf4\x7f" \
+    "\xa5\x0c\xf7\x0b\x5b\x1b\xa0\xa5\x36\xa8\xc3\xba" \
+    "\x8c\x55\xb5\x2c\x5f\x80\x37\x9f\x85\xe3\x63\x70" \
+    "\xe6\x12\x4c\xfc\x01\x9f\xff\x08\xbd\x3d\xc1\x6a" \
+    "\x78\xa1\xa7\x9a\x4f\xdf\x10\x46\x2e\x42\xdf\x47" \
+    "\x41\x61\x0f\x7e\x59\x21\x63\x0d\xe1\xd1\x45\x77" \
+    "\x62\x1c\xbe\x1e\x29\x7d\xe4\x50\x1a\xb6\x35\xc1" \
+    "\xe9\x4b\x30\x3c\xbe\xc8\xb1\x51\x78\xa4\x1d\x72" \
+    "\x05\x78\xe2\x1d\x88\x1e\x39\xab\x60\xcf\xb3\xa8" \
+    "\x06\xf0\xa2\x9a\xeb\x82\x38\xb2\xff\x06\xa7\xdc" \
+    "\xcd\x25\xf8\xe1\x77\x38\xfe\x33\x74\xb4\x41\xc1" \
+    "\x0b\x0a\xfc\xfc\x5e\xd8\xb5\xa3\x6c\xb2\x25\xb0" \
+    "\x31\x06\xd7\x05\x55\xc3\xc9\x89\x45\x06\xd2\xd5" \
+    "\xec\xdf\x03\x6d\x0d\x30\x79\x15\x8e\x9e\x82\xa5" \
+    "\x5b\xf0\x64\x27\xbc\xbe\x0f\xea\x53\x50\x9b\x84" \
+    "\x44\x55\x90\xed\xee\x1d\x30\x3d\x1b\x01\x1b\x23" \
+    "\x7c\xfb\xfd\x18\xd6\xfa\x94\xfe\x7d\xc1\xd1\xd9" \
+    "\x75\x50\xc3\x16\x7c\xc0\xc6\x7a\x34\xd2\x96\xe8" \
+    "\xd4\x8b\x6a\xe9\x3b\xbf\xe1\xaf\x67\x23\xfd\x07" \
+    "\x7d\x5b\x3f\x90\x4f\xa7\x05\x8f\x00\x00\x00\x00" \
+    "\x49\x45\x4e\x44\xae\x42\x60\x82"
 
 class AlbumArtDialog(QMainWindow):
     def __init__(self,parent = None,name = None,fl = 0):
@@ -1130,6 +1208,8 @@ class AlbumArtDialog(QMainWindow):
         self.image9.loadFromData(image9_data,"PNG")
         self.image10 = QPixmap()
         self.image10.loadFromData(image10_data,"PNG")
+        self.image11 = QPixmap()
+        self.image11.loadFromData(image11_data,"PNG")
         if not name:
             self.setName("AlbumArtDialog")
 
@@ -1233,25 +1313,27 @@ class AlbumArtDialog(QMainWindow):
         self.helpAboutAction = QAction(self,"helpAboutAction")
         self.helpAboutAction.setIconSet(QIconSet(self.image0))
         self.reloadAction = QAction(self,"reloadAction")
-        self.reloadAction.setEnabled(0)
+        self.reloadAction.setEnabled(1)
         self.reloadAction.setIconSet(QIconSet(self.image6))
         self.nextAction = QAction(self,"nextAction")
-        self.nextAction.setEnabled(0)
+        self.nextAction.setEnabled(1)
         self.nextAction.setIconSet(QIconSet(self.image7))
         self.previousAction = QAction(self,"previousAction")
-        self.previousAction.setEnabled(0)
+        self.previousAction.setEnabled(1)
         self.previousAction.setIconSet(QIconSet(self.image8))
         self.removeAction = QAction(self,"removeAction")
-        self.removeAction.setEnabled(0)
+        self.removeAction.setEnabled(1)
         self.removeAction.setIconSet(QIconSet(self.image9))
         self.showCoversAction = QAction(self,"showCoversAction")
         self.showCoversAction.setToggleAction(1)
         self.autoDownloadAction = QAction(self,"autoDownloadAction")
-        self.autoDownloadAction.setEnabled(0)
+        self.autoDownloadAction.setEnabled(1)
         self.autoDownloadAction.setIconSet(QIconSet(self.image10))
         self.synchronizeAction = QAction(self,"synchronizeAction")
-        self.removeAllAction = QAction(self,"removeAllAction")
-        self.removeAllAction.setEnabled(0)
+        self.selectAllAction = QAction(self,"selectAllAction")
+        self.selectAllAction.setEnabled(1)
+        self.viewCoverAction = QAction(self,"viewCoverAction")
+        self.viewCoverAction.setIconSet(QIconSet(self.image11))
 
 
         self.toolBar = QToolBar(QString(""),self,Qt.DockTop)
@@ -1279,7 +1361,7 @@ class AlbumArtDialog(QMainWindow):
         self.autoDownloadAction.addTo(self.EditMenu)
         self.synchronizeAction.addTo(self.EditMenu)
         self.removeAction.addTo(self.EditMenu)
-        self.removeAllAction.addTo(self.EditMenu)
+        self.selectAllAction.addTo(self.EditMenu)
         self.menubar.insertItem(QString(""),self.EditMenu,2)
 
         self.View = QPopupMenu(self)
@@ -1311,7 +1393,7 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.showCoversAction,SIGNAL("toggled(bool)"),self.showCoversAction_toggled)
         self.connect(self.autoDownloadAction,SIGNAL("activated()"),self.autoDownloadAction_activated)
         self.connect(self.synchronizeAction,SIGNAL("activated()"),self.synchronizeAction_activated)
-        self.connect(self.removeAllAction,SIGNAL("activated()"),self.removeAllAction_activated)
+        self.connect(self.selectAllAction,SIGNAL("activated()"),self.selectAllAction_activated)
         self.connect(self.albumEdit,SIGNAL("textChanged(const QString&)"),self.queryEdited)
         self.connect(self.artistEdit,SIGNAL("textChanged(const QString&)"),self.queryEdited)
         self.connect(self.pushDownload,SIGNAL("clicked()"),self.pushDownload_clicked)
@@ -1320,6 +1402,8 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.filterEdit,SIGNAL("textChanged(const QString&)"),self.setFilter)
         self.connect(self.filterEdit,SIGNAL("lostFocus()"),self.filterEdit.clear)
         self.connect(self.clearFilter,SIGNAL("clicked()"),self.filterEdit.clear)
+        self.connect(self.dirlist,SIGNAL("contextMenuRequested(QListViewItem*,const QPoint&,int)"),self.dirlist_contextMenuRequested)
+        self.connect(self.viewCoverAction,SIGNAL("activated()"),self.viewCoverImage)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)
@@ -1372,11 +1456,14 @@ class AlbumArtDialog(QMainWindow):
         self.showCoversAction.setMenuText(self.__tr("Show &Cover Images in List"))
         self.autoDownloadAction.setText(self.__tr("Download &missing cover images"))
         self.autoDownloadAction.setMenuText(self.__tr("Download &missing cover images"))
-        self.autoDownloadAction.setToolTip(self.__tr("Download missing cover images"))
+        self.autoDownloadAction.setToolTip(self.__tr("Download missing cover images for selected items"))
         self.synchronizeAction.setText(self.__tr("Synchronize cover images for all targets"))
         self.synchronizeAction.setMenuText(self.__tr("Synchronize cover images for all targets"))
-        self.removeAllAction.setText(self.__tr("Delete all cover images under the current directory"))
-        self.removeAllAction.setMenuText(self.__tr("&Delete all cover images..."))
+        self.selectAllAction.setText(self.__tr("Select &All"))
+        self.selectAllAction.setMenuText(self.__tr("Select &All"))
+        self.selectAllAction.setToolTip(self.__tr("Select all items"))
+        self.selectAllAction.setAccel(self.__tr("Ctrl+A"))
+        self.viewCoverAction.setText(self.__tr("View cover image"))
         self.toolBar.setLabel(self.__tr("Tools"))
         if self.menubar.findItem(1):
             self.menubar.findItem(1).setText(self.__tr("&File"))
@@ -1469,14 +1556,20 @@ class AlbumArtDialog(QMainWindow):
     def iconSizeLargeAction_toggled(self,a0):
         print "AlbumArtDialog.iconSizeLargeAction_toggled(bool): Not implemented yet"
 
-    def removeAllAction_activated(self):
-        print "AlbumArtDialog.removeAllAction_activated(): Not implemented yet"
+    def selectAllAction_activated(self):
+        print "AlbumArtDialog.selectAllAction_activated(): Not implemented yet"
 
     def queryEdited(self):
         print "AlbumArtDialog.queryEdited(): Not implemented yet"
 
     def setFilter(self,a0):
         print "AlbumArtDialog.setFilter(const QString&): Not implemented yet"
+
+    def dirlist_contextMenuRequested(self,a0,a1,a2):
+        print "AlbumArtDialog.dirlist_contextMenuRequested(QListViewItem*,const QPoint&,int): Not implemented yet"
+
+    def viewCoverImage(self):
+        print "AlbumArtDialog.viewCoverImage(): Not implemented yet"
 
     def __tr(self,s,c = None):
         return qApp.translate("AlbumArtDialog",s,c)

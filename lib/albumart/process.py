@@ -109,13 +109,13 @@ class AutoDownloadProcess(Process):
     failures = 0
     cache = {}
     
-    items = []
-    for path in self.items:
-      items.append(path)
-      items += filter(lambda fn: os.path.isfile(fn), map(lambda fn: os.path.join(path, fn), os.listdir(path)))
+    #items = self.items
+    #for path in self.items:
+    #  items.append(path)
+    #  items += filter(lambda fn: os.path.isfile(fn), map(lambda fn: os.path.join(path, fn), os.listdir(path)))
 
     try:
-      for path in items:
+      for path in self.items:
         if self.isCanceled():
           failures = -1
           break
@@ -158,7 +158,7 @@ class AutoDownloadProcess(Process):
               failures += 1
                 
         itemsProcessed += 1
-        self.setProgress(itemsProcessed, len(items))
+        self.setProgress(itemsProcessed, len(self.items))
     except Exception, x:    
       self.postEvent(self.dialog, ExceptionEvent(self, x))
         
@@ -173,7 +173,7 @@ class AutoDownloadProcess(Process):
         "Out of a total of %d items, %d were recognized, \n" +
         "%d matching covers were found and \n" +
         "%d were installed.") % \
-      (len(items), recognized, coversFound, coversInstalled),
+      (len(self.items), recognized, coversFound, coversInstalled),
       result = (failures == 0))
 
 class SynchronizeProcess(Process):
