@@ -4,6 +4,9 @@ import sys
 
 if os.name=='nt':
 	import py2exe
+        scr=['bin/albumart-qt']
+else:
+        scr=None
 
 setup(
 	name="albumart", 
@@ -17,6 +20,7 @@ setup(
 	description="Downloads album cover images semi-automatically from the Internet.",
 	long_description="Album Cover Art Downloader is a download utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
 
+        scripts=scr,
 #	scripts=[
 #		'bin/albumart-qt',
 #		],

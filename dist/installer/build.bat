@@ -1,4 +1,4 @@
-@python ..\..\..\Installer\Build.py albumart-qt.spec
-@mkdir distalbumart-qt\share
-@mkdir distalbumart-qt\share\albumart
-@copy ..\..\share\albumart\*.png distalbumart-qt\share\albumart
+@python ..\..\..\Installer\Build.py albumart-qt-w32.spec
+@mkdir distalbumart-qt-w32\share
+@mkdir distalbumart-qt-w32\share\albumart
+@copy ..\..\share\albumart\*.png distalbumart-qt-w32\share\albumart
