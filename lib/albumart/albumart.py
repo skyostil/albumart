@@ -16,6 +16,7 @@ __module__ = "albumart"
 
 import os
 import tempfile
+from __future__ import generators
 
 class Module:
         """Base class for a module that provides additional functionality."""
