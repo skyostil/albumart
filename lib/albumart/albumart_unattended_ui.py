@@ -25,17 +25,14 @@ from event import *
 from process import *
 
 class AlbumArtUnattendedUi(QWidget):
-  #
-  # Constructor. 
-  #
-  # @param parent Parent widget
-  # @param name Widget name
-  # @param showSummary Show a summary dialog when done.
-  #
   def __init__(self, parent = None,
                name = "AlbumArtUnattendedUi",
                showSummary = False,
                hidden = False):
+    """Constructor. 
+       @param parent Parent widget
+       @param name Widget name
+       @param showSummary Show a summary dialog when done."""
     QObject.__init__(self, parent, name)
     self.config = ConfigParser.ConfigParser()
     self.showSummary = showSummary
@@ -65,10 +62,8 @@ class AlbumArtUnattendedUi(QWidget):
     except Exception, x:
       self.reportException(self.tr("Loading settings"), x)
   
-  #
-  # Load a module with the given name (id)
-  #      
   def loadModule(self, id):
+    """Load a module with the given name (id)"""
     try:
       (mod, cls) = id.split(".")
       exec("import %s" % (mod))
@@ -93,23 +88,19 @@ class AlbumArtUnattendedUi(QWidget):
     except Exception, x:
       self.reportException(self.tr("Loading module '%s'") % (id), x)
       
-  #
-  # Reports the given exception to the user.
-  #
-  # @param task Description of task during which the exception was raised
-  # @param exception The exception that was raised
-  #
   def reportException(self, task, exception):
+    """Reports the given exception to the user.
+    
+       @param task Description of task during which the exception was raised
+       @param exception The exception that was raised"""
     xcpt = traceback.format_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
     msg = self.tr(
             "%(task)s was interrupted by the following exception:\n%(xcpt)s\n") % \
             {"task" : task, "xcpt": "".join(xcpt)}
     sys.stderr.write(msg)
 
-  #
-  # Runs the given process instance. @see process.Process
-  #
   def startProcess(self, process):
+    """Runs the given process instance. @see process.Process"""
     self.progressDialog = QProgressDialog(self, "progress", 1)
     self.progressDialog.setCaption(process.__doc__)
     self.thread = process
@@ -124,41 +115,31 @@ class AlbumArtUnattendedUi(QWidget):
       self.progressDialog.show()
     self.thread.start()
 
-  #
-  # Cancels the active process
-  #
   def processCanceled(self):
+    """Cancels the active process"""
     if self.thread:
       self.thread.cancel()
 
-  #
-  # Download images automatically for the given path
-  #
   def downloadCovers(self, path):
+    """Download images automatically for the given path"""
     items = self.getItems(path)
     items = filter(lambda i: not albumart.hasCover(i), items)
     self.startProcess(AutoDownloadProcess(self, path, items))
 
-  #
-  # Make sure all the albums have same images in all their targets
-  # (fd.o, wxp, id3v2, etc.)
-  #
   def synchronizeCovers(self, path):
+    """Make sure all the albums have same images in all their targets
+      (fd.o, wxp, id3v2, etc.)"""
     items = self.getItems(path)
     items = filter(lambda i: albumart.hasCover(i), items)
     self.startProcess(SynchronizeProcess(self, path, items))
 
-  #
-  # Delete all cover images below the given path
-  #
   def deleteCovers(self, path):
+    """Delete all cover images below the given path"""
     items = self.getItems(path)
     self.startProcess(DeleteProcess(self, path, items))
 
-  #
-  # Handle events from processes
-  #        
   def customEvent(self,event):
+    """Handle events from processes"""
     try:
       # if the message was sent by an older thread, ignore it.
       if self.thread != event.thread:
@@ -197,25 +178,19 @@ class AlbumArtUnattendedUi(QWidget):
 
     del event
     
-  #
-  # Returns a list of processable items under the given path
-  #
   def getItems(self, path):
+    """Returns a list of processable items under the given path"""
     items = []
     for root, dirs, files in os.walk(path):
       items.append(root)
     return filter(lambda x: not os.path.basename(x).startswith("."), items)
 
-  #
-  # @returns a python string representation of the given QString
-  #
   def getQString(self, qstring):
+    """@returns a python string representation of the given QString"""
     return unicode(qstring).encode("latin-1", "replace")
     
-  #
-  # Overridden translation method that returns native Python strings
-  #  
   def tr(self, identifier, context = None):
+    """Overridden translation method that returns native Python strings"""
     if qVersion().split(".")[0] == "2":
       # tr is static in old Qt
       return self.getQString(QObject.tr(identifier, context))

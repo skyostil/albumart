@@ -34,7 +34,6 @@ class ID3v2(albumart.Target):
     if self.enabled:
       for f in self.getFileList(path):
         id3v2 = id3.ID3v2(f)
-
         try:
           for frame in id3v2.frames:
             if frame.id == "APIC":
@@ -63,12 +62,15 @@ class ID3v2(albumart.Target):
     for f in self.getFileList(path):
       print "Writing APIC tag to", f
       try:
+        stat = os.stat(f)
         id3v2 = id3.ID3v2(f)
         frame = id3v2.get_apic_frame('Cover Image')
         frame.image = data
         frame.picturetype = '\x03'
         frame.unsynchronisation = True
         id3v2.save()
+        # restore the modification date and time
+        os.utime(f, (stat.st_atime, stat.st_mtime))
       except Exception, x:
         # collect exceptions, since some of the files might work
         if len(str(x)):
@@ -80,12 +82,13 @@ class ID3v2(albumart.Target):
   def getFileList(self, path):
     if os.path.isfile(path) and path.lower().endswith(".mp3"):
       return [path]
-    return glob.glob(os.path.join(path, "*.mp3"))
+    return []
 
   def removeCover(self, path):
     if not self.enabled: return
 
     for f in self.getFileList(path):
+      stat = os.stat(f)
       id3v2 = id3.ID3v2(f)
 
       newframes = []
@@ -94,6 +97,8 @@ class ID3v2(albumart.Target):
           newframes.append(frame)
       id3v2.frames = newframes
       id3v2.save()
+      # restore the modification date and time
+      os.utime(f, (stat.st_atime, stat.st_mtime))
 
   def hasCover(self, path):
     if self.enabled:

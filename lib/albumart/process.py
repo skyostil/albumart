@@ -7,18 +7,14 @@ import traceback
 import sys
 import os
 
-#
-# An asynchronous process for doing lengthy operations.
-#
 class Process(QThread):
-  #
-  # Constructor.
-  #
-  # @param dialog The QObject that will receive events via postEvent
-  #               Warning: The given QObject should have a tr() method that
-  #                        returns native Python strings.
-  #
+  """An asynchronous process for doing lengthy operations."""
   def __init__(self, dialog):
+    """Constructor.
+    
+       @param dialog The QObject that will receive events via postEvent
+                     Warning: The given QObject should have a tr() method that
+                     returns native Python strings."""
     QThread.__init__(self)
     self.dialog = dialog
     self.canceled = 0
@@ -45,7 +41,7 @@ class Process(QThread):
     pass
 
 class CoverDownloaderProcess(Process):
-  "Cover Download"
+  """Cover Download"""
   def __init__(self,dialog,artist,album):
     Process.__init__(self, dialog)
     self.artist = artist
@@ -95,7 +91,7 @@ class CoverDownloaderProcess(Process):
                        "go ahead drop it on the cover image list."))
 
 class AutoDownloadProcess(Process):
-  "Automatic Cover Download"
+  """Automatic Cover Download"""
   def __init__(self, dialog, dir, items):
     Process.__init__(self, dialog)
     self.items = items
@@ -177,7 +173,7 @@ class AutoDownloadProcess(Process):
       result = (failures == 0))
 
 class SynchronizeProcess(Process):
-  "Cover Image Synchronization"
+  """Cover Image Synchronization"""
   def __init__(self, dialog, dir, items):
     Process.__init__(self, dialog)
     self.items = items
@@ -201,7 +197,7 @@ class SynchronizeProcess(Process):
     self.setComplete()
 
 class DeleteProcess(Process):
-  "Cover Image Deletion"
+  """Cover Image Deletion"""
   def __init__(self, dialog, dir, items):
     Process.__init__(self, dialog)
     self.items = items

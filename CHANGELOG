@@ -1,3 +1,10 @@
+1.5.0:
+	- User interface overhauled.
+	- Group music by albums rather than directories.
+	- Don't change mp3 modification times.
+	- Don't hang with large music collections.
+	- Drag and drop support enhanced.
+
 1.4.0:
 	- Album information is now also read from ID3v2 tags.
 	- All the automated processes now process each file separately rather
