@@ -3,6 +3,7 @@
 	- Don't report bogus album counts.
 	- Don't leave temporary files lying around.
 	- Make sure the images are in JPEG format.
+	- Added missing generators import for Python 2.2.
 
 1.3:
 
