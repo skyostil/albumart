@@ -154,9 +154,12 @@
     <connection>
         <sender>pageList</sender>
         <signal>highlighted(int)</signal>
-        <receiver>pageStack</receiver>
-        <slot>raiseWidget(int)</slot>
+        <receiver>ConfigurationDialogBase</receiver>
+        <slot>setPage(int)</slot>
     </connection>
 </connections>
+<slots>
+    <slot>setPage(int)</slot>
+</slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
