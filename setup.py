@@ -64,7 +64,7 @@ setup(
 			'lib/albumart/id3/binfuncs.py',
 			'lib/albumart/id3/ID3v2Frames.py',
 		]),
-		('share/doc/albumart', ['README','TODO','CHANGELOG']),
+		('share/doc/albumart', ['README','TODO']),
 	]
 )
 
