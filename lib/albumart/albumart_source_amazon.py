@@ -16,9 +16,9 @@ configDesc = {
                                  "Please enter your Amazon Web Services license key.\n" +
                                  "This key can be obtained free of charge from Amazon at\n" +
                                  "http://www.amazon.com/gp/aws/registration/registration-form.html"),
-  "locale":          ("string",  "Set Amazon country...",
-                                 "Please enter the country setting for Amazon.\n" +
-                                 "It can be one of us, uk, de, jp."),
+  "locale":          ("stringlist",  "Set Amazon country...",
+                                     "Please enter the country setting for Amazon.",
+                                     ["us", "uk", "de", "jp"]),
 }
 
 class Amazon(albumart.Source):
@@ -41,6 +41,10 @@ class Amazon(albumart.Source):
         return amazon.searchByKeyword(name,type="lite",product_line="music")
       except amazon.AmazonError:
         pass
+      except amazon.NoLicenseKey, x:
+        raise RuntimeError(
+                "Please get a license key from http://www.amazon.com/gp/aws/registration/registration-form.html\n " +
+                "and enter it into Settings | Set Amazon license key.")            
 
   def getCover(self,album):
     if self.enabled:

@@ -129,6 +129,7 @@ def getAvailableCovers(artist, album, requireExactMatch = False):
         yield s.getCover(a)
   except Exception, x:
     traceback.print_exc(file = sys.stderr)
+    raise
 
 def guessArtistAndAlbum(path):
   """Given a path/file, try to extract the artist and album.

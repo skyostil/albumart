@@ -127,7 +127,8 @@ class AlbumArtUi(AlbumArtDialog):
         path = self.config.get("albumart", "lastDirectory")
       self.walk(path)
     except Exception, x:
-      self.reportException(self.tr("Reading the previous album directory"), x)
+      self.reportException(self.tr("Reading the previous album directory"), x,
+                           silent = True)
 
   def scaleIconPixmap(self, pixmap):
     if not pixmap.isNull() and pixmap.width() > 0 and pixmap.height() > 0:
@@ -217,15 +218,24 @@ class AlbumArtUi(AlbumArtDialog):
   # @param task Description of task during which the exception was raised
   # @param exception The exception that was raised
   # @param silent Pass True if a dialog box shouldn't be shown.
+  # @param description An optional description of the exception.
+  #        If not given, the description is generated from the system stack.
   #
-  def reportException(self, task, exception, silent = False):
-    xcpt = traceback.format_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
+  def reportException(self, task, exception, silent = False, description = None):
+    if not description:
+        description = traceback.format_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
+    fullmsg = self.tr(
+            "%(task)s was interrupted by the following exception:\n%(description)s\n") % \
+            {"task" : task, "description": "".join(description)}
     msg = self.tr(
-            "%(task)s was interrupted by the following exception:\n%(xcpt)s\n") % \
-            {"task" : task, "xcpt": "".join(xcpt)}
-    sys.stderr.write(msg)
+            "%(task)s was interrupted by the following exception:\n%(description)s\n") % \
+            {"task" : task, "description": description[-1]}
+    sys.stderr.write(fullmsg)
     if not silent:
-      QMessageBox.critical(self, version.__program__, msg)
+      if QMessageBox.critical(self, version.__program__, msg,
+                              self.tr("OK"),
+                              self.tr("More...")) == 1:
+        QMessageBox.critical(self, version.__program__, fullmsg)
 
   def showCoversAction_toggled(self, enabled):
     self.config.set("albumart", "showcovers", enabled)
@@ -264,7 +274,19 @@ class AlbumArtUi(AlbumArtDialog):
         mod.__configuration__[key] = enabled
         mod.configure(mod.__configuration__)
       elif desc[0] == "string":
-        (text,status) = QInputDialog.getText(desc[1], desc[2], QLineEdit.Normal, mod.__configuration__[key], self)
+        (text, status) = QInputDialog.getText(desc[1], desc[2], QLineEdit.Normal, mod.__configuration__[key], self)
+        if status:
+          mod.__configuration__[key] = unicode(text)
+          mod.configure(mod.__configuration__)
+      elif desc[0] == "stringlist":
+        items = QStringList()
+        map(lambda i: items.append(i), desc[3])
+        selected = 0
+        for i in xrange(0, len(desc[3])):
+            if mod.__configuration__[key] == desc[3][i]:
+                selected = i
+                
+        (text, status) = QInputDialog.getItem(desc[1], desc[2], items, selected, True)
         if status:
           mod.__configuration__[key] = unicode(text)
           mod.configure(mod.__configuration__)
@@ -680,13 +702,11 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   #
   # Handle events from processes
   #        
-  def customEvent(self,event):
-    try:
-      # if the message was sent by an older thread, ignore it.
+  def customEvent(self, event):
+    # if the message was sent by an older thread, ignore it.
+    if self.__dict__.has_key("thread"):
       if self.thread != event.thread:
         return
-    except AttributeError:
-      pass
       
     if event.type() == CoverDownloadedEvent.id:
       self.covers.append(event.filename)
@@ -703,7 +723,9 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
 
       self.pushDownload.setEnabled(1)
     elif event.type() == ExceptionEvent.id:
-      self.reportException(self.tr("Downloading cover images"), event.exception)
+      self.reportException(self.tr("Downloading cover images"),
+                           event.exception,
+                           description = event.description)
     elif event.type() == ProgressEvent.id:
       if self.progressDialog:
         self.progressDialog.setTotalSteps(event.total)
@@ -763,6 +785,9 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   # Overridden translation method that returns native Python strings
   #  
   def tr(self, identifier, context = None):
+    if qVersion().split(".")[0] == "2":
+        # tr is static in old Qt
+        return self.getQString(QObject.tr(identifier, context))
     return self.getQString(QObject.tr(self, identifier, context))
 
   def coverview_dropped(self,a0,a1):

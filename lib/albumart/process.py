@@ -83,8 +83,8 @@ class CoverDownloaderProcess(Process):
         # downloaded as they may have been blank or
         # corrupt.
         self.setProgress(coversFound - 1,coversFound)
-    except Exception, x:
-      self.postEvent(self.dialog, ExceptionEvent(x))
+    except Exception, x:    
+      self.postEvent(self.dialog, ExceptionEvent(self, x))
 
     if coversFound > 0:
       self.setComplete()
@@ -112,45 +112,48 @@ class AutoDownloadProcess(Process):
     for path in self.items:
       items.append(path)
       items += filter(lambda fn: os.path.isfile(fn), map(lambda fn: os.path.join(path, fn), os.listdir(path)))
-      
-    for path in items:
-      if self.isCanceled():
-        break
 
-      (artist, album) = albumart.guessArtistAndAlbum(path)
-      
-      if artist and album:
-        recognized += 1
-        self.setStatusText(self.dialog.tr('Searching cover for "%(album)s" by %(artist)s...') % \
-                           {"album" : album, "artist" : artist})
-        if cache.has_key((artist, album)):
-          try:
-            albumart.setCover(path, cache[(artist, album)])
-            coversInstalled += 1
-          except Exception, x:
-            traceback.print_exc(file = sys.stderr)
-        else:
-          for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = True):
+    try:
+      for path in items:
+        if self.isCanceled():
+          break
+
+        (artist, album) = albumart.guessArtistAndAlbum(path)
+          
+        if artist and album:
+          recognized += 1
+          self.setStatusText(self.dialog.tr('Searching cover for "%(album)s" by %(artist)s...') % \
+                             {"album" : album, "artist" : artist})
+          if cache.has_key((artist, album)):
             try:
-              img = Image.open(cover)
-              img.load()
-              coversFound += 1
-              
-              # convert to JPEG if needed
-              if img.format != "JPEG":
-                img = img.convert("RGB")
-                img.save(cover)
-  
-              cache[(artist, album)] = cover                
-              albumart.setCover(path, cover)
+              albumart.setCover(path, cache[(artist, album)])
               coversInstalled += 1
             except Exception, x:
               traceback.print_exc(file = sys.stderr)
-            break
-            
-      itemsProcessed += 1
-      self.setProgress(itemsProcessed, len(items))
-      
+          else:
+            for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = True):
+              try:
+                img = Image.open(cover)
+                img.load()
+                coversFound += 1
+                
+                # convert to JPEG if needed
+                if img.format != "JPEG":
+                  img = img.convert("RGB")
+                  img.save(cover)
+    
+                cache[(artist, album)] = cover                
+                albumart.setCover(path, cover)
+                coversInstalled += 1
+              except Exception, x:
+                traceback.print_exc(file = sys.stderr)
+              break
+                
+        itemsProcessed += 1
+        self.setProgress(itemsProcessed, len(items))
+    except Exception, x:    
+      self.postEvent(self.dialog, ExceptionEvent(self, x))
+        
     self.triggerReload()
     
     # clear the cache

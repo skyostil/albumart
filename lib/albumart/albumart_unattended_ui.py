@@ -207,4 +207,7 @@ class AlbumArtUnattendedUi(QWidget):
   # Overridden translation method that returns native Python strings
   #  
   def tr(self, identifier, context = None):
+    if qVersion().split(".")[0] == "2":
+        # tr is static in old Qt
+        return self.getQString(QObject.tr(identifier, context))
     return self.getQString(QObject.tr(self, identifier, context))
