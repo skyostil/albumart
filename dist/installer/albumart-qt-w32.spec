@@ -1,6 +1,11 @@
-a = Analysis([os.path.join(HOMEPATH,'support\\_mountzlib.py'), os.path.join(HOMEPATH,'support\\useUnicode.py'), '..\\..\\bin\\albumart-qt'],
+a = Analysis([
+               os.path.join(HOMEPATH,'support\\_mountzlib.py'), 
+               os.path.join(HOMEPATH,'support\\useUnicode.py'), 
+               '..\\..\\bin\\albumart-qt'
+             ],
              pathex=['..\\..\\bin', '..\\..\\lib\\albumart'],
-		 hookspath=['.'])
+             hookspath=['.']
+            )
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,

@@ -14,8 +14,6 @@ at your option) any later version.
 
 __module__ = "albumart"
 
-from __future__ import generators
-
 import os
 import tempfile
 

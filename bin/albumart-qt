@@ -12,11 +12,12 @@ the Free Software Foundation; either version 2 of the License, or
 at your option) any later version.
 """
 
-# first, find out where our program and data files are and set up sys.path accordingly.
 import os
 import sys
 import traceback
 import encodings
+import imghdr
+import StringIO
 
 def getBaseDir():
         path = os.path.dirname(sys.argv[0])
@@ -30,6 +31,7 @@ def getLibDir():
 def getShareDir():
         return os.path.join(getBaseDir(),"share","albumart")
 
+# first, find out where our program and data files are and set up sys.path accordingly.
 sys.path = [getBaseDir(), getLibDir()] + sys.path
 
 import albumart
@@ -147,7 +149,7 @@ class CoverDownloaderProcess(Process):
                         self.postEvent(self.dialog, ExceptionEvent(x))
 
                 if coversFound > 0:
-                        self.setComplete("%d covers found. Done." % coversFound)
+                        self.setComplete()
                 else:
                         self.setComplete("Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
 
@@ -424,25 +426,41 @@ class AlbumArt(AlbumArtDialog):
 
                 ce.accept()
 
-        def getIconForPath(self, path):
-                "Returns a QPixmap that can be used as an icon for the given path."
-
+        def getPixmapForPath(self, path):
+                "Returns a QPixmap for the given path."
                 if albumart.hasCover(path):
-                        if self.showCoversAction and not self.showCoversAction.isOn():
-                                return self.coverPixmap
-
                         filename = albumart.getCover(path)
 
                         if filename:
-                                pixmap = QPixmap(filename)
-                                pixmap = self.scaleIconPixmap(pixmap)
-                                if pixmap.width()>1 and pixmap.height()>1:
+                                # if we're running on Qt 2, convert the image to a png.
+                                if qVersion().split(".")[0]=='2' and imghdr.what(filename) != "png":
+                                        try:
+                                            i = Image.open(filename)
+                                            s = StringIO.StringIO()
+                                            i.save(s, "PNG")
+                                            pixmap = QPixmap()
+                                            pixmap.loadFromData(s.getvalue())
+                                        except IOError:
+                                            return self.noCoverPixmap
+                                else:
+                                    pixmap = QPixmap(filename)
+                                    
+                                #pixmap = self.scaleIconPixmap(pixmap)
+                                if pixmap.width()>0 and pixmap.height()>0:
                                         return pixmap
                                 else:
                                         return self.noCoverPixmap
                         else:
                                 return self.noCoverPixmap
                 return self.noCoverPixmap
+
+        def getIconForPath(self, path):
+                "Returns a QPixmap that can be used as an icon for the given path."
+                if self.showCoversAction and not self.showCoversAction.isOn():
+                        if albumart.hasCover(path):
+                                return self.scaleIconPixmap(self.coverPixmap)
+                        return self.scaleIconPixmap(self.noCoverPixmap)
+                return self.scaleIconPixmap(self.getPixmapForPath(path))
 
         def process(self, root, dirname, names):
                 # repaint every 10 items.
@@ -644,7 +662,6 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
 
         def getQString(self, qstring):
                 return unicode(qstring).encode("latin-1", "replace")
-#               return unicode(qstring)
 
         def updateIcon(self):
                 # Try to load the current album cover image and display it as the folder icon.
@@ -653,11 +670,10 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         self.albumIcon.setPixmap(QPixmap())
                         path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
 
-                        f = albumart.getCover(path)
-
-                        if f:
-                                pixmap = QPixmap(f)
+                        if albumart.hasCover(path):
+                                pixmap = self.getPixmapForPath(path)
                                 image = pixmap.convertToImage()
+
                                 if not image.isNull() and image.width()>1 and image.height()>1:
                                         image = image.smoothScale(60,60)
                                         pixmap.convertFromImage(image)
@@ -670,28 +686,29 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                 # Try to load the current album cover image and display it in as new window
                 try:
                         path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-                        f = albumart.getCover(path)
-                        if f:
-                                pixmap = QPixmap(f)
-                                self.coverPreviewWindow = QLabel(None)
-                                self.coverPreviewWindow.setPixmap(pixmap)
-                                self.coverPreviewWindow.setFixedSize(pixmap.width(), pixmap.height())
-                                self.coverPreviewWindow.setCaption("Cover image for " + self.getQString(self.selectedAlbum.text(0)))
-                                self.coverPreviewWindow.show()
+                        pixmap = self.getPixmapForPath(path)
+                        self.coverPreviewWindow = QLabel(None)
+                        self.coverPreviewWindow.setPixmap(pixmap)
+                        self.coverPreviewWindow.setFixedSize(pixmap.width(), pixmap.height())
+                        self.coverPreviewWindow.setCaption("Cover image for " + self.getQString(self.selectedAlbum.text(0)))
+                        self.coverPreviewWindow.show()
                 except:
                         pass
 
         def addCoverToList(self,coverfile):
                 # if we're running on Qt 2, convert the image to a png.
-                if qVersion().split(".")[0]=='2':
-                        newcoverfile = coverfile + ".png"
-                        i = Image.open(coverfile)
-                        i.save(newcoverfile, "PNG")
-                        del i
-                        os.unlink(coverfile)
-                        coverfile = newcoverfile
-
-                image = QImage(coverfile)
+                try:
+                        if qVersion().split(".")[0]=='2' and imghdr.what(coverfile) != "png":
+                                i = Image.open(coverfile)
+                                s = StringIO.StringIO()
+                                i.save(s, "PNG")
+                                pixmap = QPixmap()
+                                pixmap.loadFromData(s.getvalue())
+                                image = pixmap.convertToImage()
+                        else:
+                                image = QImage(coverfile)
+                except IOError:
+                        return 0
 
                 if not image.isNull() and image.width()>1 and image.height()>1:
                         # if we're running on Qt 2, do the scaling a bit differently
