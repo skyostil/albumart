@@ -3,20 +3,16 @@ include README
 include INSTALL
 include TODO
 include CHANGELOG
-include albumart.desktop
+include COPYING
+include share/applnk/Multimedia/albumart.desktop
 include setup.py
 include bin/albumart-qt
 include share/albumart/*
 include share/pixmaps/*
 include share/applnk/Multimedia/albumart.desktop
 include share/apps/konqueror/servicemenus/albumart_set_cover_image.desktop
-#include lib/albumart/albumart.py
-#include lib/albumart/albumartdialog.py
-#include lib/albumart/albumartdialog_qt230.py
-#include lib/albumart/albumartdialog_qt300.py
-#include lib/albumart/amazon.py
-#include lib/albumart/version.py
 include lib/albumart/*.py
+include lib/albumart/id3/*.py
 include debian/*
-include src/*
-include win32/*
+include MANIFEST.in
+

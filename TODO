@@ -4,5 +4,5 @@
 - remember last directory - DONE 1.2
 - make sure we save the images in a proper format - DONE 1.2
 - don't modify mp3 timestamps - DONE 1.5.0
-- proper configuration dialog
-- abort directory read operation on close
+- proper configuration dialog - DONE 1.5.0
+- abort directory read operation on close - DONE 1.5.0

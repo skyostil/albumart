@@ -1,57 +1,58 @@
-                          Album Cover Art Downloader                         
+                          Album Cover Art Downloader
                   http://kempele.fi/~skyostil/projects/albumart
-                                                                             
-   Here's a program that will semi-automatically download album              
-   cover images for your music collection. All you have to do                
-   is point it at the root of your music directory and for each              
-   directory, the program will download a set of corresponding               
-   (well, best guess) album covers from the Internet, from                   
-   which you can choose one that suits your fancy.                           
-                                                                             
-   Currently supported image providers:                                      
-                                                                             
-     * Amazon.com                                                            
-                                                                             
-   At least the following programs make use of the cover                     
-   images:                                                                   
-                                                                             
-     * Ones that follow the FreeDesktop.org .desktop-entry                   
-       spec, for example KDE and GNOME.                                      
-     * Windows XP Explorer                                                   
-     * Windows Media Player 9+                                               
-     * CDcover, an XMMS plugin                                               
-     * CoverViewer, another XMMS plugin.                                     
-     * wmalbum, a WindowMaker dock applet                                    
-     * Various WinAMP plugins, for example ShowCover.                        
-   In addition, some portable music players can show the cover               
-   image if it is embedded in the MP3 file.                                  
-                                                                             
- Usage                                                                     
-                                                                             
-   Click File | Open and navigate to the directory containing                
-   the albums you want to find cover images for. The program                 
-   will load all the directories under the path you chose and                
-   try to guess an artist and album for each entry. An orange                
-   indicator beside a directory means that it already has a                  
-   cover image.                                                              
-                                                                             
-   If you are feeling lazy, just select Edit | Download missing              
-   cover images and sit back while the program downloads covers              
-   for all the directories lacking them. The automatic                       
-   downloader only accepts exact matches when searching covers,              
-   so it may miss some directories.                                          
-                                                                             
-   To set a cover manually, pick a directory from the list and               
-   check that the artist and album fields at the top-right                   
-   corner are sensible. Now click Download Covers. After a few               
-   seconds you should see a list of cover images on the right.               
-   If no images are found, try to simplify the artist and album              
-   fields (e.g. clear the album field completely). You can also              
-   drop an image from your file manager on the list to use that              
-   one.                                                                      
-                                                                             
-   Go ahead and choose a suitable cover from the list. Finally,              
-   click Set as Cover to confirm your choice.                                
+
+   Here's a program that will semi-automatically download album
+   cover images for your music collection. All you have to do
+   is point it at the root of your music directory and for each
+   directory, the program will download a set of corresponding
+   (well, best guess) album covers from the Internet, from
+   which you can choose one that suits your fancy.
+
+   Currently supported image providers:
+
+     * Amazon.com
+
+   At least the following programs make use of the cover
+   images:
+
+     * Ones that follow the FreeDesktop.org .desktop-entry
+       spec, for example KDE and GNOME.
+     * Windows XP Explorer
+     * Windows Media Player 9+
+     * CDcover, an XMMS plugin
+     * CoverViewer, another XMMS plugin.
+     * wmalbum, a WindowMaker dock applet
+     * Various WinAMP plugins, for example ShowCover.
+   In addition, some portable music players can show the cover
+   image if it is embedded in the MP3 file.
+
+ Usage
+
+   Click File | Open and navigate to the directory containing
+   the albums you want to find cover images for. The program
+   will load all the music files under the path you chose and
+   sort them into albums.
+
+   If you are feeling lazy, just select Edit | Select All
+   followed by Edit | Download missing cover images and sit
+   back while the program downloads covers for all the
+   directories lacking them. The automatic downloader only
+   accepts exact matches while searching covers, so it may miss
+   some directories.
+
+   To set a cover manually, pick a directory from the list and
+   check that the artist and album fields at the top-right
+   corner are sensible. Now click Download Covers. After a few
+   seconds you should see a list of cover images on the right.
+   If no images are found, try to simplify the artist and album
+   fields (e.g. clear the album field completely). You can also
+   drop an image from your file manager on the list to use that
+   one.
+
+   Go ahead and choose a suitable cover from the list. Finally,
+   click Set as Cover to confirm your choice. You can also drag
+   and drop the cover image on the albums or music files of your 
+   choice.
 
  Command line options
 
@@ -73,25 +74,11 @@
    -i, --summary
           Show summary information when done.
 
- Internals                                                                 
-                                                                             
-   The cover images are in one or more of the following places:              
-                                                                             
-     * folder.jpg for Windows XP                                             
-     * .folder.png and an Icon entry in .directory for                       
-       Konqueror, etc.                                                       
-     * ID3v2 APIC frame, which is embedded into the MP3 files.               
-                                                                             
- Troubleshooting                                                           
-                                                                             
-   The following message means that your installed Python                    
-   interpreter is too old. It should be at least version 2.2,                
-   as that's when generators were introduced to the language.                
-                                                                             
-   Traceback (most recent call last):                                        
-     File "bin/albumart-qt", line 33, in ?                                   
-       import albumart                                                       
-     File "lib/albumart/albumart.py", line 83                                
-       yield s.getCover(a)                                                   
-             ^                                                               
-   SyntaxError: invalid syntax                                               
+ Internals
+
+   The cover images are in one or more of the following places:
+
+     * folder.jpg for Windows XP
+     * .folder.png and an Icon entry in .directory for
+       Konqueror, etc.
+     * ID3v2 APIC frame, which is embedded into the MP3 files.
