@@ -57,6 +57,7 @@ share/albumart/filesave.png
 share/albumart/icon.png
 share/albumart/nocover.png
 share/albumart/reload.png
+share/albumart/autodownload.png
 share/applnk/Multimedia/albumart.desktop
 share/apps/konqueror/servicemenus/albumart_set_cover_image.desktop
 share/pixmaps/albumart.png

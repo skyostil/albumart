@@ -42,6 +42,7 @@ setup(
 			'share/albumart/1leftarrow.png',
 			'share/albumart/download.png',
 			'share/albumart/filesave.png',
+			'share/albumart/autodownload.png',			
 			]),
 		('share/applnk/Multimedia',['share/applnk/Multimedia/albumart.desktop']),
 		('share/apps/konqueror/servicemenus',['share/apps/konqueror/servicemenus/albumart_set_cover_image.desktop']),
