@@ -44,6 +44,9 @@
                 <property name="name">
                     <cstring>pageView</cstring>
                 </property>
+                <property name="rootIsDecorated">
+                    <bool>true</bool>
+                </property>
             </widget>
             <widget class="QWidgetStack">
                 <property name="name">
@@ -154,9 +157,15 @@
         <receiver>ConfigurationDialogBase</receiver>
         <slot>reject()</slot>
     </connection>
+    <connection>
+        <sender>pageView</sender>
+        <signal>clicked(QListViewItem*)</signal>
+        <receiver>ConfigurationDialogBase</receiver>
+        <slot>setPage(QListViewItem*)</slot>
+    </connection>
 </connections>
 <slots>
-    <slot>setPage(int)</slot>
+    <slot>setPage(QListViewItem*)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
