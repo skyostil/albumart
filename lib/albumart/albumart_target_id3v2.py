@@ -4,6 +4,7 @@ import glob
 import os
 import id3   # PyID3, see http://icepick.info/projects/pyid3/
 import tempfile
+import Image
 
 defaultConfig = {
         "enabled":      1,
@@ -47,7 +48,16 @@ class ID3v2(albumart.Target):
         def setCover(self, path, cover):
                 if not self.enabled: return
 
-                data = open(cover, "rb").read()
+                img = Image.open(cover)
+                img.load()
+
+                # convert to JPEG if needed
+                if img.format != "JPEG":
+                        img = img.convert("RGB")
+                        img.save(self.tempfile)
+                        data = open(self.tempfile, "rb").read()
+                else:
+                        data = open(cover, "rb").read()
                 errors = ""
 
                 for f in self.__filelist__(path):

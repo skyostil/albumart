@@ -57,36 +57,169 @@ else:
                 from albumartdialog import AlbumArtDialog
 
 class CoverDownloadedEvent(QCustomEvent):
+        id = QEvent.User
         def __init__(self,thread,filename):
-                QCustomEvent.__init__(self,QEvent.User+0)
+                QCustomEvent.__init__(self,self.id)
                 self.filename = filename
                 self.thread = thread
 
 class TaskFinishedEvent(QCustomEvent):
-        def __init__(self,thread):
-                QCustomEvent.__init__(self,QEvent.User+1)
+        id = QEvent.User+1
+        def __init__(self,thread,message = None):
+                QCustomEvent.__init__(self,self.id)
                 self.thread = thread
+                self.message = message
 
 class ExceptionEvent(QCustomEvent):
+        id = QEvent.User+2
         def __init__(self,x):
-                QCustomEvent.__init__(self,QEvent.User+2)
+                QCustomEvent.__init__(self,self.id)
                 self.exception = x
 
-class CoverDownloader(QThread):
-        def __init__(self,dialog,artist,album):
+class ProgressEvent(QCustomEvent):
+        id = QEvent.User+3
+        def __init__(self,thread,progress,total):
+                QCustomEvent.__init__(self,self.id)
+                self.thread = thread
+                self.progress = progress
+                self.total = total
+
+class StatusEvent(QCustomEvent):
+        id = QEvent.User+4
+        def __init__(self,thread,text):
+                QCustomEvent.__init__(self,self.id)
+                self.thread = thread
+                self.text = text
+
+class ReloadEvent(QCustomEvent):
+        id = QEvent.User+5
+        def __init__(self,thread):
+                QCustomEvent.__init__(self,self.id)
+                self.thread = thread
+
+class Process(QThread):
+        def __init__(self,dialog):
                 QThread.__init__(self)
+                self.dialog = dialog
+                self.canceled = 0
+
+        def cancel(self):
+                self.canceled = 1
+
+        def isCanceled(self):
+                return self.canceled
+
+        def setProgress(self, progress, total):
+                self.postEvent(self.dialog, ProgressEvent(self, progress, total))
+
+        def setStatusText(self, text):
+                self.postEvent(self.dialog, StatusEvent(self, text))
+                
+        def setComplete(self, message = None):
+                self.postEvent(self.dialog, TaskFinishedEvent(self, message))
+
+        def triggerReload(self):
+                self.postEvent(self.dialog, ReloadEvent(self))
+
+        def run(self):
+                pass
+
+class CoverDownloaderProcess(Process):
+        "Cover Download"
+        def __init__(self,dialog,artist,album):
+                Process.__init__(self, dialog)
                 self.dialog = dialog
                 self.artist = artist
                 self.album = album
 
         def run(self):
+                coversFound = 0
+                self.setStatusText("Searching images for '%s' by %s..." % (self.album, self.artist))
+                        
                 try:
                         for c in albumart.getAvailableCovers(self.artist, self.album):
+                                coversFound += 1
+                                if self.isCanceled():
+                                        break
                                 self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
+                                self.setStatusText("%d covers found, looking for more..." % coversFound)
                 except Exception,x:
                         self.postEvent(self.dialog, ExceptionEvent(x))
 
-                self.postEvent(self.dialog, TaskFinishedEvent(self))
+                if coversFound > 0:
+                        self.setComplete("%d covers found. Done." % coversFound)
+                else:
+                        self.setComplete("Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
+
+class AutoDownloadProcess(Process):
+        "Automatic Cover Download"
+        def __init__(self, dialog, dir, items):
+                Process.__init__(self, dialog)
+                self.items = items
+                self.dir = dir
+
+        def run(self):
+                itemsProcessed = 0
+                recognized = 0
+                coversFound = 0
+                coversInstalled = 0
+                
+                for path in self.items:
+                        if self.isCanceled():
+                                break
+
+                        (artist,album)=albumart.guessArtistAndAlbum(path.replace(self.dir,""))
+
+                        if artist and album:
+                                recognized += 1
+                                self.setStatusText('Searching cover for "%s" by %s...' % (album, artist))
+                                for cover in albumart.getAvailableCovers(artist, album, requireExactMatch=1):
+                                        try:
+                                                img = Image.open(cover)
+                                                img.load()
+                                                coversFound += 1
+
+                                                # convert to JPEG if needed
+                                                if img.format != "JPEG":
+                                                        img = img.convert("RGB")
+                                                        img.save(cover)
+
+                                                albumart.setCover(path,cover)
+                                                coversInstalled += 1
+                                        except Exception,x:
+                                                print str(x)
+                                        break
+                                    
+                        itemsProcessed += 1
+                        self.setProgress(itemsProcessed, len(self.items))
+
+                self.triggerReload()
+                self.setComplete(
+                        "Out of a total of %d folders, %d were recognized, %d matching covers were found and %d were installed." %
+                        (len(self.items), recognized, coversFound, coversInstalled))
+
+class SynchronizeProcess(Process):
+        "Cover Image Synchronization"
+        def __init__(self, dialog, dir, items):
+                Process.__init__(self, dialog)
+                self.items = items
+                self.dir = dir
+
+        def run(self):
+                itemsProcessed = 0
+                
+                for path in self.items:
+                        if self.isCanceled():
+                                break
+
+                        self.setStatusText('Synchronizing %s...' % (path.replace(self.dir,"")))
+                        albumart.synchronizeCovers(path)
+                                    
+                        itemsProcessed += 1
+                        self.setProgress(itemsProcessed, len(self.items))
+
+                self.triggerReload()
+                self.setComplete()
 
 class AlbumArt(AlbumArtDialog):
         def __init__(self,parent = None,name = None,fl = 0):
@@ -112,11 +245,6 @@ class AlbumArt(AlbumArtDialog):
                         self.menubar.insertItem("&Settings", self.settingsMenu, -1, 3)
 
                         # global settings
-#                       try:
-#                               self.showCoversAction.addTo(self.settingsMenu)
-#                       except:
-#                               pass
-
                         try:
                                 self.showCoversAction.setOn(self.config.getboolean("albumart", "showcovers"))
                         except Exception,x:
@@ -162,7 +290,7 @@ class AlbumArt(AlbumArtDialog):
                         pass
 
         def scaleIconPixmap(self, pixmap):
-                if not pixmap.isNull():
+                if not pixmap.isNull() and pixmap.width()>0 and pixmap.height()>0:
                         try:
                                 pixmap.convertFromImage(pixmap.convertToImage().scale(self.iconSize,self.iconSize))
                         except AttributeError:
@@ -365,8 +493,10 @@ class AlbumArt(AlbumArtDialog):
                 self.dirlist.clear()
 
                 self.statusBar().message("Reading directory...")
+                self.setCursor(Qt.waitCursor)
                 os.path.walk(path, self.process, path)
                 self.statusBar().message("Ready",5000)
+                self.setCursor(Qt.arrowCursor)
 
                 self.pushDownload.setEnabled(0)
 
@@ -405,7 +535,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
 
 
                         self.setCursor(Qt.waitCursor)
-                        self.statusBar().message("Deleting cover images...")
+                        self.statusBar().message("Deleting selected cover image...")
 
                         try:
                                 albumart.removeCover(path)
@@ -448,8 +578,23 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                                 self.dirlist.ensureItemVisible(item)
                                 break
 
-        def autoDownloadAction_canceled(self):
-                self.canceled = 1
+        def startProcess(self, process):
+                self.progressDialog = QProgressDialog(self, "progress", 1)
+                self.progressDialog.setCaption(str(process))
+                self.thread = process
+
+                # looks like trolltech fixed their spelling in Qt 3
+                if qVersion().split(".")[0]=="2":
+                        self.progressDialog.connect(self.progressDialog, SIGNAL("cancelled()"), self.processCanceled)
+                else:
+                        self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
+
+                self.progressDialog.show()
+                self.thread.start()
+
+        def processCanceled(self):
+                if self.thread:
+                        self.thread.cancel()
 
         def autoDownloadAction_activated(self):
                 item = self.dirlist.firstChild()
@@ -465,54 +610,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         if not albumart.hasCover(path):
                                 items.append(path)
 
-                progressDialog = QProgressDialog(self, "progress", 1)
-                progressDialog.setTotalSteps(len(items))
-                progressDialog.setProgress(0)
-                progressDialog.setCaption("Automatic Cover Download")
-                self.canceled = 0
-
-                # looks like trolltech fixed their spelling in Qt 3
-                if qVersion().split(".")[0]=="2":
-                        progressDialog.connect(progressDialog, SIGNAL("cancelled()"), self.autoDownloadAction_canceled)
-                else:
-                        progressDialog.connect(progressDialog, SIGNAL("canceled()"), self.autoDownloadAction_canceled)
-
-                progressDialog.show()
-
-                for path in items:
-                        qApp.processEvents()
-                        if self.canceled:
-                                break
-
-                        (artist,album)=albumart.guessArtistAndAlbum(path.replace(self.dir,""))
-
-                        if artist and album:
-                                recognized += 1
-                                progressDialog.setLabelText('Searching cover for "%s" by %s...' % (album, artist))
-                                for cover in albumart.getAvailableCovers(artist, album, requireExactMatch=1):
-                                        try:
-                                                img = Image.open(cover)
-                                                img.load()
-                                                coversFound += 1
-
-                                                # convert to JPEG if needed
-                                                if img.format != "JPEG":
-                                                        img = img.convert("RGB")
-                                                        img.save(cover)
-
-                                                albumart.setCover(path,cover)
-                                                coversInstalled += 1
-                                        except Exception,x:
-                                                print str(x)
-                                        break
-
-                        progressDialog.setProgress(progressDialog.progress()+1)
-
-                progressDialog.close()
-                self.reloadAction_activated()
-                QMessageBox.information(self, "Automatic Download Results",
-                        "Out of a total of %d folders, %d were recognized, %d matching covers were found and %d were installed." %
-                        (len(items), recognized, coversFound, coversInstalled))
+                self.startProcess(AutoDownloadProcess(self, self.dir, items))
 
         def synchronizeAction_activated(self):
                 item = self.dirlist.firstChild()
@@ -525,31 +623,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         if albumart.hasCover(path):
                                 items.append(path)
 
-                progressDialog = QProgressDialog(self, "progress", 1)
-                progressDialog.setTotalSteps(len(items))
-                progressDialog.setProgress(0)
-                progressDialog.setCaption("Cover Image Synchronization")
-                self.canceled = 0
-
-                # looks like trolltech fixed their spelling in Qt 3
-                if qVersion().split(".")[0]=="2":
-                        progressDialog.connect(progressDialog, SIGNAL("cancelled()"), self.autoDownloadAction_canceled)
-                else:
-                        progressDialog.connect(progressDialog, SIGNAL("canceled()"), self.autoDownloadAction_canceled)
-
-                progressDialog.show()
-
-                for path in items:
-                        qApp.processEvents()
-                        if self.canceled:
-                                break
-
-                        albumart.synchronizeCovers(path)
-                        progressDialog.setLabelText('Synchronizing %s...' % (path.replace(self.dir,"")))
-                        progressDialog.setProgress(progressDialog.progress()+1)
-
-                progressDialog.close()
-                self.reloadAction_activated()
+                self.startProcess(SynchronizeProcess(self, self.dir, items))
 
         def dirlist_selectionChanged(self,a0):
                 self.selectedAlbum = a0
@@ -635,29 +709,38 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                 return 0
 
         def customEvent(self,event):
-                if event.type()==QEvent.User+0:
+                try:
                         # if the message was sent by an older thread, ignore it.
                         if self.thread != event.thread:
                                 return
-
+                except AttributeError:
+                        pass
+            
+                if event.type()==CoverDownloadedEvent.id:
                         self.covers.append(event.filename)
                         self.addCoverToList(event.filename)
-                        self.statusBar().message("%d covers found. Looking for more..." % len(self.coverfiles.keys()))
-                elif event.type()==QEvent.User+1:
-                        # if the message was sent by an older thread, ignore it.
-                        if self.thread != event.thread:
-                                return
-
+                elif event.type()==TaskFinishedEvent.id:
                         self.thread.wait()
                         self.thread = None
-                        self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
 
-                        if not len(self.coverfiles.keys()):
-                                QMessageBox.information(self, version.__program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
+                        if self.progressDialog:
+                                self.progressDialog.close()
+
+                        if event.message:
+                                QMessageBox.information(self, version.__program__,event.message)
 
                         self.pushDownload.setEnabled(1)
-                elif event.type()==QEvent.User+2:
+                elif event.type()==ExceptionEvent.id:
                         QMessageBox.critical(self, version.__program__,"The following error occured while downloading cover images:\n%s"%str(event.exception))
+                elif event.type()==ProgressEvent.id:
+                        if self.progressDialog:
+                                self.progressDialog.setTotalSteps(event.total)
+                                self.progressDialog.setProgress(event.progress)
+                elif event.type()==StatusEvent.id:
+                        if self.progressDialog:
+                                self.progressDialog.setLabelText(event.text)
+                elif event.type()==ReloadEvent.id:
+                        self.reloadAction_activated()
 
                 del event
 
@@ -676,9 +759,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                 self.covers = []
 
                 # start the downloader thread
-                self.statusBar().message("Searching for covers...")
-                self.thread = CoverDownloader(self,self.getQString(self.artistEdit.text()), self.getQString(self.albumEdit.text()))
-                self.thread.start()
+                self.startProcess(CoverDownloaderProcess(self,self.getQString(self.artistEdit.text()), self.getQString(self.albumEdit.text())))
 
         def coverview_selectionChanged(self,a0):
                 self.pushSet.setEnabled(1)

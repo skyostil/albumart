@@ -17,6 +17,7 @@ __module__ = "albumart"
 from __future__ import generators
 
 import os
+import tempfile
 
 class Module:
         """Base class for a module that provides additional functionality."""
@@ -142,12 +143,23 @@ def synchronizeCovers(path):
         """Makes sure all the cover image targets for the given path
            have the same image."""
 
-        image = getCover(path)
+        image = None
+        imageSource = None
+
+        # find an image for the path
+        for t in targets:
+                image = t.getCover(path)
+                if image:
+                        imageSource = t
+                        break
+
         if image:
                 for t in targets:
+                        # don't set the same image again if we got it from this target
+                        if t == imageSource:
+                                continue
                         try:
-                                if not t.hasCover(path):
-                                        t.setCover(path, image)
+                                t.setCover(path, image)
                         except:
                                 pass
 
