@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '../../src/albumart.ui'
 #
-# Created: la helmi  26 12:52:35 2005
+# Created: la helmi  26 16:40:32 2005
 #      by: The PyQt User Interface Compiler (pyuic) 3.13
 #
 # WARNING! All changes made in this file will be lost!
@@ -1152,60 +1152,6 @@ class AlbumArtDialog(QMainWindow):
         layout6.addWidget(self.clearFilter)
 
         self.filterEdit = QLineEdit(LayoutWidget,"filterEdit")
-        pal = QPalette()
-        cg = QColorGroup()
-        cg.setColor(QColorGroup.Foreground,Qt.black)
-        cg.setColor(QColorGroup.Button,QColor(238,234,222))
-        cg.setColor(QColorGroup.Light,Qt.white)
-        cg.setColor(QColorGroup.Midlight,QColor(246,244,238))
-        cg.setColor(QColorGroup.Dark,QColor(119,117,111))
-        cg.setColor(QColorGroup.Mid,QColor(158,155,147))
-        cg.setColor(QColorGroup.Text,QColor(186,186,179))
-        cg.setColor(QColorGroup.BrightText,Qt.white)
-        cg.setColor(QColorGroup.ButtonText,Qt.black)
-        cg.setColor(QColorGroup.Base,Qt.white)
-        cg.setColor(QColorGroup.Background,QColor(238,238,230))
-        cg.setColor(QColorGroup.Shadow,Qt.black)
-        cg.setColor(QColorGroup.Highlight,QColor(98,161,255))
-        cg.setColor(QColorGroup.HighlightedText,Qt.black)
-        cg.setColor(QColorGroup.Link,QColor(0,0,192))
-        cg.setColor(QColorGroup.LinkVisited,QColor(128,0,128))
-        pal.setActive(cg)
-        cg.setColor(QColorGroup.Foreground,Qt.black)
-        cg.setColor(QColorGroup.Button,QColor(238,234,222))
-        cg.setColor(QColorGroup.Light,Qt.white)
-        cg.setColor(QColorGroup.Midlight,Qt.white)
-        cg.setColor(QColorGroup.Dark,QColor(119,117,111))
-        cg.setColor(QColorGroup.Mid,QColor(158,155,147))
-        cg.setColor(QColorGroup.Text,QColor(186,186,179))
-        cg.setColor(QColorGroup.BrightText,Qt.white)
-        cg.setColor(QColorGroup.ButtonText,Qt.black)
-        cg.setColor(QColorGroup.Base,Qt.white)
-        cg.setColor(QColorGroup.Background,QColor(238,238,230))
-        cg.setColor(QColorGroup.Shadow,Qt.black)
-        cg.setColor(QColorGroup.Highlight,QColor(98,161,255))
-        cg.setColor(QColorGroup.HighlightedText,Qt.black)
-        cg.setColor(QColorGroup.Link,QColor(0,0,192))
-        cg.setColor(QColorGroup.LinkVisited,QColor(128,0,128))
-        pal.setInactive(cg)
-        cg.setColor(QColorGroup.Foreground,QColor(128,128,128))
-        cg.setColor(QColorGroup.Button,QColor(238,234,222))
-        cg.setColor(QColorGroup.Light,Qt.white)
-        cg.setColor(QColorGroup.Midlight,Qt.white)
-        cg.setColor(QColorGroup.Dark,QColor(119,117,111))
-        cg.setColor(QColorGroup.Mid,QColor(158,155,147))
-        cg.setColor(QColorGroup.Text,QColor(186,186,179))
-        cg.setColor(QColorGroup.BrightText,Qt.white)
-        cg.setColor(QColorGroup.ButtonText,QColor(128,128,128))
-        cg.setColor(QColorGroup.Base,Qt.white)
-        cg.setColor(QColorGroup.Background,QColor(238,238,230))
-        cg.setColor(QColorGroup.Shadow,Qt.black)
-        cg.setColor(QColorGroup.Highlight,QColor(98,161,255))
-        cg.setColor(QColorGroup.HighlightedText,Qt.black)
-        cg.setColor(QColorGroup.Link,QColor(0,0,192))
-        cg.setColor(QColorGroup.LinkVisited,QColor(128,0,128))
-        pal.setDisabled(cg)
-        self.filterEdit.setPalette(pal)
         self.filterEdit.setReadOnly(0)
         layout6.addWidget(self.filterEdit)
         layout7.addLayout(layout6)
@@ -1214,7 +1160,7 @@ class AlbumArtDialog(QMainWindow):
         self.dirlist.addColumn(QString.null)
         self.dirlist.header().setClickEnabled(0,self.dirlist.header().count() - 1)
         self.dirlist.header().setResizeEnabled(0,self.dirlist.header().count() - 1)
-        self.dirlist.setEnabled(0)
+        self.dirlist.setEnabled(1)
         self.dirlist.setMinimumSize(QSize(400,0))
         self.dirlist.setAcceptDrops(1)
         self.dirlist.setSelectionMode(QListView.Extended)
@@ -1353,7 +1299,7 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.fileOpenAction,SIGNAL("activated()"),self.fileOpen)
         self.connect(self.fileExitAction,SIGNAL("activated()"),self.fileExit)
         self.connect(self.helpAboutAction,SIGNAL("activated()"),self.helpAbout)
-        self.connect(self.dirlist,SIGNAL("selectionChanged(QListViewItem*)"),self.dirlist_selectionChanged)
+        self.connect(self.dirlist,SIGNAL("currentChanged(QListViewItem*)"),self.dirlist_currentChanged)
         self.connect(self.coverview,SIGNAL("selectionChanged(QIconViewItem*)"),self.coverview_selectionChanged)
         self.connect(self.pushSet,SIGNAL("clicked()"),self.pushSet_clicked)
         self.connect(self.coverview,SIGNAL("dropped(QDropEvent*,const QValueList<QIconDragItem>&)"),self.coverview_dropped)
@@ -1385,7 +1331,7 @@ class AlbumArtDialog(QMainWindow):
         self.setCaption(self.__tr("Album Cover Art Downloader"))
         self.clearFilter.setText(QString.null)
         QToolTip.add(self.clearFilter,self.__tr("Reset filter"))
-        self.filterEdit.setText(self.__tr("Filter albums"))
+        self.filterEdit.setText(QString.null)
         QToolTip.add(self.filterEdit,self.__tr("Enter a string to filter albums by"))
         self.dirlist.header().setLabel(0,QString.null)
         self.textLabel1_2.setText(self.__tr("<p align=\"right\">Album:</p>"))
@@ -1469,8 +1415,8 @@ class AlbumArtDialog(QMainWindow):
     def helpAbout(self):
         print "AlbumArtDialog.helpAbout(): Not implemented yet"
 
-    def dirlist_selectionChanged(self,a0):
-        print "AlbumArtDialog.dirlist_selectionChanged(QListViewItem*): Not implemented yet"
+    def dirlist_currentChanged(self,a0):
+        print "AlbumArtDialog.dirlist_currentChanged(QListViewItem*): Not implemented yet"
 
     def dirlist_mouseButtonClicked(self,a0,a1,a2,a3):
         print "AlbumArtDialog.dirlist_mouseButtonClicked(int,QListViewItem*,const QPoint&,int): Not implemented yet"

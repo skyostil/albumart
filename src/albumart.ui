@@ -66,258 +66,8 @@
                                 <property name="name">
                                     <cstring>filterEdit</cstring>
                                 </property>
-                                <property name="palette">
-                                    <palette>
-                                        <active>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>238</red>
-                                                <green>234</green>
-                                                <blue>222</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>246</red>
-                                                <green>244</green>
-                                                <blue>238</blue>
-                                            </color>
-                                            <color>
-                                                <red>119</red>
-                                                <green>117</green>
-                                                <blue>111</blue>
-                                            </color>
-                                            <color>
-                                                <red>158</red>
-                                                <green>155</green>
-                                                <blue>147</blue>
-                                            </color>
-                                            <color>
-                                                <red>186</red>
-                                                <green>186</green>
-                                                <blue>179</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>238</red>
-                                                <green>238</green>
-                                                <blue>230</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>98</red>
-                                                <green>161</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>192</blue>
-                                            </color>
-                                            <color>
-                                                <red>128</red>
-                                                <green>0</green>
-                                                <blue>128</blue>
-                                            </color>
-                                        </active>
-                                        <disabled>
-                                            <color>
-                                                <red>128</red>
-                                                <green>128</green>
-                                                <blue>128</blue>
-                                            </color>
-                                            <color>
-                                                <red>238</red>
-                                                <green>234</green>
-                                                <blue>222</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>119</red>
-                                                <green>117</green>
-                                                <blue>111</blue>
-                                            </color>
-                                            <color>
-                                                <red>158</red>
-                                                <green>155</green>
-                                                <blue>147</blue>
-                                            </color>
-                                            <color>
-                                                <red>186</red>
-                                                <green>186</green>
-                                                <blue>179</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>128</red>
-                                                <green>128</green>
-                                                <blue>128</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>238</red>
-                                                <green>238</green>
-                                                <blue>230</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>98</red>
-                                                <green>161</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>192</blue>
-                                            </color>
-                                            <color>
-                                                <red>128</red>
-                                                <green>0</green>
-                                                <blue>128</blue>
-                                            </color>
-                                        </disabled>
-                                        <inactive>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>238</red>
-                                                <green>234</green>
-                                                <blue>222</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>119</red>
-                                                <green>117</green>
-                                                <blue>111</blue>
-                                            </color>
-                                            <color>
-                                                <red>158</red>
-                                                <green>155</green>
-                                                <blue>147</blue>
-                                            </color>
-                                            <color>
-                                                <red>186</red>
-                                                <green>186</green>
-                                                <blue>179</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>255</red>
-                                                <green>255</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>238</red>
-                                                <green>238</green>
-                                                <blue>230</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>98</red>
-                                                <green>161</green>
-                                                <blue>255</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>0</blue>
-                                            </color>
-                                            <color>
-                                                <red>0</red>
-                                                <green>0</green>
-                                                <blue>192</blue>
-                                            </color>
-                                            <color>
-                                                <red>128</red>
-                                                <green>0</green>
-                                                <blue>128</blue>
-                                            </color>
-                                        </inactive>
-                                    </palette>
-                                </property>
                                 <property name="text">
-                                    <string>Filter albums</string>
+                                    <string></string>
                                 </property>
                                 <property name="readOnly">
                                     <bool>false</bool>
@@ -344,7 +94,7 @@
                             <cstring>dirlist</cstring>
                         </property>
                         <property name="enabled">
-                            <bool>false</bool>
+                            <bool>true</bool>
                         </property>
                         <property name="minimumSize">
                             <size>
@@ -873,9 +623,9 @@
     </connection>
     <connection>
         <sender>dirlist</sender>
-        <signal>selectionChanged(QListViewItem*)</signal>
+        <signal>currentChanged(QListViewItem*)</signal>
         <receiver>AlbumArtDialog</receiver>
-        <slot>dirlist_selectionChanged(QListViewItem*)</slot>
+        <slot>dirlist_currentChanged(QListViewItem*)</slot>
     </connection>
     <connection>
         <sender>coverview</sender>
@@ -1015,7 +765,7 @@
     <slot>helpIndex()</slot>
     <slot>helpContents()</slot>
     <slot>helpAbout()</slot>
-    <slot>dirlist_selectionChanged( QListViewItem * )</slot>
+    <slot>dirlist_currentChanged(QListViewItem *)</slot>
     <slot>dirlist_mouseButtonClicked( int, QListViewItem *, const QPoint &amp;, int )</slot>
     <slot>pushDownload_clicked()</slot>
     <slot>coverview_selectionChanged( QIconViewItem * )</slot>
