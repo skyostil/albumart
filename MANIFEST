@@ -10,3 +10,5 @@ lib/albumart/amazon.py
 lib/albumart/version.py
 share/albumart/cover.png
 share/albumart/nocover.png
+share/applnk/albumart.desktop
+share/pixmaps/albumart.png

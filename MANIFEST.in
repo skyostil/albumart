@@ -1,3 +1,4 @@
+# these are included in the source repository
 include README
 include TODO
 include albumart.desktop
@@ -5,6 +6,8 @@ include setup.py
 include bin/albumart-qt.py
 include share/albumart/cover.png
 include share/albumart/nocover.png
+include share/pixmaps/albumart.png
+include share/applnk/albumart.desktop
 include lib/albumart/albumart.py
 include lib/albumart/albumartdialog.py
 include lib/albumart/albumartdialog_qt230.py
