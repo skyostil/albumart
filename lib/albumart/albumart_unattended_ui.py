@@ -30,11 +30,14 @@ class AlbumArtUnattendedUi(QWidget):
   #
   # @param parent Parent widget
   # @param name Widget name
+  # @param showSummary Show a summary dialog when done.
   #
   def __init__(self, parent = None,
-               name = "AlbumArtUnattendedUi"):
+               name = "AlbumArtUnattendedUi",
+               showSummary = False):
     QObject.__init__(self, parent, name)
     self.config = ConfigParser.ConfigParser()
+    self.showSummary = showSummary
     
     try:
       # load the configuration
@@ -172,6 +175,8 @@ class AlbumArtUnattendedUi(QWidget):
 
       if event.message:
         print event.message.replace("\n", "")
+        if self.showSummary:
+          QMessageBox.information(self, version.__program__, event.message)
       
       QApplication.exit(not event.result)
 

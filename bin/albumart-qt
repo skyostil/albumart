@@ -50,12 +50,13 @@ http://kempele.fi/~skyostil/projects/albumart
 Assings cover images to directories holding albums.
 
 Usage:
-  %(executable)-18s      [options] [path]
+  %(executable)-18s    [options] [path]
 Options:
-  -h, --help              This text.
-  -d, --download          Download covers for the given path.
-  -x, --delete            Remove covers below the given path.
-  -s, --synchronize       Synchronizes all covers below the given path.""" % \
+  -h, --help           This text.
+  -d, --download       Download covers for the given path.
+  -x, --delete         Remove covers below the given path.
+  -s, --synchronize    Synchronizes all covers below the given path.
+  -i, --summary        Show a dialog with summary information when done.""" % \
   {
     "executable" : sys.argv[0],
     "app" : version.__program__, 
@@ -86,13 +87,13 @@ def runGui(albumPath = None):
 #
 # @returns a numeric exit code (0 for success)
 #
-def runUnattendedGui(operation, albumPath):
+def runUnattendedGui(operation, albumPath, showSummary = False):
   # load the heavy modules on demand
   import albumart_unattended_ui
   import qt
   
   app = qt.QApplication(sys.argv)
-  ui = albumart_unattended_ui.AlbumArtUnattendedUi()
+  ui = albumart_unattended_ui.AlbumArtUnattendedUi(showSummary = showSummary)
   app.setMainWidget(ui)
   
   if operation == "download":
@@ -107,13 +108,16 @@ def runUnattendedGui(operation, albumPath):
 if __name__=="__main__":
   try:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "hdxs",
-                               ["help", "download", "delete", "synchronize"])
+                               "hdxsi",
+                               ["help", "download", "delete", "synchronize",
+                                "summary"])
   except getopt.GetoptError:
     printUsage()
     sys.exit(2)
   
   operation = None
+  showSummary = False
+  
   for option, arg in opts:
     if option in ("-h", "--help"):
       printUsage()
@@ -124,11 +128,13 @@ if __name__=="__main__":
       operation = "delete"
     elif option in ("-s", "--synchronize"):
       operation = "synchronize"
+    elif option in ("-i", "--summary"):
+      showSummary = True
       
   if not args:
     sys.exit(runGui())
   else:
     if operation:
-      sys.exit(runUnattendedGui(operation, args[0]))
+      sys.exit(runUnattendedGui(operation, args[0], showSummary))
     else:
       sys.exit(runGui(args[0]))
