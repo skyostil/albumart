@@ -148,9 +148,20 @@ class CoverDownloaderProcess(Process):
                                 coversFound += 1
                                 if self.isCanceled():
                                         break
+                                        
+                                img = Image.open(c)
+                                img.load()
+                                
+                                # convert to JPEG if needed
+                                if img.format != "JPEG":
+                                    img = img.convert("RGB")
+                                    img.save(c)
+                                        
                                 self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
-				# better some progress than none at all :)
-				# we can't tell how many covers we've downloaded as they may have been blank or corrupt.
+                                # better fake progress than none at all :)
+                                # we can't tell how many covers we've
+                                # downloaded as they may have been blank or
+                                # corrupt.
 	                        self.setProgress(coversFound-1,coversFound)
                 except Exception,x:
                         self.postEvent(self.dialog, ExceptionEvent(x))

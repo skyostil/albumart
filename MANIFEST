@@ -17,7 +17,6 @@ debian/docs
 debian/emacsen-install.ex
 debian/emacsen-remove.ex
 debian/emacsen-startup.ex
-debian/files
 debian/init.d.ex
 debian/manpage.1.ex
 debian/manpage.sgml.ex
@@ -39,9 +38,9 @@ lib/albumart/albumartdialog_qt300.py
 lib/albumart/amazon.py
 lib/albumart/config.py
 lib/albumart/version.py
-lib/albumart/id3/__init__.py
 lib/albumart/id3/binfuncs.py
 lib/albumart/id3/ID3v2Frames.py
+lib/albumart/id3/__init__.py
 share/albumart/1leftarrow.png
 share/albumart/1rightarrow.png
 share/albumart/cover.png
