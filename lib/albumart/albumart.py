@@ -12,6 +12,8 @@ the Free Software Foundation; either version 2 of the License, or
 at your option) any later version.
 """
 
+__module__ = "albumart"
+
 from __future__ import generators
 
 import os

@@ -1,0 +1,10 @@
+1.2:
+
+	- Made sure the images are saved in a proper format. Thanks to Josh Portner for pointing this out.
+	- Paths with non-ascii characters are now handled properly.
+	- Don't freeze the UI while reading a directory.
+	- Save settings for the user (last directory, etc.).
+	- Now able to select source and target modules.
+	- Cover image previews in the directory list and above the cover list.
+	- Reload UI icons to restore alpha transparency.
+	- New keyboard shortcuts and actions for navigating the directory list.

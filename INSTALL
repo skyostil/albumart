@@ -1,13 +1,13 @@
 To install (as root):
 
-	# python setup.py install
+	% python setup.py install
 
 Run python setup.py install --help for more options.
 
 To build an RPM file:
 
-	# python setup.py bdist_rpm --group "Application/Multimedia"
+	% python setup.py bdist_rpm --group "Application/Multimedia"
 
 To build a DEB file:
 
-	# fakeroot debian/rules binary
+	% fakeroot debian/rules binary

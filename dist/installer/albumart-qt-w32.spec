@@ -1,5 +1,6 @@
 a = Analysis([os.path.join(HOMEPATH,'support\\_mountzlib.py'), os.path.join(HOMEPATH,'support\\useUnicode.py'), '..\\..\\bin\\albumart-qt'],
-             pathex=['..\\..\\bin', '..\\..\\lib\\albumart', 'C:\\Sami\\cvs\\albumart\\dist\\INSTAL~1'])
+             pathex=['..\\..\\bin', '..\\..\\lib\\albumart'],
+		 hookspath=['.'])
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
@@ -7,7 +8,7 @@ exe = EXE(pyz,
           name='buildalbumart-qt-w32/albumart-qt.exe',
           debug=0,
           strip=0,
-          upx=0,
+          upx=1,
           console=0 , icon='..\\..\\win32\\icon.ico')
 coll = COLLECT( exe,
                a.binaries,

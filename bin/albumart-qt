@@ -1,20 +1,21 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-"""
-QT-frontend for the album image downloader.
-
-Copyright (C) 2003 Sami Kyöstilä <skyostil@kempele.fi>
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-at your option) any later version.
-"""
+#"""
+#QT-frontend for the album image downloader.
+#
+#Copyright (C) 2003 Sami Kyöstilä <skyostil@kempele.fi>
+#
+#This program is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 2 of the License, or
+#at your option) any later version.
+#"""
 
 # first, find out where our program and data files are and set up sys.path accordingly.
 import os
 import sys
+import encodings
 
 def getBaseDir():
 	path = os.path.dirname(sys.argv[0])
@@ -124,7 +125,11 @@ class AlbumArt(AlbumArtDialog):
 			self.menubar.insertItem("&Settings", self.settingsMenu, -1, 2)
 
 			# global settings
-			self.showCoversAction.addTo(self.settingsMenu)
+			try:
+				self.showCoversAction.addTo(self.settingsMenu)
+			except:
+				pass
+				
 			try:
 				self.showCoversAction.setOn(self.config.getboolean("albumart", "showcovers"))
 			except Exception,x:
@@ -139,7 +144,8 @@ class AlbumArt(AlbumArtDialog):
 			for t in self.config.get("albumart", "targets").split(":"):
 				mod = self.loadModule(t)
 				albumart.addTarget(mod)
-		except:
+		except Exception,x:
+			sys.stderr.write("Unable to load configuration: %s\n" % str(x))
 			pass
 
 		self.show()
@@ -245,7 +251,12 @@ class AlbumArt(AlbumArtDialog):
 			pixmap = QPixmap(albumart.getCover(path))
 			image = pixmap.convertToImage()
 			if not image.isNull() and image.width()>1 and image.height()>1:
-				image = image.scale(16,16)
+				try:
+					image = image.scale(16,16)
+				except:
+					# for older Qt 2.x
+					image = image.smoothScale(16,16)
+				
 				pixmap.convertFromImage(image)
 				return pixmap
 			else:
@@ -265,10 +276,11 @@ class AlbumArt(AlbumArtDialog):
 				return
 
 		# ugly portability hack
-		if "\\" in root:
-			if not root[-1] == "\\" : root+="\\"
-		else:
-			if not root[-1] == "/": root+="/"
+		if len(root):
+			if "\\" in root:
+				if not root[-1] == "\\" : root+="\\"
+			else:
+				if not root[-1] == "/": root+="/"
 
 		dirname=dirname.replace(root,"")
 
@@ -310,7 +322,10 @@ class AlbumArt(AlbumArtDialog):
 
 	def helpAbout(self):
 		QMessageBox.information(self, version.__program__, """%s version %s by %s.
-Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__program__,version.__version__,version.__author__))
+http://kempele.fi/~skyostil/projects/albumart		
+		
+Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).
+Icons by Everaldo Coelho (http://www.everaldo.com) et al.""" % (version.__program__,version.__version__,version.__author__))
 
 	def fileOpen(self):
 		d=self.getQString(QFileDialog.getExistingDirectory(self.dir,self,"Choose a directory that contains one or more albums","Choose a directory", 1))
