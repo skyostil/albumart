@@ -458,7 +458,7 @@
             <iconset>image7</iconset>
         </property>
         <property name="text">
-            <string>Delete cover image...</string>
+            <string>Delete cover images...</string>
         </property>
         <property name="menuText">
             <string>&amp;Delete cover image...</string>
@@ -467,7 +467,7 @@
             <string>Delete the cover image for the currently selected items</string>
         </property>
         <property name="statusTip">
-            <string>Delete the cover image for the currently selected items</string>
+            <string>Delete cover images from the currently selected items</string>
         </property>
     </action>
     <action>
