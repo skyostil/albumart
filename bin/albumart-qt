@@ -74,11 +74,11 @@ Options:
 #
 def runGui(albumPath = None):
   # load the heavy modules on demand
-  import albumart_ui
+  import albumart_dialog
   import qt
-  
+
   app = qt.QApplication(sys.argv)
-  mainwin = albumart_ui.AlbumArtUi(dataPath = getShareDir(), albumPath = albumPath)
+  mainwin = albumart_dialog.AlbumArtDialog(dataPath = getShareDir(), albumPath = albumPath)
   app.setMainWidget(mainwin)
   mainwin.show()
   return app.exec_loop()
