@@ -559,6 +559,9 @@
         <property name="text">
             <string>Stop</string>
         </property>
+        <property name="accel">
+            <string>Esc</string>
+        </property>
     </action>
 </actions>
 <images>
