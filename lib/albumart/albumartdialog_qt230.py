@@ -1,10 +1,6 @@
-# Form implementation generated from reading ui file 'albumart.ui'
 #
-# Created: ma touko  5 22:12:59 2003
-#      by: The PyQt User Interface Compiler (pyuic)
+# Implementation for Qt 2.3.0
 #
-# WARNING! All changes made in this file will be lost!
-
 
 from qt import *
 
@@ -2831,8 +2827,27 @@ class AlbumArtDialog(QMainWindow):
         self.showCoversAction.setToggleAction(1)
         self.removeAction = QAction(self,"removeAction")
         self.removeAction.setEnabled(0)
+        self.viewIcon_SizeAction = QAction(self,"viewIcon_SizeAction")
+        self.SizeActionGroup = QActionGroup(self,"SizeActionGroup")
+        self.viewIcon_SizeSmallAction = QAction(self.SizeActionGroup,"viewIcon_SizeSmallAction")
+        self.viewIcon_SizeSmallAction.setToggleAction(1)
+        self.viewIcon_SizeSmallAction.setText("Small")
+        self.viewIcon_SizeMediumAction = QAction(self.SizeActionGroup,"viewIcon_SizeMediumAction")
+        self.viewIcon_SizeMediumAction.setToggleAction(1)
+        self.viewIcon_SizeMediumAction.setText("Medium")
+        self.viewIcon_SizeLargeAction = QAction(self.SizeActionGroup,"viewIcon_SizeLargeAction")
+        self.viewIcon_SizeLargeAction.setToggleAction(1)
+        self.viewIcon_SizeLargeAction.setText("Large")
 
         self.toolBar = QToolBar("",self)
+
+        self.View = QPopupMenu(self)
+        self.showCoversAction.addTo(self.View)
+        self.viewIcon_SizeAction_2 = QPopupMenu(self)
+        self.View.insertItem(self.viewIcon_SizeAction.iconSet(),"Icon &Size",self.viewIcon_SizeAction_2)
+        self.viewIcon_SizeSmallAction.addTo(self.viewIcon_SizeAction_2)
+        self.viewIcon_SizeMediumAction.addTo(self.viewIcon_SizeAction_2)
+        self.viewIcon_SizeLargeAction.addTo(self.viewIcon_SizeAction_2)
 
         self.fileOpenAction.addTo(self.toolBar)
         self.reloadAction.addTo(self.toolBar)
@@ -2854,6 +2869,8 @@ class AlbumArtDialog(QMainWindow):
         self.previousAction.addTo(self.editMenu)
         self.removeAction.addTo(self.editMenu)
         self.menubar.insertItem(QString("&Edit"),self.editMenu,2)
+
+        self.menubar.insertItem(QString("&View"),self.View,3)
 
         self.helpMenu = QPopupMenu(self)
         self.helpMenu.insertSeparator()
@@ -2878,6 +2895,9 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.previousAction,SIGNAL("activated()"),self.previousAction_activated)
         self.connect(self.showCoversAction,SIGNAL("toggled(bool)"),self.showCoversAction_toggled)
         self.connect(self.removeAction,SIGNAL("activated()"),self.removeAction_activated)
+        self.connect(self.viewIcon_SizeSmallAction,SIGNAL("toggled(bool)"),self.iconSizeSmallAction_toggled)
+        self.connect(self.viewIcon_SizeMediumAction,SIGNAL("toggled(bool)"),self.iconSizeMediumAction_toggled)
+        self.connect(self.viewIcon_SizeLargeAction,SIGNAL("toggled(bool)"),self.iconSizeLargeAction_toggled)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)

@@ -126,12 +126,12 @@ class AlbumArt(AlbumArtDialog):
                         except Exception,x:
                                 pass
 
-                        if self.iconSize == 16:
-                                self.viewIcon_SizeSmallAction.setOn(1)
-                        elif self.iconSize == 32:
-                                self.viewIcon_SizeMediumAction.setOn(1);
-                        elif self.iconSize == 64:
-                                self.viewIcon_SizeLargeAction.setOn(1);
+			if self.iconSize == 16:
+				self.viewIcon_SizeSmallAction.setOn(1)
+			elif self.iconSize == 32:
+				self.viewIcon_SizeMediumAction.setOn(1);
+			elif self.iconSize == 64:
+				self.viewIcon_SizeLargeAction.setOn(1);
 
                         for s in self.config.get("albumart", "sources").split(":"):
                                 mod = self.loadModule(s)
@@ -164,7 +164,7 @@ class AlbumArt(AlbumArtDialog):
                 try:
                         pixmap.convertFromImage(pixmap.convertToImage().scale(self.iconSize,self.iconSize))
                         return pixmap
-                except NameError:
+                except AttributeError:
                         # for older Qt 2.x
                         pixmap.convertFromImage(pixmap.convertToImage().smoothScale(self.iconSize,self.iconSize))
                         return pixmap
@@ -391,7 +391,8 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         self.walk(d)
 
         def reloadAction_activated(self):
-                self.walk(self.dir)
+		if len(self.dir):
+	                self.walk(self.dir)
 
         def removeAction_activated(self):
                 if QMessageBox.information(self, "Confirm deletion", "Are you sure you want to delete the selected cover image?", QMessageBox.Yes, QMessageBox.No+QMessageBox.Default+QMessageBox.Escape) == QMessageBox.Yes:
