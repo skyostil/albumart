@@ -104,12 +104,7 @@ class AlbumArtUnattendedUi(QWidget):
     self.progressDialog = QProgressDialog(self, "progress", 1)
     self.progressDialog.setCaption(process.__doc__)
     self.thread = process
-
-    # looks like trolltech fixed their spelling in Qt 3
-    if qVersion().split(".")[0] == "2":
-      self.progressDialog.connect(self.progressDialog, SIGNAL("cancelled()"), self.processCanceled)
-    else:
-      self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
+    self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
 
     if not self.hidden:
       self.progressDialog.show()
@@ -191,7 +186,4 @@ class AlbumArtUnattendedUi(QWidget):
     
   def tr(self, identifier, context = None):
     """Overridden translation method that returns native Python strings"""
-    if qVersion().split(".")[0] == "2":
-      # tr is static in old Qt
-      return self.getQString(QObject.tr(identifier, context))
     return self.getQString(QObject.tr(self, identifier, context))

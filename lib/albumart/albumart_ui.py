@@ -30,12 +30,7 @@ from pixmap import getPixmapForPath
 from items import TrackItem, AlbumItem, CoverItem
 from event import *
 from process import *
-
-# see if we're using an old Qt version
-if qVersion().split(".")[0] == "2":
-  from albumartdialog_qt230 import AlbumArtDialog
-else:
-  from albumartdialog import AlbumArtDialog
+from albumartdialog import AlbumArtDialog
 
 class AlbumArtUi(AlbumArtDialog):
   """Main window."""
@@ -435,13 +430,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.progressDialog = QProgressDialog(self, "progress", 1)
     self.progressDialog.setCaption(process.__doc__)
     self.thread = process
-
-    # looks like trolltech fixed their spelling in Qt 3
-    if qVersion().split(".")[0] == "2":
-      self.progressDialog.connect(self.progressDialog, SIGNAL("cancelled()"), self.processCanceled)
-    else:
-      self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
-
+    self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
     self.progressDialog.show()
     self.thread.start()
 
@@ -566,31 +555,14 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
           
   def addCoverToList(self, coverfile):
     """Adds the given cover to the list of available album covers."""
-    # if we're running on Qt 2, convert the image to a png.
     try:
-      if qVersion().split(".")[0] == '2' and imghdr.what(coverfile) != "png":
-        i = Image.open(coverfile)
-        s = StringIO.StringIO()
-        i.save(s, "PNG")
-        pixmap = QPixmap()
-        pixmap.loadFromData(s.getvalue())
-        image = pixmap.convertToImage()
-      else:
-        image = QImage(coverfile)
+      image = QImage(coverfile)
     except IOError:
       return 0
 
     if not image.isNull() and image.width() > 1 and image.height() > 1:
-      # if we're running on Qt 2, do the scaling a bit differently
-      if qVersion().split(".")[0] == '2':
-        image = image.smoothScale(256, 256 * float(image.height()) / float(image.width()))
-        pixmap = QPixmap()
-        pixmap.convertFromImage(image)
-        item = CoverItem(self.coverview, pixmap, coverfile)
-      else:
-        image = image.smoothScale(256, 256, QImage.ScaleMin)
-        item = CoverItem(self.coverview, QPixmap(image), coverfile)
-
+      image = image.smoothScale(256, 256, QImage.ScaleMin)
+      item = CoverItem(self.coverview, QPixmap(image), coverfile)
       return 1
     return 0
 
@@ -692,6 +664,10 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       s = QString()
       if QTextDrag.decode(event, s):
         url = urllib.unquote(self.getQString(s))
+        if url.startswith("file:///"):
+          url = url[len("file:///"):]
+        if os.path.exists(url):
+          url = urllib.pathname2url(url)
         f = urllib.urlopen(url)
         fn = tempfile.mktemp()
 
@@ -751,9 +727,6 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
 
   def tr(self, identifier, context = None):
     """Overridden translation method that returns native Python strings"""
-    if qVersion().split(".")[0] == "2":
-        # tr is static in old Qt
-        return self.getQString(QObject.tr(identifier, context))
     return self.getQString(QObject.tr(self, identifier, context))
 
   def coverview_dropped(self, event, a1):
