@@ -72,6 +72,9 @@ sources = []
 targets = []
 recognizers = []
 
+# list of extensions that are considered audio files
+mediaExtensions = [".mp3", ".ogg", ".wma"]
+
 def addSource(source):
   global sources
   sources.append(source)

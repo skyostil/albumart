@@ -38,7 +38,7 @@ class ID3v2(albumart.Target):
         try:
           for frame in id3v2.frames:
             if frame.id == "APIC":
-              file = open(self.tempfile,"wb")
+              file = open(self.tempfile, "wb")
               file.write(frame.image)
               file.close()
               return self.tempfile

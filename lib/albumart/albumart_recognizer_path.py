@@ -75,7 +75,7 @@ class PathRecognizer(albumart.Recognizer):
     
   def guessArtistAndAlbum(self, path):
     if os.path.isfile(path):
-      return (None, None)
+      path = os.path.dirname(path)
       
     artist = None
     album = None

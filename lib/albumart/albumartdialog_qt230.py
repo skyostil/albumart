@@ -2903,10 +2903,11 @@ class AlbumArtDialog(QMainWindow):
         layout2.addMultiCellWidget(self.albumIcon,0,1,4,4)
 
         self.dirlist = QListView(self.centralWidget(),"dirlist")
-        self.dirlist.addColumn(self.tr("Directory"))
-        self.dirlist.addColumn(self.tr("Artist"))
-        self.dirlist.addColumn(self.tr("Album"))
+        self.dirlist.addColumn("")
+        self.dirlist.header().hide()
         self.dirlist.setEnabled(0)
+        self.dirlist.setMultiSelection(1)
+        self.dirlist.setSelectionMode(QListView.Extended)
         self.dirlist.setAllColumnsShowFocus(1)
         self.dirlist.setRootIsDecorated(0)
 
@@ -3043,9 +3044,6 @@ class AlbumArtDialog(QMainWindow):
     def languageChange(self):
         self.setCaption(self.tr("Album Cover Art Downloader"))
         self.textLabel1.setText(self.tr("<p align=\"right\">Artist:</p>"))
-        self.dirlist.header().setLabel(0,self.tr("Directory"))
-        self.dirlist.header().setLabel(1,self.tr("Artist"))
-        self.dirlist.header().setLabel(2,self.tr("Album"))
         self.pushSet.setText(self.tr("&Set as Cover"))
         self.pushDownload.setText(self.tr("&Download Covers"))
         self.textLabel1_2.setText(self.tr("<p align=\"right\">Album:</p>"))

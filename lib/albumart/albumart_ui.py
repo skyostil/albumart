@@ -35,6 +35,158 @@ if qVersion().split(".")[0] == "2":
 else:
   from albumartdialog import AlbumArtDialog
 
+#
+# A track list item
+#  
+class TrackItem(QListViewItem):
+  def __init__(self, album, path):
+    QListViewItem.__init__(self, album)
+    self.path = path
+    self.name = os.path.basename(path)
+    self.margin = 8
+    self.album = album
+
+  def paintCell(self, painter, colorGroup, column, width, alignment):
+    if self.isSelected():
+      painter.fillRect(0, 0, width, self.height(), QBrush(colorGroup.mid().light()))
+    else:
+      painter.eraseRect(0, 0, width, self.height())
+
+    m = self.listView().itemMargin()
+    painter.drawPixmap(m, 0, self.pixmap(0))
+    painter.drawText(2 * m + self.pixmap(0).width(), m, 
+                     width, self.height(), 0, self.name)
+    
+  def paintFocus(self, painter, colorGroup, rect):
+    pass
+
+  def width(self, fontMetrics, listView, column):
+    return self.pixmap(0).width() + fontMetrics.width(self.name) + 16
+
+  #
+  # @returns the album name
+  #
+  def getAlbumName(self):
+    return self.album.getAlbumName()
+
+  #
+  # @returns the artist name
+  #
+  def getArtistName(self):
+    return self.album.getArtistName()
+
+  #
+  # @returns the path for this item
+  #
+  def getPath(self):
+    return self.path
+                  
+#
+# An album list item
+#  
+class AlbumItem(QListViewItem):
+  def __init__(self, parent, artist, album):
+    QListViewItem.__init__(self, parent)
+    self.artist = artist
+    self.album = album
+    self.tracks = []
+    self.margin = 8
+    self.openTrigger = QRect()
+    self.font = QFont()
+    self.titleFont = QFont(QFont().family(), 5 * QFont().pixelSize() / 4, QFont.Bold)
+
+  def paintCell(self, painter, colorGroup, column, width, alignment):
+    if self.isSelected():
+      painter.fillRect(0, 0, width, self.height(), QBrush(colorGroup.mid().light()))
+    else:
+      painter.eraseRect(0, 0, width, self.height())
+
+    # draw the icon    
+    m = self.listView().itemMargin()
+    painter.drawPixmap(m + self.margin, m + self.margin, self.pixmap(0))
+    m += 4
+      
+    left = self.pixmap(0).width() + m + self.margin
+    painter.setPen(colorGroup.text())
+    fontSize = painter.font().pixelSize()
+    
+    # draw the album title
+    painter.setFont(self.titleFont)
+    painter.drawText(left, m + self.margin, 
+                     width, self.height(), 0, self.album)
+    titleRect = painter.boundingRect(0, 0, width, self.height(), 0, self.album)
+    
+    # draw the artist name
+    subtitleRect = painter.boundingRect(0, 0, width, self.height(), 0, self.artist)
+    painter.setFont(QFont(painter.font().family(), fontSize))
+    painter.drawText(left, m + self.margin + titleRect.height(), 
+                     width, self.height() / 2, 0, self.artist)
+
+    # draw the open indicator
+    painter.setPen(colorGroup.mid())
+    painter.setBrush(colorGroup.mid())
+    smallFontSize = 3 * fontSize / 4
+    arrow = QPointArray(3)
+    if self.isOpen():
+      arrow.setPoint(0, 0, smallFontSize / 2 + 2)
+      arrow.setPoint(1, smallFontSize, smallFontSize / 2 + 2)
+      arrow.setPoint(2, smallFontSize / 2, smallFontSize + 2)
+    else:
+      arrow.setPoint(0, smallFontSize / 4, 0 + 2)
+      arrow.setPoint(1, 3 * smallFontSize / 4, smallFontSize / 2 + 2)
+      arrow.setPoint(2, smallFontSize / 4, smallFontSize + 2)
+    self.openTrigger.setRect(left, m + self.margin + titleRect.height() + m + subtitleRect.height(),
+                             smallFontSize, smallFontSize)
+    painter.translate(self.openTrigger.left(), self.openTrigger.top())
+    painter.drawPolygon(arrow)
+                     
+    # draw the track count
+    painter.setFont(QFont(painter.font().family(), smallFontSize))
+    text = str(len(self.tracks)) + (len(self.tracks) == 1 and " track" or " tracks")
+    painter.drawText(self.openTrigger.width() + m, 0,
+                     width, self.height() / 2, 0, text)
+    
+  def paintFocus(self, painter, colorGroup, rect):
+    pass
+    
+  def paintBranches(self, painter, colorGroup, w, y, h, style):
+    painter.eraseRect(0, 0, w, h)
+
+  def width(self, fontMetrics, listView, column):
+    return self.pixmap(0).width() + QFontMetrics(self.titleFont).width(self.album) + 16
+    
+  def setup(self):
+    self.setHeight(self.pixmap(0).height() + self.margin * 2)
+    
+  def activate(self):
+    # open the album if the cursor is within the trigger
+    p = self.listView().mapFromGlobal(QCursor.pos())
+    p.setY(p.y() - self.itemPos() + self.listView().contentsY())
+    if p.y() >= self.openTrigger.top() and \
+       p.x() > self.openTrigger.left() - 4 and \
+       p.x() < self.openTrigger.right() + 4:
+      self.setOpen(not self.isOpen())
+      
+  #
+  # @returns the album name
+  #
+  def getAlbumName(self):
+    return self.album
+
+  #
+  # @returns the artist name
+  #
+  def getArtistName(self):
+    return self.artist
+            
+  #
+  # Add a new track to this album
+  #
+  def addTrack(self, fileName):
+    if not fileName in self.tracks:
+      self.tracks.append(fileName)
+    return TrackItem(self, fileName)
+    
 class AlbumArtUi(AlbumArtDialog):
   #
   # Constructor. 
@@ -57,6 +209,8 @@ class AlbumArtUi(AlbumArtDialog):
     self.dir = ""
     self.dataPath = dataPath
     self.lastRepaintTime = 0
+    self.albums = {}
+    self.covers = []
 
     self.loadIcons()
     self.show()
@@ -128,17 +282,27 @@ class AlbumArtUi(AlbumArtDialog):
       self.walk(path)
     except Exception, x:
       self.reportException(self.tr("Reading the previous album directory"), x,
-                           silent = True)
+                           silent = False)
 
+  #
+  #  @returns the given pixmap scaled to icon size
+  #                          
   def scaleIconPixmap(self, pixmap):
+    return self.scalePixmap(pixmap, self.iconSize)
+
+  #
+  #  @returns the given pixmap scaled to a new size
+  #  @param size New pixel size.
+  #
+  def scalePixmap(self, pixmap, size):
     if not pixmap.isNull() and pixmap.width() > 0 and pixmap.height() > 0:
       try:
-        pixmap.convertFromImage(pixmap.convertToImage().scale(self.iconSize,self.iconSize))
+        pixmap.convertFromImage(pixmap.convertToImage().scale(size, size))
       except AttributeError:
         # for older Qt 2.x
-        pixmap.convertFromImage(pixmap.convertToImage().smoothScale(self.iconSize,self.iconSize))
+        pixmap.convertFromImage(pixmap.convertToImage().smoothScale(size, size))
     return pixmap
-  
+      
   #
   # @returns a full path to the given file in the data directory
   #  
@@ -302,7 +466,7 @@ class AlbumArtUi(AlbumArtDialog):
   def closeEvent(self, ce):
     # delete the downloaded covers
     try:
-      for f in self.covers:
+      for f in self.covers.values():
         os.unlink(f)
     except:
       pass
@@ -343,7 +507,6 @@ class AlbumArtUi(AlbumArtDialog):
         else:
             pixmap = QPixmap(filename)
             
-        #pixmap = self.scaleIconPixmap(pixmap)
         if pixmap.width()>0 and pixmap.height()>0:
           return pixmap
         else:
@@ -364,7 +527,7 @@ class AlbumArtUi(AlbumArtDialog):
 
   def process(self, root, dirname, names):
     # repaint often enough
-    if time.time() > self.lastRepaintTime + 0.25:
+    if time.time() > self.lastRepaintTime + 1:
       self.lastRepaintTime = time.time()
       qApp.processEvents()
 
@@ -382,16 +545,43 @@ class AlbumArtUi(AlbumArtDialog):
       else:
         if not root[-1] == "/": root+="/"
 
-    (artist, album) = albumart.guessArtistAndAlbum(dirname)
+    # first save the folder as an album
+    #(artist, album) = albumart.guessArtistAndAlbum(dirname)
+    #album = AlbumItem(self.dirlist, artist, album)
+    #album.setPixmap(0, self.getIconForPath(path))
+    #self.albums[(artist, album)] = album
     
-    dirname=dirname.replace(root,"")
+    #dirname=dirname.replace(root,"")
+    #if not len(dirname):
+    #  dirname="."
 
-    if not len(dirname):
-      dirname="."
+    #item = QListViewItem(self.dirlist, dirname, artist, album)
 
-
-    item = QListViewItem(self.dirlist, dirname, artist, album)
-    item.setPixmap(0, self.getIconForPath(path))
+    # add each file in the directory to it's respective album
+    for n in names:
+      if os.path.splitext(n)[1].lower() in albumart.mediaExtensions:
+        # update status bar
+        self.statusBar().message(self.tr("Reading %s") % n)
+        p = os.path.join(path, n)
+        (artist, album) = albumart.guessArtistAndAlbum(p)
+        
+        # get the album for this track
+        if not (artist, album) in self.albums:
+          a = AlbumItem(self.dirlist, artist, album)
+          
+          if albumart.hasCover(p):
+            a.setPixmap(0, self.getIconForPath(p))
+          else:
+            a.setPixmap(0, self.getIconForPath(path))
+          
+          self.albums[(artist, album)] = a
+        else:
+          a = self.albums[(artist, album)]
+        
+        # add the track to the album 
+        t = a.addTrack(p)
+        pixmap = self.scalePixmap(self.getPixmapForPath(p), 16)
+        t.setPixmap(0, pixmap)
 
   #
   # Walk the given path and fill the album list with all the albums found.
@@ -399,6 +589,7 @@ class AlbumArtUi(AlbumArtDialog):
   def walk(self, path):
     self.dir = path
     
+    # update the widget states
     self.pushSet.setEnabled(0)      
     self.fileOpenAction.setEnabled(0)
     self.pushDownload.setEnabled(0)
@@ -409,18 +600,19 @@ class AlbumArtUi(AlbumArtDialog):
     self.removeAllAction.setEnabled(1)
     self.albumEdit.clear()
     self.coverview.setEnabled(0)
-    self.coverview.clear()
     self.albumIcon.setPixmap(QPixmap())
     self.albumIcon.setEnabled(0)
     self.autoDownloadAction.setEnabled(0)
     self.synchronizeAction.setEnabled(0)
     self.dirlist.setEnabled(1)
     self.dirlist.clear()
-
-    self.statusBar().message(self.tr("Reading directory..."))
+    
+    # clear the db
+    self.albums = {}
+    
     self.setCursor(Qt.waitCursor)
     os.path.walk(path, self.process, path)
-    self.statusBar().message(self.tr("Ready"), 5000)
+    self.statusBar().message(self.tr("%d albums found. Ready.") % (self.dirlist.childCount()), 5000)
     self.setCursor(Qt.arrowCursor)
 
     self.pushDownload.setEnabled(0)
@@ -471,11 +663,11 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
       self.setCursor(Qt.waitCursor)
       self.statusBar().message("Deleting selected cover image...")
       
-      path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+      path = os.path.join(self.dir,self.getQString(self.selectedItem.path(0)))
       try:
         albumart.removeCover(path)
         self.updateIcon()
-        self.selectedAlbum.setPixmap(0,self.getIconForPath(path))
+        self.selectedItem.setPixmap(0,self.getIconForPath(path))
       except Exception, x:
         self.reportException(self.tr("Removing the cover"), x)
 
@@ -605,27 +797,16 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     self.startProcess(SynchronizeProcess(self, self.dir, items))
 
   def dirlist_selectionChanged(self, a0):
-    # delete downloaded covers
-    try:
-      for f in self.covers:
-        os.unlink(f)
-    except:
-      pass
-  
-    self.selectedAlbum = a0
-    self.coverview.clear()
-    self.artistEdit.setText(a0.text(1))
-    self.albumEdit.setText(a0.text(2))
+    self.selectedItem = a0
+    self.artistEdit.setText(a0.getArtistName())
+    self.albumEdit.setText(a0.getAlbumName())
     self.pushDownload.setEnabled(1)
     self.removeAction.setEnabled(1)
-    self.pushSet.setEnabled(0)
+    self.pushSet.setEnabled(self.coverview.count() > 0)
     self.artistEdit.setEnabled(1)
     self.albumEdit.setEnabled(1)
     self.coverview.setEnabled(1)
-    self.coverfiles = {}    # a map of listiview items to cover files
-    self.covers = []  # a list of downloaded covers
     self.thread = None
-    self.statusBar().message("")
     self.updateIcon()
 
   #
@@ -639,37 +820,67 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   #
   def updateIcon(self):
     # Try to load the current album cover image and display it as the folder icon.
+    iconSize = 60
     try:
-      self.albumIcon.setEnabled(0)
-      self.albumIcon.setPixmap(QPixmap())
-      path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-
+      path = self.selectedItem.getPath()
       if albumart.hasCover(path):
-        pixmap = self.getPixmapForPath(path)
-        image = pixmap.convertToImage()
-
-        if not image.isNull() and image.width()>1 and image.height()>1:
-          image = image.smoothScale(60,60)
-          pixmap.convertFromImage(image)
-          self.albumIcon.setPixmap(pixmap)
-          self.albumIcon.setEnabled(1)
+        pixmap = self.scalePixmap(self.getPixmapForPath(path), iconSize)
+        self.albumIcon.setPixmap(pixmap)
+        self.albumIcon.setEnabled(1)
+      else:
+        self.albumIcon.setPixmap(QPixmap(iconSize, iconSize))
+        self.albumIcon.setEnabled(0)
     except Exception, x:
       self.reportException(self.tr("Loading the album cover"), x, silent = True)
+    
+    #try:
+    #  self.albumIcon.setEnabled(0)
+    #  self.albumIcon.setPixmap(QPixmap())
+    #  path = os.path.join(self.dir,self.getQString(self.selectedItem.text(0)))
+
+    #  if albumart.hasCover(path):
+    #    pixmap = self.getPixmapForPath(path)
+    #    image = pixmap.convertToImage()
+
+    #    if not image.isNull() and image.width()>1 and image.height()>1:
+    #      image = image.smoothScale(60,60)
+    #      pixmap.convertFromImage(image)
+    #      self.albumIcon.setPixmap(pixmap)
+    #      self.albumIcon.setEnabled(1)
+    #except Exception, x:
+    #  self.reportException(self.tr("Loading the album cover"), x, silent = True)
 
   def albumIcon_clicked(self):
     # Try to load the current album cover image and display it in as new window
     try:
-      path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+      path = os.path.join(self.dir,self.getQString(self.selectedItem.text(0)))
       pixmap = self.getPixmapForPath(path)
       self.coverPreviewWindow = QLabel(None)
       self.coverPreviewWindow.setPixmap(pixmap)
       self.coverPreviewWindow.setFixedSize(pixmap.width(), pixmap.height())
       self.coverPreviewWindow.setCaption(
         self.tr("Cover image for %(album)s") % \
-        {"album" : self.getQString(self.selectedAlbum.text(0))})
+        {"album" : self.getQString(self.selectedItem.text(0))})
       self.coverPreviewWindow.show()
     except Exception, x:
       self.reportException(self.tr("Loading the album cover"), x)
+      
+  #
+  #  @returns a list of selected media files to process
+  #
+  def getSelectedFiles(self):
+    # return each selected track's path
+    albumItem = self.dirlist.firstChild()
+    files = []
+    
+    while albumItem:
+      trackItem = item.firstChild()
+      while trackItem:
+        if trackItem.isSelected() or albumItem.isSelected():
+          files.append(trackItem.getPath())
+        trackItem = trackItem.nextSibling()
+      albumItem = albumItem.nextSibling()
+    return files
 
   #
   # Adds the given cover to the list of available album covers.
@@ -677,7 +888,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   def addCoverToList(self, coverfile):
     # if we're running on Qt 2, convert the image to a png.
     try:
-      if qVersion().split(".")[0]=='2' and imghdr.what(coverfile) != "png":
+      if qVersion().split(".")[0] == '2' and imghdr.what(coverfile) != "png":
         i = Image.open(coverfile)
         s = StringIO.StringIO()
         i.save(s, "PNG")
@@ -689,18 +900,18 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     except IOError:
       return 0
 
-    if not image.isNull() and image.width()>1 and image.height()>1:
+    if not image.isNull() and image.width() > 1 and image.height() > 1:
       # if we're running on Qt 2, do the scaling a bit differently
-      if qVersion().split(".")[0]=='2':
-        image = image.smoothScale(256,256 * float(image.height())/float(image.width()))
+      if qVersion().split(".")[0] == '2':
+        image = image.smoothScale(256, 256 * float(image.height()) / float(image.width()))
         pixmap = QPixmap()
         pixmap.convertFromImage(image)
         item = QIconViewItem(self.coverview, None, pixmap)
       else:
-        image = image.smoothScale(256,256,QImage.ScaleMin)
+        image = image.smoothScale(256, 256, QImage.ScaleMin)
         item = QIconViewItem(self.coverview, None, QPixmap(image))
 
-      self.coverfiles[item] = coverfile
+      self.covers[item] = coverfile
       return 1
     return 0
 
@@ -714,7 +925,6 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
         return
       
     if event.type() == CoverDownloadedEvent.id:
-      self.covers.append(event.filename)
       self.addCoverToList(event.filename)
     elif event.type() == TaskFinishedEvent.id:
       self.thread.wait()
@@ -746,16 +956,16 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   def pushDownload_clicked(self):
     # delete the previously downloaded covers
     try:
-      for f in self.covers:
+      for f in self.covers.values():
         os.unlink(f)
     except:
       pass
 
+    self.covers = {}
+    
     self.coverview.clear()
     self.pushSet.setEnabled(0)
     self.pushDownload.setEnabled(0)
-    self.coverfiles = {}
-    self.covers = []
 
     # start the downloader thread
     proc = CoverDownloaderProcess(
@@ -767,21 +977,23 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
   def coverview_selectionChanged(self,a0):
     self.pushSet.setEnabled(1)
     self.selectedCover=a0
-
+    
   def pushSet_clicked(self):
     self.setCursor(Qt.waitCursor)
     self.statusBar().message(self.tr("Setting cover images..."))
 
-    path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
-    cover = self.coverfiles[self.selectedCover]
+    path = os.path.join(self.dir,self.getQString(self.selectedItem.text(0)))
+    cover = self.covers[self.selectedCover]
 
-    try:
-      albumart.setCover(path,cover)
-      self.pushSet.setEnabled(0)
-      self.selectedAlbum.setPixmap(0, self.getIconForPath(path))
-      self.updateIcon()
-    except Exception, x:
-      self.reportException(self.tr("Setting the cover image"), x)
+    for path in self.getSelectedFiles():
+      try:
+        albumart.setCover(path,cover)
+      except Exception, x:
+        self.reportException(self.tr("Setting the cover image"), x)
+        
+    self.pushSet.setEnabled(0)
+    self.selectedItem.setPixmap(0, self.getIconForPath(path))
+    self.updateIcon()
 
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message(self.tr("Ready"), 5000)
@@ -796,7 +1008,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
     return self.getQString(QObject.tr(self, identifier, context))
 
   def coverview_dropped(self,a0,a1):
-    if not self.selectedAlbum:
+    if not self.selectedItem:
       return
 
     text = QString()
@@ -819,6 +1031,5 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
         img = img.convert("RGB")
         img.save(fn, "JPEG")
         self.addCoverToList(fn)
-        self.covers.append(fn)
       except Exception, x:
         self.reportException(self.tr("Adding the cover image"), x)
