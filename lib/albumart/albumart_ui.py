@@ -201,7 +201,7 @@ class AlbumArtUi(AlbumArtDialog):
                          If not given, the description is generated from
                          the system stack."""
     if not description:
-        description = traceback.format_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
+      description = traceback.format_exception(sys.exc_type, sys.exc_value, sys.exc_traceback)
     fullmsg = self.tr(
             "%(task)s was interrupted by the following exception:\n%(description)s\n") % \
             {"task" : task, "description": "".join(description)}

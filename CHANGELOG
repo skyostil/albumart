@@ -4,6 +4,7 @@
 	- Don't change mp3 modification times.
 	- Don't hang with large music collections.
 	- Drag and drop support enhanced.
+	- Removed support for Qt 2.3.
 
 1.4.0:
 	- Album information is now also read from ID3v2 tags.

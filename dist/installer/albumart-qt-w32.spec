@@ -13,7 +13,7 @@ exe = EXE(pyz,
           name='buildalbumart-qt-w32/albumart-qt.exe',
           debug=0,
           strip=0,
-          upx=1,
+          upx=0,
           console=0 , icon='..\\..\\win32\\icon.ico')
 coll = COLLECT( exe,
                a.binaries,

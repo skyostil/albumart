@@ -108,6 +108,11 @@ def runUnattendedGui(operation, albumPath, showSummary = False, hidden = False):
   return app.exec_loop()
 
 if __name__=="__main__":
+  # fix output streams on windows
+  if os.name == "nt" and sys.argv[0].lower().endswith(".exe"):
+    sys.stdout = sys.stderr = \
+      open(os.path.join(os.path.dirname(sys.argv[0]), "log.txt"), "w")
+
   try:
     opts, args = getopt.getopt(sys.argv[1:],
                                "hdxsiH",

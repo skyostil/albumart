@@ -7,7 +7,7 @@ AppSupportURL=http://kempele.fi/~skyostil/projects/albumart
 AppUpdatesURL=http://kempele.fi/~skyostil/projects/albumart
 DefaultDirName={pf}\Album Cover Art Downloader
 DefaultGroupName=Album Cover Art Downloader
-InfoBeforeFile=installer\distalbumart-qt-w32\Copying.txt
+InfoBeforeFile=distalbumart-qt-w32\Copying.txt
 Compression=lzma
 SolidCompression=yes
 OutputDir=.
@@ -16,11 +16,11 @@ OutputDir=.
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "installer\distalbumart-qt-w32\albumart-qt.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "installer\distalbumart-qt-w32\support\*"; DestDir: "{app}\support"; Flags: ignoreversion recursesubdirs
-Source: "installer\distalbumart-qt-w32\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "installer\distalbumart-qt-w32\Copying.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "installer\distalbumart-qt-w32\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion isreadme
+Source: "distalbumart-qt-w32\albumart-qt.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "distalbumart-qt-w32\support\*"; DestDir: "{app}\support"; Flags: ignoreversion recursesubdirs
+Source: "distalbumart-qt-w32\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "distalbumart-qt-w32\Copying.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "distalbumart-qt-w32\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion isreadme
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [INI]
