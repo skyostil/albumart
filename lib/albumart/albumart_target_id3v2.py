@@ -9,15 +9,18 @@ import id3   # PyID3, see http://icepick.info/projects/pyid3/
 import tempfile
 import Image
 
+# all defined APIC picture types
+pictureTypes = id3.ID3v2Frames.AttachedPicture.picturetypes
+
 defaultConfig = {
   "enabled":      1,
-  "tag":          "APIC",
+  "type":          "03: " + pictureTypes[chr(3)],
 }
 
 configDesc = {
-  "enabled":      ("boolean", "Save image directly into MP3 files"),
-  "tag":          ("stringlist", "Tag to save image to",
-                   ["APIC"]),
+  "enabled":      ("boolean", "Enable"),
+  "type":         ("stringlist", "Output image type",
+                   ["%02X: %s" % (ord(c), d) for c, d in pictureTypes.items()]),
 }
 
 class ID3v2(albumart.Target):
@@ -34,6 +37,7 @@ class ID3v2(albumart.Target):
 
   def configure(self, config):
     self.enabled = config["enabled"]
+    self.pictureType = chr(int(config["type"][:2]))
 
   def getCover(self, path):
     # get the first APIC cover we find
@@ -56,6 +60,10 @@ class ID3v2(albumart.Target):
     img = Image.open(cover)
     img.load()
 
+    # scale if needed
+    if self.pictureType == chr(1):
+      img = img.resize((32, 32), resample = 1)
+
     # convert to JPEG if needed
     if img.format != "JPEG":
       img = img.convert("RGB")
@@ -72,7 +80,7 @@ class ID3v2(albumart.Target):
         id3v2 = id3.ID3v2(f)
         frame = id3v2.get_apic_frame('Cover Image')
         frame.image = data
-        frame.picturetype = '\x03'
+        frame.picturetype = self.pictureType
         frame.unsynchronisation = True
         id3v2.save()
         # restore the modification date and time

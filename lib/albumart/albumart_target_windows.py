@@ -6,14 +6,24 @@ import albumart
 import Image
 import os
 
+scales = {
+  "Default": None,
+  "128x128 pixels": 128,
+  "64x64 pixels": 64,
+  "48x48 pixels": 48,
+  "32x32 pixels": 32,
+}
+
 defaultConfig = {
   "enabled":   1,
   "filename":  "folder.jpg",
+  "scale":     "Default",
 }
 
 configDesc = {
   "enabled":  ("boolean", "Enable"),
-  "filename": ("string", "File name for image")
+  "filename": ("string", "File name for image"),
+  "scale":    ("stringlist", "Image size", scales.keys())
 }
 
 class Windows(albumart.Target):
@@ -24,6 +34,7 @@ class Windows(albumart.Target):
   def configure(self, config):
     self.filename = config["filename"]
     self.enabled = config["enabled"]
+    self.scale = scales[config["scale"]]
 
   def getCover(self, path):
     if self.enabled:
@@ -33,6 +44,11 @@ class Windows(albumart.Target):
   def setCover(self, path, cover):
     if self.enabled and not os.path.isfile(path):
       i = Image.open(cover)
+
+      # scale it
+      if self.scale:
+        i = i.resize((self.scale, self.scale), resample = 1)
+
       i.save(os.path.join(path, self.filename), "JPEG")
 
   def hasCover(self, path):
@@ -43,7 +59,7 @@ class Windows(albumart.Target):
   def removeCover(self, path):
     if not self.enabled or os.path.isfile(path):
       return
-    
+
     try:
       os.unlink(os.path.join(path, self.filename))
     except OSError:

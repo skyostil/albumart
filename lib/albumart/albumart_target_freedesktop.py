@@ -7,15 +7,25 @@ import Image
 import ConfigParser
 import os
 
+scales = {
+  "Default": None,
+  "128x128 pixels": 128,
+  "64x64 pixels": 64,
+  "48x48 pixels": 48,
+  "32x32 pixels": 32,
+}
+
 defaultConfig = {
   "enabled":   1,
   "relpaths":  1,
   "filename":  ".folder.png",
+  "scale":     "Default",
 }
 
 configDesc = {
-  "enabled":   ("boolean", "Enable Freedesktop.org"),
+  "enabled":   ("boolean", "Enable"),
   "relpaths":  ("boolean", "Use relative paths"),
+  "scale":     ("stringlist", "Image size", scales.keys())
 }
 
 class MyParser(ConfigParser.ConfigParser):
@@ -47,6 +57,7 @@ class Freedesktop(albumart.Target):
     self.filename = config["filename"]
     self.enabled = config["enabled"]
     self.relpaths = config["relpaths"]
+    self.scale = scales[config["scale"]]
 
   def getCover(self, path):
     if self.enabled:
@@ -56,12 +67,17 @@ class Freedesktop(albumart.Target):
   def setCover(self, path, cover):
     if not self.enabled:
       return
-    
+
     # check that it is not a file
     if os.path.isfile(path):
       return
 
     i = Image.open(cover)
+
+    # scale it
+    if self.scale:
+      i = i.resize((self.scale, self.scale), resample = 1)
+
     i.save(os.path.join(path, self.filename), "PNG")
 
     # .directory-file entry
@@ -72,7 +88,7 @@ class Freedesktop(albumart.Target):
       pass
     if not cf.has_section("Desktop Entry"):
       cf.add_section("Desktop Entry")
-      
+
     if self.relpaths or os.name == "nt":
       cf.set("Desktop Entry", "Icon", os.path.join(".", self.filename))
     else:
@@ -82,7 +98,7 @@ class Freedesktop(albumart.Target):
   def removeCover(self, path):
     if not self.enabled:
       return
-    
+
     # check that it is not a file
     if os.path.isfile(path):
       return

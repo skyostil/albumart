@@ -17,7 +17,7 @@ class TrackItem(QListViewItem):
   def paintCell(self, painter, colorGroup, column, width, alignment):
     if not self.pixmap(0):
       self.refresh()
-      
+
     if self.isSelected():
       painter.fillRect(0, 0, width, self.height(), QBrush(colorGroup.mid().light(120)))
     else:
@@ -36,7 +36,7 @@ class TrackItem(QListViewItem):
 
   def refresh(self):
     self.setPixmap(0, resizePixmap(getPixmapForPath(self.path), 22))
-        
+
   def width(self, fontMetrics, listView, column):
     if self.pixmap(0):
       return self.pixmap(0).width() + fontMetrics.width(self.name) + 16
@@ -71,10 +71,10 @@ class AlbumItem(QListViewItem):
 
   def acceptDrops(self, mimeSource):
     return True
-    
+
   def refresh(self):
     self.setPixmap(0, resizePixmap(getPixmapForPath(self.path), self.iconSize))
-    
+
   def paintCell(self, painter, colorGroup, column, width, alignment):
     if not self.pixmap(0):
       self.refresh()
@@ -84,25 +84,25 @@ class AlbumItem(QListViewItem):
     else:
       painter.eraseRect(0, 0, width, self.height())
 
-    # draw the icon    
+    # draw the icon
     m = self.listView().itemMargin()
     painter.drawPixmap(m + self.margin, m + self.margin, self.pixmap(0))
     m += 4
-      
+
     left = self.pixmap(0).width() + m + self.margin
     painter.setPen(colorGroup.text())
     fontSize = painter.font().pointSize()
-    
+
     # draw the album title
     painter.setFont(self.titleFont)
-    painter.drawText(left, m + self.margin, 
+    painter.drawText(left, m + self.margin,
                      width, self.height(), 0, self.album)
     titleRect = painter.boundingRect(0, 0, width, self.height(), 0, self.album)
-    
+
     # draw the artist name
     subtitleRect = painter.boundingRect(0, 0, width, self.height(), 0, self.artist)
     painter.setFont(QFont(painter.font().family(), fontSize))
-    painter.drawText(left, m + self.margin + titleRect.height(), 
+    painter.drawText(left, m + self.margin + titleRect.height(),
                      width, self.height() / 2, 0, self.artist)
 
     # draw the open indicator
@@ -122,7 +122,7 @@ class AlbumItem(QListViewItem):
                              smallFontSize, smallFontSize)
     painter.translate(self.openTrigger.left(), self.openTrigger.top())
     painter.drawPolygon(arrow)
-                     
+
     # draw the track count
     painter.setFont(QFont(painter.font().family(), smallFontSize))
     text = str(len(self.tracks)) + (len(self.tracks) == 1 and " track" or " tracks")
@@ -151,7 +151,7 @@ class AlbumItem(QListViewItem):
        p.x() > self.openTrigger.left() - 4 and \
        p.x() < self.openTrigger.right() + 4:
       self.setOpen(not self.isOpen())
-      
+
   def getAlbumName(self):
     """@returns the album name"""
     return self.album
@@ -159,21 +159,21 @@ class AlbumItem(QListViewItem):
   def getArtistName(self):
     """@returns the artist name"""
     return self.artist
-            
+
   def addTrack(self, fileName):
     """Add a new track to this album"""
     if not fileName in self.tracks:
       self.tracks.append(fileName)
     return TrackItem(self, fileName)
-    
+
   def getTrackCount(self):
     """@returns the number of tracks under this album"""
     return len(self.tracks)
-  
+
   def getPath(self):
     """@returns the path for this item"""
     return self.path
-    
+
 class CoverItem(QIconViewItem):
   """A cover image item"""
   def __init__(self, parent, pixmap, path):
@@ -183,7 +183,7 @@ class CoverItem(QIconViewItem):
     self.setItemRect(QRect(0, 0,
                      self.pixmap().width() + self.margin * 2,
                      self.pixmap().height() + self.margin * 2))
-                     
+
   def __del__(self):
     # delete the temporary file
     try:

@@ -14,7 +14,7 @@ defaultConfig = {
 }
 
 configDesc = {
-  "enabled":        ("boolean", "Enable Amazon.com"),
+  "enabled":        ("boolean", "Enable"),
   "locale":         ("stringlist",  "Country",
                      ["us", "uk", "de", "jp"]),
 }
