@@ -1,3 +1,19 @@
+albumart (1.3-1) stable; urgency=low
+
+  * Upgraded to the new Amazon web services API.
+  * Added ability to save images into ID3 v2 tags.
+  * Made the freedesktop image path relative, see
+    http://bugs.kde.org/show_bug.cgi?id=73463
+  * Added automatic image downloader.
+  * Added automatic image synchronizer, that makes sure all the image
+    targets have the same picture.
+  * Added better status information and error reporting.
+  * Made the folder icon size configurable.
+  * The main window now looks nicer when you maximize it.
+  * Switched to nicer icons.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Sat, 12 May 2004 22:51:00 +0200
+  
 albumart (1.2-1) stable; urgency=low
 
   * New upstream release

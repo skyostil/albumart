@@ -20,7 +20,7 @@ setup(
 	version="1.2",
 	license="GPL",
 	description="Downloads album cover images semi-automatically from the Internet.",
-	long_description="Album Cover Art Downloader is a download utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
+	long_description="Album Cover Art Downloader is a utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
 
         scripts=scr,
 #	scripts=[
@@ -54,6 +54,7 @@ setup(
 			'lib/albumart/albumart_source_amazon.py',
 			'lib/albumart/albumart_target_freedesktop.py',
 			'lib/albumart/albumart_target_windows.py',
+			'lib/albumart/albumart_target_id3v2.py',
 		]),
 		('share/doc/albumart', ['README','TODO','CHANGELOG']),
 	]

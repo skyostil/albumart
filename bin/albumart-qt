@@ -17,7 +17,6 @@ import os
 import sys
 import traceback
 import encodings
-import time
 
 def getBaseDir():
         path = os.path.dirname(sys.argv[0])
@@ -34,7 +33,6 @@ def getShareDir():
 sys.path = [getBaseDir(), getLibDir()] + sys.path
 
 import albumart
-import albumartworker
 import version
 import config
 
