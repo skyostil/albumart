@@ -1,7 +1,7 @@
 README
 TODO
 setup.py
-bin/albumart-qt.py
+bin/albumart-qt
 lib/albumart/albumart.py
 lib/albumart/albumartdialog.py
 lib/albumart/albumartdialog_qt230.py

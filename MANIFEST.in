@@ -3,7 +3,7 @@ include README
 include TODO
 include albumart.desktop
 include setup.py
-include bin/albumart-qt.py
+include bin/albumart-qt
 include share/albumart/cover.png
 include share/albumart/nocover.png
 include share/pixmaps/albumart.png

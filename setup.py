@@ -17,11 +17,14 @@ setup(
 	description="Downloads album cover images semi-automatically from the Internet.",
 	long_description="Album Cover Art Downloader is a download utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
 
-	scripts=[
-		'bin/albumart-qt.py',
-		],
+#	scripts=[
+#		'bin/albumart-qt',
+#		],
 	data_files=[
+		('bin',['bin/albumart-qt']),
 		('share/albumart',['share/albumart/cover.png','share/albumart/nocover.png']),
+		('share/applnk',['share/applnk/albumart.desktop']),
+		('share/pixmaps',['share/pixmaps/albumart.png']),
 		('lib/albumart',[
 			'lib/albumart/albumart.py',
 			'lib/albumart/albumartdialog.py',

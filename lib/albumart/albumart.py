@@ -106,7 +106,7 @@ def guessArtistAndAlbum(path):
 	if not len(artist): artist=None
 	if not len(album): album=None
 
-	if not artist and len(album):
+	if not artist and (album and len(album)):
 		return (album,None)
 
 	return (artist,album)

@@ -124,7 +124,7 @@ class AlbumArt(AlbumArtDialog):
 		self.dirlist.setEnabled(1)
 
 	def helpAbout(self):
-		QMessageBox.information(self, __program__, """%s version %s by %s.
+		QMessageBox.information(self, version.__program__, """%s version %s by %s.
 Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__program__,version.__version__,version.__author__))
 
 	def fileOpen(self):
@@ -272,4 +272,10 @@ if __name__=="__main__":
 		pass
 
 	mainwin.show()
-	app.exec_loop()
+
+	try:
+		app.exec_loop()
+	except:
+		pass
+
+	return 0
