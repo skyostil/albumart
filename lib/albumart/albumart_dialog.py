@@ -75,10 +75,9 @@ class AlbumArtDialog(AlbumArtDialogBase):
     # restore the previous directory
     try:
       if albumPath:
-        path = albumPath
-      else:
-        path = self.config.get("albumart", "lastDirectory")
-      self.walk(path)
+        self.walk(albumPath)
+      elif self.config.has_option("albumart", "lastDirectory"):
+        self.walk(self.config.get("albumart", "lastDirectory"))
     except Exception, x:
       self.reportException(self.tr("Reading the previous album directory"), x,
                            silent = False)
