@@ -1,5 +1,6 @@
 include README
 include TODO
+include albumart.desktop
 include setup.py
 include bin/albumart-qt.py
 include share/albumart/cover.png
