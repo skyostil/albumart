@@ -17,6 +17,6 @@ exe = EXE(pyz,
           console=1 )
 coll = COLLECT( exe,
                a.binaries,
-               strip=1,
-               upx=1,
+               strip=0,
+               upx=0,
                name='distalbumart-qt')
