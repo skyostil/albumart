@@ -11,6 +11,8 @@ the Free Software Foundation; either version 2 of the License, or
 at your option) any later version.
 """
 
+from __future__ import generators
+
 import urllib
 import tempfile
 import os
@@ -43,16 +45,23 @@ class Amazon(Source):
 			o = open(output, "wb")
 			o.write(i.read())
 			o.close()
-			print output
 			return output
 		except:
 			return None
 
-# the used sources
+# the sources to be used
 sources = [Amazon]
 
 def getAvailableCovers(artist,album):
-	"""Downloads a list of cover images for the given artist/album pair and returns the list of file names."""
+	"""
+	Downloads a set of cover images for the given artist/album pair and returns an interator for the list of file names.
+
+	You might use this function as follows:
+
+		for coverfile in albumart.getAvailableCovers(artist,album):
+			[do something with the image]
+	"""
+
 	covers = []
 	for src in sources:
 		s = src()
@@ -71,12 +80,10 @@ def getAvailableCovers(artist,album):
 					pass
 
 		for a in results:
-			covers.append(s.getCover(a))
-
-	return covers
+			yield s.getCover(a)
 
 def guessArtistAndAlbum(path):
-	"""Given a path, try to extract the artist and album. Works on cases such as:
+	"""Given a path, try to extract the artist and album. Works in cases such as:
 
 		artist/album
 		artist - album/
@@ -121,6 +128,7 @@ def setCover(path,cover):
 
 	# windows xp
 	coverfile = os.path.join(path,"folder.jpg")
+
 	# freedesktop.org .desktop-file standard
 	coverfile_png = os.path.join(path,".folder.png")
 
@@ -132,6 +140,8 @@ def setCover(path,cover):
 
 	i = Image.open(coverfile)
 	i.save(coverfile_png, "PNG")
+
+	# we used to do this with ImageMagick:
 #	os.spawnl(os.P_WAIT, "/usr/bin/convert", "/usr/bin/convert", coverfile, coverfile_png)
 #	os.system("convert '%s' '%s'" % (coverfile, coverfile_png))
 
@@ -152,7 +162,6 @@ def process(root, dirname, names):
 	if not root[:-1] == os.sep: root+=os.sep
 	dirname=dirname.replace(root,"")
 	(artist,album)=guessArtistAndAlbum(dirname.replace(root,""))
-
 	print artist, album
 
 def walk(path):
