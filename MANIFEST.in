@@ -16,3 +16,4 @@ include lib/albumart/amazon.py
 include lib/albumart/version.py
 include debian/*
 include src/*
+include win32/*

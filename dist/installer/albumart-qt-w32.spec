@@ -4,7 +4,7 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=1,
-          name='buildalbumart-qt/albumart-qt.exe',
+          name='buildalbumart-qt-w32/albumart-qt.exe',
           debug=0,
           strip=0,
           upx=0,
@@ -13,4 +13,4 @@ coll = COLLECT( exe,
                a.binaries,
                strip=0,
                upx=0,
-               name='distalbumart-qt')
+               name='distalbumart-qt-w32')
