@@ -136,7 +136,12 @@ class CoverDownloaderProcess(Process):
 
         def run(self):
                 coversFound = 0
-                self.setStatusText("Searching images for '%s' by %s..." % (self.album, self.artist))
+		if self.album and self.artist and len(self.album) and len(self.artist):
+	                self.setStatusText("Searching images for '%s' by %s..." % (self.album, self.artist))
+		elif len(self.album):
+	                self.setStatusText("Searching images for the album '%s'..." % (self.album))
+		elif len(self.artist):
+	                self.setStatusText("Searching images for the artist %s..." % (self.artist))
                         
                 try:
                         for c in albumart.getAvailableCovers(self.artist, self.album):
@@ -144,7 +149,9 @@ class CoverDownloaderProcess(Process):
                                 if self.isCanceled():
                                         break
                                 self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
-                                self.setStatusText("%d covers found, looking for more..." % coversFound)
+				# better some progress than none at all :)
+				# we can't tell how many covers we've downloaded as they may have been blank or corrupt.
+	                        self.setProgress(coversFound-1,coversFound)
                 except Exception,x:
                         self.postEvent(self.dialog, ExceptionEvent(x))
 
@@ -494,7 +501,8 @@ class AlbumArt(AlbumArtDialog):
         def walk(self,path):
                 self.dir = path
 
-                self.pushSet.setEnabled(0)
+                self.pushSet.setEnabled(0)            
+                self.fileOpenAction.setEnabled(0)
                 self.pushDownload.setEnabled(0)
                 self.artistEdit.setEnabled(0)
                 self.albumEdit.setEnabled(0)
@@ -507,7 +515,7 @@ class AlbumArt(AlbumArtDialog):
                 self.albumIcon.setEnabled(0)
                 self.autoDownloadAction.setEnabled(0)
                 self.synchronizeAction.setEnabled(0)
-                self.dirlist.setEnabled(1)
+                self.dirlist.setEnabled(0)
                 self.dirlist.clear()
 
                 self.statusBar().message("Reading directory...")
@@ -524,6 +532,8 @@ class AlbumArt(AlbumArtDialog):
                         self.previousAction.setEnabled(1)
                         self.autoDownloadAction.setEnabled(1)
                         self.synchronizeAction.setEnabled(1)
+                        self.fileOpenAction.setEnabled(1)
+	                self.dirlist.setEnabled(1)
                 except:
                         pass
 
@@ -734,6 +744,7 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         pass
             
                 if event.type()==CoverDownloadedEvent.id:
+			print event.filename
                         self.covers.append(event.filename)
                         self.addCoverToList(event.filename)
                 elif event.type()==TaskFinishedEvent.id:
