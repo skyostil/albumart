@@ -1,0 +1,67 @@
+The following is from http://louhi.kempele.fi/~skyostil/projects/albumart/
+
+                                                Album Cover Art Downloader                                               
+                                                                                                                         
+   Here's a program that will semi-automatically download album cover images for your music collection.                  
+   All you have to do is point it at the root of your music directory and for each directory, the program                
+   will download a set of corresponding (well, best guess) album covers from the Internet, from which you                
+   can choose one that suits your fancy.                                                                                 
+                                                                                                                         
+   Currently supported image providers:                                                                                  
+                                                                                                                         
+     * Amazon.com                                                                                                        
+                                                                                                                         
+   At least the following programs make use of the cover images:                                                         
+                                                                                                                         
+     * Ones that follow the .desktop-entry spec, for example KDE and GNOME.                                              
+     * Windows XP Explorer                                                                                               
+     * Windows Media Player 9+                                                                                           
+     * CDcover, an XMMS plugin                                                                                           
+     * wmalbum, a WindowMaker dock applet                                                                                
+     * Various WinAMP plugins, for example ShowCover.                                                                    
+                                                                                                                         
+   Requirements                                                                                                          
+                                                                                                                         
+   In order to run this piece of software you'll need:                                                                   
+                                                                                                                         
+     * Python 2 or better with python-xmlbase.                                                                           
+     * QT >= 2.3 or >= 3.0 and PyQT, the Python bindings.                                                                          
+     * PyAmazon (included) and an Amazon Web Services Developer's Token.                                                 
+                                                                                                                         
+       You can get the token in approximately 5 seconds from this page. Once you get the token, put it                   
+       into a file called amazonkey.txt in your home directory or this program's directory.                              
+                                                                                                                         
+       Don't tell anyone, but it seems that currently you can put in any number and it will work.                        
+     * Python Imaging Library
+                                                                                                                         
+   On Debian the following command should get you rolling in a jiffy:                                                    
+                                                                                                                         
+                   # apt-get install python-qt3 imagemagick python-xmlbase                                               
+                                                                                                                         
+                                                                                                                         
+   Note that since the program doesn't make any use of ID3-tags or similar, the artist and album names are               
+   guessed from the pathname only. If your directories have utterly incomprehensible names, don't worry,          
+   you can still type in the artist and album names manually.                                                     
+
+   Usage                                                                                                                 
+                                                                                                                         
+   Once you have the prerequisites sorted out, go ahead and run albumart-qt.py. It is the QT frontend to                 
+   the program.                                                                                                          
+                                                                                                                         
+   Click File|Open and navigate to the directory containing the albums you want to find cover images for.                
+   The program will load all the directories under the path you chose and try to guess an artist and album               
+   for each entry. A green indicator beside a directory means that it already has a cover image.                         
+                                                                                                                         
+   Now pick a directory from the list and check that the artist and album fields at the top-right corner                 
+   are sensible. Now click Download Covers. After a few seconds you should see a list of cover images on                 
+   the right. If no images are found, try to simplify the artist and album fields (e.g. clear the album                  
+   field completely). You can also drop an image from your file manager on the list to use that one.                     
+                                                                                                                         
+   Go ahead and choose a suitable cover from the list. Finally, click Set as Cover to confirm your choice.               
+                                                                                                                         
+   Internals                                                                                                             
+                                                                                                                         
+   The cover images are saved in each directory as follows:                                                              
+                                                                                                                         
+     * folder.jpg for Windows XP                                                                                         
+     * .folder.png and an Icon entry in .directory for Konqueror, etc.                                                   
