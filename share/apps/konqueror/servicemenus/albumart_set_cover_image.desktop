@@ -1,0 +1,10 @@
+[Desktop Entry]
+Actions=SetAlbumCoverImage
+Encoding=iso-8859-1
+ServiceTypes=inode/directory
+
+[Desktop Action SetAlbumCoverImage]
+Exec=albumart-qt %f
+Name=Set album cover image
+Name[fi]=Aseta albumin kansikuva
+Icon=albumart

@@ -1,3 +1,9 @@
+albumart (1.2-1) stable; urgency=low
+
+  * New upstream release
+  
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Sat, 8 Oct 2003 22:13:00 +0200
+   
 albumart (1.1-2) unstable; urgency=low
 
   * Removed dependancy of python-xmlbase since it is now integrated with Python 2.3.

@@ -94,6 +94,20 @@ class AlbumArt(AlbumArtDialog):
 		self.moduleAttributeMap = {}
 		self.dir = ""
 
+		# replace ugly icons without alpha channel
+		try:
+			self.fileOpenAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"fileopen.png"))))
+			self.fileExitAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"exit.png"))))
+			self.helpAboutAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"icon.png"))))
+			self.reloadAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"reload.png"))))
+			self.nextAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"1rightarrow.png"))))
+			self.previousAction.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"1leftarrow.png"))))
+			self.pushDownload.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"download.png"))))
+			self.pushSet.setIconSet(QIconSet(QPixmap(os.path.join(getShareDir(),"filesave.png"))))
+		except:
+			# if that doesn't work, never mind
+			pass
+
 		# load the configuration
 		try:
 			fn = os.path.join(config.getConfigPath("albumart"), "config")
@@ -107,7 +121,14 @@ class AlbumArt(AlbumArtDialog):
 
 			self.settingsMenu = QPopupMenu()
 			self.connect(self.settingsMenu,SIGNAL("activated(int)"), self.settingsMenuActivated)
-			self.menubar.insertItem("&Settings", self.settingsMenu, -1, 1)
+			self.menubar.insertItem("&Settings", self.settingsMenu, -1, 2)
+
+			# global settings
+			self.showCoversAction.addTo(self.settingsMenu)
+			try:
+				self.showCoversAction.setOn(self.config.getboolean("albumart", "showcovers"))
+			except Exception,x:
+				pass
 
 			for s in self.config.get("albumart", "sources").split(":"):
 				mod = self.loadModule(s)
@@ -120,6 +141,8 @@ class AlbumArt(AlbumArtDialog):
 				albumart.addTarget(mod)
 		except:
 			pass
+
+		self.show()
 
 		# restore the previous directory
 		try:
@@ -146,21 +169,29 @@ class AlbumArt(AlbumArtDialog):
 			c.__configuration__ = cfg
 
 			for (key,desc) in cfgdesc.items():
-				id = self.settingsMenu.insertItem(desc[1])
-				self.moduleAttributeMap[id] = (c,key,desc)
-				if desc[0]=="boolean":
-					if self.config.getboolean(mod,key):
-						self.settingsMenu.setItemChecked(id, 1)
-						cfg[key] = 1
-					else:
-						cfg[key] = 0
+				i = self.settingsMenu.insertItem(desc[1])
+				self.moduleAttributeMap[i] = (c,key,desc)
+
+				try:
+					if desc[0]=="boolean":
+						if cfg[key]==1 or self.config.getboolean(mod,key):
+							self.settingsMenu.setItemChecked(i, 1)
+							cfg[key] = 1
+						else:
+							cfg[key] = 0
+				except:
+					pass
 
 			c.configure(cfg)
 			return c
-		except:
+		except Exception,x:
+			print x
 			sys.stderr.write("Unable to load module '%s'.\n" % id)
 			raise
 
+	def showCoversAction_toggled(self, enabled):
+		self.config.set("albumart", "showcovers", enabled)
+		self.reloadAction_activated()
 
 	def settingsMenuActivated(self, id):
 		enabled = not self.settingsMenu.isItemChecked(id)
@@ -208,7 +239,8 @@ class AlbumArt(AlbumArtDialog):
 		"Returns a QPixmap that can be used as an icon for the given path."
 
 		if albumart.hasCover(path):
-			return self.coverPixmap
+			if self.showCoversAction and not self.showCoversAction.isOn():
+				return self.coverPixmap
 
 			pixmap = QPixmap(albumart.getCover(path))
 			image = pixmap.convertToImage()
@@ -221,6 +253,10 @@ class AlbumArt(AlbumArtDialog):
 		return self.noCoverPixmap
 
 	def process(self, root, dirname, names):
+		# repaint every 10 items.
+		if self.dirlist.childCount()%10==0:
+			qApp.processEvents()
+
 		path = dirname
 
 		# filter out hidden directories
@@ -244,23 +280,33 @@ class AlbumArt(AlbumArtDialog):
 		item = QListViewItem(self.dirlist, dirname, artist, album)
 		item.setPixmap(0, self.getIconForPath(path))
 
-#		if albumart.hasCover(path):
-#			item.setPixmap(0,self.coverPixmap)
-#			item.setPixmap(0,QPixmap(albumart.getCover(path)))
-#			pixmap = QPixmap(albumart.getCover(path))
-#			image = pixmap.convertToImage()
-#			if not image.isNull() and image.width()>1 and image.height()>1:
-#				image = image.smoothScale(16,16)
-#				pixmap.convertFromImage(image)
-#				item.setPixmap(0,pixmap)
-#		else:
-#			item.setPixmap(0,self.noCoverPixmap)
-
 	def walk(self,path):
 		self.dir = path
-		self.dirlist.clear()
-		os.path.walk(path, self.process, path)
+
+		self.pushSet.setEnabled(0)
+		self.pushDownload.setEnabled(0)
+		self.artistEdit.setEnabled(0)
+		self.albumEdit.setEnabled(0)
+		self.artistEdit.clear()
+		self.albumEdit.clear()
+		self.coverview.setEnabled(0)
+		self.coverview.clear()
+		self.albumIcon.hide()
 		self.dirlist.setEnabled(1)
+		self.dirlist.clear()
+
+		self.statusBar().message("Reading directory...")
+		os.path.walk(path, self.process, path)
+		self.statusBar().message("Ready",5000)
+
+		self.pushDownload.setEnabled(0)
+
+		try:
+			self.reloadAction.setEnabled(1)
+			self.nextAction.setEnabled(1)
+			self.previousAction.setEnabled(1)
+		except:
+			pass
 
 	def helpAbout(self):
 		QMessageBox.information(self, version.__program__, """%s version %s by %s.
@@ -271,6 +317,39 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 		if d and len(d):
 			self.config.set("albumart", "lastDirectory", d)
 			self.walk(d)
+
+	def reloadAction_activated(self):
+		self.walk(self.dir)
+
+	def nextAction_activated(self):
+		item = self.dirlist.selectedItem()
+
+		if not item:
+			item = self.dirlist.firstChild()
+
+		while item:
+			item = item.itemBelow()
+			if not item: break
+			path = os.path.join(self.dir, self.getQString(item.text(0)))
+			if not albumart.hasCover(path):
+				self.dirlist.setSelected(item, 1)
+				self.dirlist.ensureItemVisible(item)
+				break
+
+	def previousAction_activated(self):
+		item = self.dirlist.selectedItem()
+
+		if not item:
+			item = self.dirlist.lastItem()
+
+		while item:
+			item = item.itemAbove()
+			if not item: break
+			path = os.path.join(self.dir, self.getQString(item.text(0)))
+			if not albumart.hasCover(path):
+				self.dirlist.setSelected(item, 1)
+				self.dirlist.ensureItemVisible(item)
+				break
 
 	def dirlist_selectionChanged(self,a0):
 		self.selectedAlbum = a0
