@@ -55,7 +55,7 @@ setup(
 			'lib/albumart/albumart_target_freedesktop.py',
 			'lib/albumart/albumart_target_windows.py',
 		]),
-		('share/doc/albumart', ['README','TODO']),
+		('share/doc/albumart', ['README','TODO','CHANGELOG']),
 	]
 )
 

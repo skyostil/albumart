@@ -2,6 +2,7 @@
 include README
 include INSTALL
 include TODO
+include CHANGELOG
 include albumart.desktop
 include setup.py
 include bin/albumart-qt
