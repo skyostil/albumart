@@ -720,6 +720,12 @@
         <receiver>AlbumArtDialogBase</receiver>
         <slot>dirlist_selectionChanged()</slot>
     </connection>
+    <connection>
+        <sender>configureAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialogBase</receiver>
+        <slot>showConfigurationDialog()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>dirlist</tabstop>
@@ -763,6 +769,7 @@
     <slot>refreshAlbumList()</slot>
     <slot>filterChanged()</slot>
     <slot>dirlist_selectionChanged()</slot>
+    <slot>showConfigurationDialog()</slot>
 </slots>
 <layoutdefaults spacing="3" margin="6"/>
 </UI>
