@@ -1,5 +1,5 @@
-#!/usr/bin/python2.2
-# -*- coding: utf-8 -*-
+#!/usr/bin/python
+# -*- coding: iso-8859-1 -*-
 
 """
 QT-frontend for the album image downloader.
@@ -28,14 +28,16 @@ def getLibDir():
 def getShareDir():
 	return os.path.join(getBaseDir(),"share","albumart")
 
-sys.path.append(getBaseDir())
-sys.path.append(getLibDir())
+sys.path = [getBaseDir(), getLibDir()] + sys.path
 
 import albumart
+import version
+import config
+
 import urllib
 import tempfile
 import Image
-import version
+import ConfigParser
 from qt import *
 
 # see if we're using an old Qt version
@@ -88,8 +90,85 @@ class AlbumArt(AlbumArtDialog):
 		AlbumArtDialog.__init__(self,parent,name,fl)
 		self.coverPixmap = QPixmap(os.path.join(getShareDir(),"cover.png"))
 		self.noCoverPixmap = QPixmap(os.path.join(getShareDir(),"nocover.png"))
+		self.config = ConfigParser.ConfigParser()
+		self.sourceModules = {}
+		self.targetModules = {}
+
+		# load the configuration
+		try:
+			fn = os.path.join(config.getConfigPath("albumart"), "config")
+			self.config.read(fn)
+
+			if not self.config.has_section("albumart"):
+				self.config.add_section("albumart")
+
+			self.config.set("albumart", "sources", "albumart_source_amazon.Amazon")
+			self.config.set("albumart", "targets", "albumart_target_freedesktop.Freedesktop:albumart_target_windows.Windows")
+
+			self.settingsMenu = QPopupMenu()
+			self.connect(self.settingsMenu,SIGNAL("activated(int)"), self.settingsMenuActivated)
+			self.menubar.insertItem("&Settings", self.settingsMenu, -1, 1)
+
+			for s in self.config.get("albumart", "sources").split(":"):
+				try:
+					(mod, cls) = s.split(".")
+					exec("from %s import %s" % (mod,cls))
+					exec("c = %s(self.config)" % cls)
+					albumart.addSource(c)
+					id = self.settingsMenu.insertItem("Use %s as an image source" % cls)
+					self.settingsMenu.setItemChecked(id, c.enabled)
+					self.settingsMenu.setWhatsThis(id, c.__doc__)
+					self.sourceModules[id] = c
+				except:
+					pass
+
+			self.settingsMenu.insertSeparator()
+
+			for t in self.config.get("albumart", "targets").split(":"):
+				try:
+					(mod, cls) = t.split(".")
+					exec("from %s import %s" % (mod,cls))
+					exec("c = %s(self.config)" % cls)
+					albumart.addTarget(c)
+					id = self.settingsMenu.insertItem("Set image for %s" % cls)
+					self.settingsMenu.setItemChecked(id, c.enabled)
+					self.settingsMenu.setWhatsThis(id, c.__doc__)
+					self.targetModules[id] = c
+				except:
+					pass
+		except:
+			raise
+
+		# restore the previous directory
+		try:
+			path = self.config.get("albumart", "lastDirectory")
+			self.walk(path)
+		except:
+			pass
+
+	def settingsMenuActivated(self, id):
+		enabled = not self.settingsMenu.isItemChecked(id)
+
+		if self.sourceModules.has_key(id):
+			m = self.sourceModules[id]
+			if enabled:
+				albumart.addSource(m)
+			else:
+				albumart.removeSource(m)
+		else:
+			m = self.targetModules[id]
+			if enabled:
+				albumart.addTarget(m)
+			else:
+				albumart.removeTarget(m)
+
+		self.settingsMenu.setItemChecked(id, enabled)
+		m.setEnabled(enabled)
 
 	def fileExit(self):
+		self.close()
+
+	def closeEvent(self, ce):
 		# delete the downloaded covers
 		try:
 			for f in self.covers:
@@ -97,26 +176,66 @@ class AlbumArt(AlbumArtDialog):
 		except:
 			pass
 
-		sys.exit(0)
+		# save the configuration
+		try:
+			fn = os.path.join(config.getConfigPath("albumart"), "config")
+			self.config.write(open(fn,"w"))
+		except:
+			pass
+
+		ce.accept()
+
+	def getIconForPath(self, path):
+		"Returns a QPixmap that can be used as an icon for the given path."
+
+		if albumart.hasCover(path):
+			return self.coverPixmap
+
+			pixmap = QPixmap(albumart.getCover(path))
+			image = pixmap.convertToImage()
+			if not image.isNull() and image.width()>1 and image.height()>1:
+				image = image.scale(16,16)
+				pixmap.convertFromImage(image)
+				return pixmap
+			else:
+				return self.noCoverPixmap
+		return self.noCoverPixmap
 
 	def process(self, root, dirname, names):
 		path = dirname
+
+		# filter out hidden directories
+		for d in dirname.split(os.sep):
+			if len(d) and d[0]==".":
+				return
 
 		# ugly portability hack
 		if "\\" in root:
 			if not root[-1] == "\\" : root+="\\"
 		else:
 			if not root[-1] == "/": root+="/"
-			
+
 		dirname=dirname.replace(root,"")
+
+		if not len(dirname):
+			dirname="."
 
 		(artist,album)=albumart.guessArtistAndAlbum(dirname)
 
 		item = QListViewItem(self.dirlist, dirname, artist, album)
-		if albumart.hasCover(path):
-			item.setPixmap(0,self.coverPixmap)
-		else:
-			item.setPixmap(0,self.noCoverPixmap)
+		item.setPixmap(0, self.getIconForPath(path))
+
+#		if albumart.hasCover(path):
+#			item.setPixmap(0,self.coverPixmap)
+#			item.setPixmap(0,QPixmap(albumart.getCover(path)))
+#			pixmap = QPixmap(albumart.getCover(path))
+#			image = pixmap.convertToImage()
+#			if not image.isNull() and image.width()>1 and image.height()>1:
+#				image = image.smoothScale(16,16)
+#				pixmap.convertFromImage(image)
+#				item.setPixmap(0,pixmap)
+#		else:
+#			item.setPixmap(0,self.noCoverPixmap)
 
 	def walk(self,path):
 		self.dir = path
@@ -129,8 +248,9 @@ class AlbumArt(AlbumArtDialog):
 Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__program__,version.__version__,version.__author__))
 
 	def fileOpen(self):
-		dir=str(QFileDialog.getExistingDirectory("",self,"Choose a directory that contains one or more albums","Choose a directory", 1))
+		dir=self.getQString(QFileDialog.getExistingDirectory(self.dir,self,"Choose a directory that contains one or more albums","Choose a directory", 1))
 		if dir and len(dir):
+			self.config.set("albumart", "lastDirectory", dir)
 			self.walk(dir)
 
 	def dirlist_selectionChanged(self,a0):
@@ -147,6 +267,42 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 		self.covers = []	# a list of downloaded covers
 		self.thread = None
 		self.statusBar().message("")
+		self.updateIcon()
+
+	def getQString(self, qstring):
+		return unicode(qstring).encode("latin-1", "replace")
+#		return unicode(qstring)
+
+	def updateIcon(self):
+		# Try to load the current album cover image and display it as the folder icon.
+		try:
+			self.albumIcon.hide()
+			path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+
+			f = albumart.getCover(path)
+
+			if f:
+				pixmap = QPixmap(f)
+				image = pixmap.convertToImage()
+				if not image.isNull() and image.width()>1 and image.height()>1:
+					image = image.smoothScale(60,60)
+					pixmap.convertFromImage(image)
+					self.albumIcon.setPixmap(pixmap)
+					self.albumIcon.show()
+		except:
+			pass
+
+	def albumIcon_clicked(self):
+		# Try to load the current album cover image and display it in as new window
+		try:
+			path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
+			f = albumart.getCover(path)
+			if f:
+				self.coverPreviewWindow = QLabel(None)
+				self.coverPreviewWindow.setPixmap(QPixmap(f))
+				self.coverPreviewWindow.show()
+		except:
+			pass
 
 	def addCoverToList(self,coverfile):
 		# if we're running on Qt 2, convert the image to a png.
@@ -157,9 +313,9 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 			del i
 			os.unlink(coverfile)
 			coverfile = newcoverfile
-			
+
 		image = QImage(coverfile)
-		
+
 		if not image.isNull() and image.width()>1 and image.height()>1:
 			# if we're running on Qt 2, do the scaling a bit differently
 			if qVersion().split(".")[0]=='2':
@@ -170,7 +326,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 			else:
 				image = image.smoothScale(256,256,QImage.ScaleMin)
 				item = QIconViewItem(self.coverview, None, QPixmap(image))
-				
+
 			self.coverfiles[item] = coverfile
 			return 1
 		return 0
@@ -190,7 +346,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 				return
 
 			self.thread.wait()
-			self.thread = None			
+			self.thread = None
 			self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
 
 			if not len(self.coverfiles.keys()):
@@ -218,7 +374,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 
 		# start the downloader thread
 		self.statusBar().message("Searching for covers...")
-		self.thread = CoverDownloader(self,self.artistEdit.text(), self.albumEdit.text())
+		self.thread = CoverDownloader(self,self.getQString(self.artistEdit.text()), self.getQString(self.albumEdit.text()))
 		self.thread.start()
 
 	def coverview_selectionChanged(self,a0):
@@ -226,26 +382,27 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 		self.selectedCover=a0
 
 	def pushSet_clicked(self):
-		path = os.path.join(self.dir,str(self.selectedAlbum.text(0)))
+		path = os.path.join(self.dir,self.getQString(self.selectedAlbum.text(0)))
 		cover = self.coverfiles[self.selectedCover]
 
 		try:
 			albumart.setCover(path,cover)
 			self.pushSet.setEnabled(0)
 			self.selectedAlbum.setPixmap(0,self.coverPixmap)
+			self.updateIcon()
 		except Exception,x:
-			QMessageBox.critical(self, __program__,"The following error occured while setting the cover image:\n%s"%str(x))
+			QMessageBox.critical(self, version.__program__,"The following error occured while setting the cover image:\n%s"%str(x))
 
 	def coverview_dropped(self,a0,a1):
 		if not self.selectedAlbum:
 			return
-		
+
 		text = QString()
 		if QTextDrag.decode(a0, text):
 			try:
-				text=str(text)
+				text=self.getQString(text)
 				text=urllib.unquote(text)
-					
+
 				f=urllib.urlopen(text)
 				fn=tempfile.mktemp()
 				o=open(fn,"wb")
@@ -254,7 +411,7 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__
 				self.addCoverToList(fn)
 				self.covers.append(fn)
 			except Exception,x:
-				QMessageBox.critical(self, __program__,"The following error occured while adding the cover image:\n%s"%str(x))
+				QMessageBox.critical(self, version.__program__,"The following error occured while adding the cover image:\n%s"%str(x))
 				raise
 
 if __name__=="__main__":
