@@ -1,4 +1,4 @@
-﻿albumart (1.4.0-1) stable; urgency=low
+albumart (1.4.0-1) stable; urgency=low
 
   * Album information is now also read from ID3v2 tags.
   * All the automated processes now process each file separately rather

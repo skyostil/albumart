@@ -7,7 +7,7 @@ Standards-Version: 3.5.8
 
 Package: albumart
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt3 (>= 3.0), python-imaging (>= 1.0) | python2.3-imaging (>=1.0), python2.2 (>= 2.2), python
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-qt3 (>= 3.0), python-imaging (>= 1.0) | python2.3-imaging (>=1.0), python (>= 2.2)
 Description: Downloads album cover images semi-automatically from the Internet
  Album Cover Art Downloader is a download utility for semi-automatically 
  downloading matching cover images from Amazon.com for each album in your 
