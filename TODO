@@ -3,4 +3,4 @@
 - move the various processes into their own threads - DONE 1.3
 - remember last directory - DONE 1.2
 - make sure we save the images in a proper format - DONE 1.2
-
+- don't modify mp3 timestamps
