@@ -6,16 +6,12 @@ import tempfile
 
 defaultConfig = {
   "enabled":        1,
-  "licensenumber":  "",
+  "licensenumber":  "D1ESMA5AOEZB24",
   "locale":         "us",
 }
 
 configDesc = {
   "enabled":        ("boolean", "Use Amazon as an image source"),
-  "licensenumber":  ("string",  "Set Amazon license key...",
-                                 "Please enter your Amazon Web Services license key.\n" +
-                                 "This key can be obtained free of charge from Amazon at\n" +
-                                 "http://www.amazon.com/gp/aws/registration/registration-form.html"),
   "locale":          ("stringlist",  "Set Amazon country...",
                                      "Please enter the country setting for Amazon.",
                                      ["us", "uk", "de", "jp"]),
