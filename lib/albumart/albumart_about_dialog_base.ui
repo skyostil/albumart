@@ -1,8 +1,8 @@
 <!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>Form1</class>
+<class>AboutDialogBase</class>
 <widget class="QDialog">
     <property name="name">
-        <cstring>Form1</cstring>
+        <cstring>AboutDialogBase</cstring>
     </property>
     <property name="geometry">
         <rect>
@@ -13,7 +13,10 @@
         </rect>
     </property>
     <property name="caption">
-        <string>Form1</string>
+        <string>About - Album Cover Art Downloader</string>
+    </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
     </property>
     <vbox>
         <property name="name">
@@ -385,6 +388,20 @@
         <data format="PNG" length="511">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000001c649444154388dedd5bf4b55611807f0cf7b8e976e42ba44777431445c8aea469b1084ff80934141534b8d414343d4120651411841844ad018d9100dfd05417aa582201b02216c33f07aae4fc3b961f92bb3dc7ae02c2fcff99ceffbf0f29e141176a3b25d5177134eff12eb7a422513959c941e8908c9d9bf101f2213793b669e4b5934b12c8ced001cc37dd199778626ad26ad65a93942a649adab4621dcd926781b774535afc6e0e141bdfb7b290326e7ca964c5392a80fd6cbe4a35b80a3b8292a7925fa8ff41b1a1ed278d730fd7e9a42727eb535b98115317071c0c28705f353f3ac482eff045e4726b26aa6fb58b7dad19a3c72738fe72c7e59e4d2fa43502e5c15f9702eebcb146f0af134084920097b719c8e7a87544dcc538c176229b8b2f1c9ea004b526bba15ad9e167d388567c21ed4db4f9542c1274c94efb8b6f9d44a78193338d95e3d881174630f56f00d0dbc44b33dc22d6a751b17843338b049e72c9e2393dcda1a5d4d4c795c1a38b141d72bbc4692dcfb3dba164e6685436b3a5ee06d3be983eda1acbd2b4eb7c7b10f4bcaad7f6e271ddf3efa6b62087c440fa6b0d0fef8c49fa1eb61921961065f31b9f3db6f2d5c8224933b25cb4aff7f4d3fea3bcb878cc411d820bb0000000049454e44ae426082</data>
     </image>
 </images>
+<connections>
+    <connection>
+        <sender>urlButton</sender>
+        <signal>clicked()</signal>
+        <receiver>AboutDialogBase</receiver>
+        <slot>openHomePage()</slot>
+    </connection>
+    <connection>
+        <sender>pushOK</sender>
+        <signal>clicked()</signal>
+        <receiver>AboutDialogBase</receiver>
+        <slot>close()</slot>
+    </connection>
+</connections>
 <slots>
     <slot>openHomePage()</slot>
 </slots>
