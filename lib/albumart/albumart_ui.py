@@ -88,7 +88,7 @@ class AlbumArtUi(AlbumArtDialog):
       try:
         self.showCoversAction.setOn(self.config.getboolean("albumart", "showcovers"))
       except Exception,x:
-        pass
+        self.showCoversAction.setOn(True)
 
       try:
         self.iconSize = self.config.getint("albumart", "iconsize")
@@ -156,29 +156,33 @@ class AlbumArtUi(AlbumArtDialog):
     self.noCoverPixmap = self.scaleIconPixmap(self.noCoverPixmap)
 
     # replace ugly icons with nicer alpha channeled ones
-    try:
-      self.fileOpenAction.setIconSet(QIconSet(QPixmap(self.getResourcePath("fileopen.png"))))
-      self.fileExitAction.setIconSet(QIconSet(QPixmap(self.getResourcePath("exit.png"))))
-      self.helpAboutAction.setIconSet(QIconSet(QPixmap(self.getResourcePath("icon.png"))))
-      self.reloadAction.setIconSet(QIconSet(QPixmap(self.getResourcePath("reload.png"))))
-      self.nextAction.setIconSet(QIconSet(QPixmap(self.getResourcePath("1rightarrow.png"))))
-      self.previousAction.setIconSet(QIconSet(QPixmap(self.getResourcePath("1leftarrow.png"))))
-      self.pushDownload.setIconSet(QIconSet(QPixmap(self.getResourcePath("download.png"))))
-      self.pushSet.setIconSet(QIconSet(QPixmap(self.getResourcePath("filesave.png"))))
-    except:
-      # if that doesn't work, never mind
-      pass
-
+    for action, picture in [
+      (self.fileOpenAction, "fileopen.png"),
+      (self.fileExitAction, "exit.png"),
+      (self.helpAboutAction, "icon.png"),
+      (self.reloadAction, "reload.png"),
+      (self.nextAction, "1rightarrow.png"),
+      (self.previousAction, "1leftarrow.png"),
+      (self.pushDownload, "download.png"),
+      (self.pushSet, "filesave.png"),
+      (self.autoDownloadAction, "autodownload.png")
+    ]:
+      try:
+        action.setIconSet(QIconSet(QPixmap(self.getResourcePath(picture))))
+      except:
+        # if that doesn't work, never mind
+        pass
+      
   #
   # Load a module with the given name (id)
   #      
   def loadModule(self, id):
     try:
       (mod, cls) = id.split(".")
-      exec("import %s" % (mod))
-      exec("cfg = %s.defaultConfig.copy()" % (mod))
-      exec("cfgdesc = %s.configDesc" % (mod))
-      exec("c = %s.%s()" % (mod,cls))
+      module = __import__(mod)
+      cfg = module.defaultConfig.copy()
+      cfgdesc = module.configDesc
+      c = module.__dict__[cls]()
 
       # load configuration
       try:
@@ -197,13 +201,14 @@ class AlbumArtUi(AlbumArtDialog):
         i = self.settingsMenu.insertItem(desc[1])
         self.moduleAttributeMap[i] = (c,key,desc)
 
+        # fix the types
         try:
           if desc[0]=="boolean":
-            if cfg[key]==1 or self.config.getboolean(mod,key):
+            if cfg[key] == 1 or self.config.getboolean(mod,key):
               self.settingsMenu.setItemChecked(i, 1)
-              cfg[key] = 1
+              cfg[key] = True
             else:
-              cfg[key] = 0
+              cfg[key] = False
         except:
           pass
 

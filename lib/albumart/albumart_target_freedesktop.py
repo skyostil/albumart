@@ -12,6 +12,7 @@ defaultConfig = {
 
 configDesc = {
   "enabled":  ("boolean", "Set image for Freedesktop (KDE, Gnome, etc.)"),
+  "relpaths":  ("boolean", "Use relative paths for Freedesktop"),
 }
 
 class MyParser(ConfigParser.ConfigParser):
@@ -42,11 +43,7 @@ class Freedesktop(albumart.Target):
   def configure(self, config):
     self.filename = config["filename"]
     self.enabled = config["enabled"]
-    
-    try:
-      self.relpaths = (config["relpaths"] == "1")
-    except:
-      self.relpaths = 1
+    self.relpaths = config["relpaths"]
 
   def getCover(self, path):
     if self.enabled:
