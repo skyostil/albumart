@@ -47,7 +47,7 @@ def printUsage():
 %(app)s version %(version)s by %(author)s
 http://kempele.fi/~skyostil/projects/albumart
 
-Assings cover images to directories holding albums.
+Assigns cover images to directories holding albums.
 
 Usage:
   %(executable)-18s    [options] [path]
