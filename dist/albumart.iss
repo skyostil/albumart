@@ -21,7 +21,7 @@ Source: "installer\distalbumart-qt-w32\support\*"; DestDir: "{app}\support"; Fla
 Source: "installer\distalbumart-qt-w32\share\*"; DestDir: "{app}\share"; Flags: ignoreversion recursesubdirs
 Source: "installer\distalbumart-qt-w32\Changelog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "installer\distalbumart-qt-w32\Copying.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "installer\distalbumart-qt-w32\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "installer\distalbumart-qt-w32\Readme.txt"; DestDir: "{app}"; Flags: ignoreversion isreadme
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [INI]
