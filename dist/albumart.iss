@@ -1,6 +1,6 @@
 [Setup]
 AppName=Album Cover Art Downloader
-AppVerName=Album Cover Art Downloader 1.4.0beta4
+AppVerName=Album Cover Art Downloader 1.4.0
 AppPublisher=Sami Kyöstilä
 AppPublisherURL=http://kempele.fi/~skyostil/projects/albumart
 AppSupportURL=http://kempele.fi/~skyostil/projects/albumart
