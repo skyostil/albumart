@@ -34,10 +34,12 @@ class AlbumArtUnattendedUi(QWidget):
   #
   def __init__(self, parent = None,
                name = "AlbumArtUnattendedUi",
-               showSummary = False):
+               showSummary = False,
+               hidden = False):
     QObject.__init__(self, parent, name)
     self.config = ConfigParser.ConfigParser()
     self.showSummary = showSummary
+    self.hidden = hidden
     
     try:
       # load the configuration
@@ -118,7 +120,8 @@ class AlbumArtUnattendedUi(QWidget):
     else:
       self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
 
-    self.progressDialog.show()
+    if not self.hidden:
+      self.progressDialog.show()
     self.thread.start()
 
   #
@@ -183,11 +186,11 @@ class AlbumArtUnattendedUi(QWidget):
     elif event.type() == ExceptionEvent.id:
       self.reportException(self.tr("Downloading cover images"), event.exception)
     elif event.type() == ProgressEvent.id:
-      if self.progressDialog:
+      if self.progressDialog and not self.hidden:
         self.progressDialog.setTotalSteps(event.total)
         self.progressDialog.setProgress(event.progress)
     elif event.type() == StatusEvent.id:
-      if self.progressDialog:
+      if self.progressDialog and not self.hidden:
         self.progressDialog.setLabelText(event.text)
     elif event.type() == ReloadEvent.id:
       pass

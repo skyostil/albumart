@@ -56,6 +56,7 @@ Options:
   -d, --download       Download covers for the given path.
   -x, --delete         Remove covers below the given path.
   -s, --synchronize    Synchronizes all covers below the given path.
+  -H, --hidden         Don't show a progress dialog.
   -i, --summary        Show a dialog with summary information when done.""" % \
   {
     "executable" : sys.argv[0],
@@ -87,13 +88,14 @@ def runGui(albumPath = None):
 #
 # @returns a numeric exit code (0 for success)
 #
-def runUnattendedGui(operation, albumPath, showSummary = False):
+def runUnattendedGui(operation, albumPath, showSummary = False, hidden = False):
   # load the heavy modules on demand
   import albumart_unattended_ui
   import qt
   
   app = qt.QApplication(sys.argv)
-  ui = albumart_unattended_ui.AlbumArtUnattendedUi(showSummary = showSummary)
+  ui = albumart_unattended_ui.AlbumArtUnattendedUi(showSummary = showSummary,
+                                                   hidden = hidden)
   app.setMainWidget(ui)
   
   if operation == "download":
@@ -108,15 +110,16 @@ def runUnattendedGui(operation, albumPath, showSummary = False):
 if __name__=="__main__":
   try:
     opts, args = getopt.getopt(sys.argv[1:],
-                               "hdxsi",
+                               "hdxsiH",
                                ["help", "download", "delete", "synchronize",
-                                "summary"])
+                                "summary", "hidden"])
   except getopt.GetoptError:
     printUsage()
     sys.exit(2)
   
   operation = None
   showSummary = False
+  hidden = False
   
   for option, arg in opts:
     if option in ("-h", "--help"):
@@ -130,11 +133,13 @@ if __name__=="__main__":
       operation = "synchronize"
     elif option in ("-i", "--summary"):
       showSummary = True
+    elif option in ("-H", "--hidden"):
+      hidden = True
       
   if not args:
     sys.exit(runGui())
   else:
     if operation:
-      sys.exit(runUnattendedGui(operation, args[0], showSummary))
+      sys.exit(runUnattendedGui(operation, args[0], showSummary, hidden))
     else:
       sys.exit(runGui(args[0]))
