@@ -130,12 +130,12 @@ class AutoDownloadProcess(Process):
           except Exception, x:
             traceback.print_exc(file = sys.stderr)
         else:
-          for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = 1):
+          for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = True):
             try:
               img = Image.open(cover)
               img.load()
               coversFound += 1
-  
+              
               # convert to JPEG if needed
               if img.format != "JPEG":
                 img = img.convert("RGB")
