@@ -24,14 +24,14 @@
         </property>
         <widget class="QSplitter">
             <property name="name">
-                <cstring>splitter3</cstring>
+                <cstring>splitter2</cstring>
             </property>
             <property name="orientation">
                 <enum>Horizontal</enum>
             </property>
             <widget class="QLayoutWidget">
                 <property name="name">
-                    <cstring>layout8</cstring>
+                    <cstring>layout7</cstring>
                 </property>
                 <vbox>
                     <property name="name">
@@ -39,13 +39,13 @@
                     </property>
                     <widget class="QLayoutWidget">
                         <property name="name">
-                            <cstring>layout7</cstring>
+                            <cstring>layout6</cstring>
                         </property>
                         <hbox>
                             <property name="name">
                                 <cstring>unnamed</cstring>
                             </property>
-                            <widget class="QPushButton">
+                            <widget class="QToolButton">
                                 <property name="name">
                                     <cstring>clearFilter</cstring>
                                 </property>
@@ -55,8 +55,11 @@
                                 <property name="iconSet">
                                     <iconset>image1</iconset>
                                 </property>
+                                <property name="autoRaise">
+                                    <bool>true</bool>
+                                </property>
                                 <property name="toolTip" stdset="0">
-                                    <string>Clear filter field</string>
+                                    <string>Reset filter</string>
                                 </property>
                             </widget>
                             <widget class="QLineEdit">
@@ -983,14 +986,14 @@
         <slot>setFilter(const QString&amp;)</slot>
     </connection>
     <connection>
-        <sender>clearFilter</sender>
-        <signal>clicked()</signal>
+        <sender>filterEdit</sender>
+        <signal>lostFocus()</signal>
         <receiver>filterEdit</receiver>
         <slot>clear()</slot>
     </connection>
     <connection>
-        <sender>filterEdit</sender>
-        <signal>lostFocus()</signal>
+        <sender>clearFilter</sender>
+        <signal>clicked()</signal>
         <receiver>filterEdit</receiver>
         <slot>clear()</slot>
     </connection>

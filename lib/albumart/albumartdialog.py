@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '../../src/albumart.ui'
 #
-# Created: to tammi  2 00:44:44 2003
+# Created: la helmi  26 12:52:35 2005
 #      by: The PyQt User Interface Compiler (pyuic) 3.13
 #
 # WARNING! All changes made in this file will be lost!
@@ -1138,17 +1138,18 @@ class AlbumArtDialog(QMainWindow):
         self.setCentralWidget(QWidget(self,"qt_central_widget"))
         AlbumArtDialogLayout = QHBoxLayout(self.centralWidget(),11,6,"AlbumArtDialogLayout")
 
-        self.splitter3 = QSplitter(self.centralWidget(),"splitter3")
-        self.splitter3.setOrientation(QSplitter.Horizontal)
+        self.splitter2 = QSplitter(self.centralWidget(),"splitter2")
+        self.splitter2.setOrientation(QSplitter.Horizontal)
 
-        LayoutWidget = QWidget(self.splitter3,"layout8")
-        layout8 = QVBoxLayout(LayoutWidget,11,6,"layout8")
+        LayoutWidget = QWidget(self.splitter2,"layout7")
+        layout7 = QVBoxLayout(LayoutWidget,11,6,"layout7")
 
-        layout7 = QHBoxLayout(None,0,6,"layout7")
+        layout6 = QHBoxLayout(None,0,6,"layout6")
 
-        self.clearFilter = QPushButton(LayoutWidget,"clearFilter")
+        self.clearFilter = QToolButton(LayoutWidget,"clearFilter")
         self.clearFilter.setIconSet(QIconSet(self.image1))
-        layout7.addWidget(self.clearFilter)
+        self.clearFilter.setAutoRaise(1)
+        layout6.addWidget(self.clearFilter)
 
         self.filterEdit = QLineEdit(LayoutWidget,"filterEdit")
         pal = QPalette()
@@ -1206,8 +1207,8 @@ class AlbumArtDialog(QMainWindow):
         pal.setDisabled(cg)
         self.filterEdit.setPalette(pal)
         self.filterEdit.setReadOnly(0)
-        layout7.addWidget(self.filterEdit)
-        layout8.addLayout(layout7)
+        layout6.addWidget(self.filterEdit)
+        layout7.addLayout(layout6)
 
         self.dirlist = QListView(LayoutWidget,"dirlist")
         self.dirlist.addColumn(QString.null)
@@ -1219,10 +1220,10 @@ class AlbumArtDialog(QMainWindow):
         self.dirlist.setSelectionMode(QListView.Extended)
         self.dirlist.setAllColumnsShowFocus(1)
         self.dirlist.setRootIsDecorated(0)
-        layout8.addWidget(self.dirlist)
+        layout7.addWidget(self.dirlist)
 
-        LayoutWidget_2 = QWidget(self.splitter3,"layout6")
-        layout6 = QVBoxLayout(LayoutWidget_2,11,6,"layout6")
+        LayoutWidget_2 = QWidget(self.splitter2,"layout6")
+        layout6_2 = QVBoxLayout(LayoutWidget_2,11,6,"layout6_2")
 
         layout5 = QGridLayout(None,1,1,0,6,"layout5")
         spacer2 = QSpacerItem(260,21,QSizePolicy.Expanding,QSizePolicy.Minimum)
@@ -1254,7 +1255,7 @@ class AlbumArtDialog(QMainWindow):
         self.pushDownload.setIconSet(QIconSet(self.image2))
 
         layout5.addWidget(self.pushDownload,2,2)
-        layout6.addLayout(layout5)
+        layout6_2.addLayout(layout5)
 
         self.coverview = QIconView(LayoutWidget_2,"coverview")
         self.coverview.setEnabled(1)
@@ -1265,7 +1266,7 @@ class AlbumArtDialog(QMainWindow):
         self.coverview.setItemsMovable(0)
         self.coverview.setWordWrapIconText(0)
         self.coverview.setShowToolTips(0)
-        layout6.addWidget(self.coverview)
+        layout6_2.addWidget(self.coverview)
 
         layout5_2 = QHBoxLayout(None,0,6,"layout5_2")
         spacer3 = QSpacerItem(91,31,QSizePolicy.Expanding,QSizePolicy.Minimum)
@@ -1276,8 +1277,8 @@ class AlbumArtDialog(QMainWindow):
         self.pushSet.setSizePolicy(QSizePolicy(0,0,0,0,self.pushSet.sizePolicy().hasHeightForWidth()))
         self.pushSet.setIconSet(QIconSet(self.image3))
         layout5_2.addWidget(self.pushSet)
-        layout6.addLayout(layout5_2)
-        AlbumArtDialogLayout.addWidget(self.splitter3)
+        layout6_2.addLayout(layout5_2)
+        AlbumArtDialogLayout.addWidget(self.splitter2)
 
         self.fileOpenAction = QAction(self,"fileOpenAction")
         self.fileOpenAction.setIconSet(QIconSet(self.image4))
@@ -1371,8 +1372,8 @@ class AlbumArtDialog(QMainWindow):
         self.connect(self.albumEdit,SIGNAL("returnPressed()"),self.pushDownload_clicked)
         self.connect(self.artistEdit,SIGNAL("returnPressed()"),self.pushDownload_clicked)
         self.connect(self.filterEdit,SIGNAL("textChanged(const QString&)"),self.setFilter)
-        self.connect(self.clearFilter,SIGNAL("clicked()"),self.filterEdit.clear)
         self.connect(self.filterEdit,SIGNAL("lostFocus()"),self.filterEdit.clear)
+        self.connect(self.clearFilter,SIGNAL("clicked()"),self.filterEdit.clear)
 
         self.setTabOrder(self.dirlist,self.artistEdit)
         self.setTabOrder(self.artistEdit,self.albumEdit)
@@ -1383,7 +1384,7 @@ class AlbumArtDialog(QMainWindow):
     def languageChange(self):
         self.setCaption(self.__tr("Album Cover Art Downloader"))
         self.clearFilter.setText(QString.null)
-        QToolTip.add(self.clearFilter,self.__tr("Clear filter field"))
+        QToolTip.add(self.clearFilter,self.__tr("Reset filter"))
         self.filterEdit.setText(self.__tr("Filter albums"))
         QToolTip.add(self.filterEdit,self.__tr("Enter a string to filter albums by"))
         self.dirlist.header().setLabel(0,QString.null)
