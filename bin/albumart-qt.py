@@ -11,12 +11,30 @@ the Free Software Foundation; either version 2 of the License, or
 at your option) any later version.
 """
 
+# first, find out where our program and data files are and set up sys.path accordingly.
 import os
 import sys
+
+def getBaseDir():
+	path = os.path.dirname(sys.argv[0])
+	if os.path.split(path)[-1]=='bin':
+		path=os.path.dirname(path)
+	return path
+
+def getLibDir():
+	return os.path.join(getBaseDir(),"lib","albumart")
+
+def getShareDir():
+	return os.path.join(getBaseDir(),"share","albumart")
+
+sys.path.append(getBaseDir())
+sys.path.append(getLibDir())
+
 import albumart
 import urllib
 import tempfile
 import Image
+import version
 from qt import *
 
 # see if we're using an old Qt version
@@ -31,12 +49,6 @@ else:
 	                raise 1
 	except:
 	        from albumartdialog import AlbumArtDialog
-
-__program__ = "Album Cover Art Downloader"
-__author__ = "Sami Kyöstilä <skyostil@kempele.fi>"
-__version__ = "1.1"
-__copyright__ = "Copyright (c) 2003 Sami Kyöstilä"
-__license__ = "GPL"
 
 class CoverDownloadedEvent(QCustomEvent):
 	def __init__(self,thread,filename):
@@ -73,8 +85,8 @@ class CoverDownloader(QThread):
 class AlbumArt(AlbumArtDialog):
 	def __init__(self,parent = None,name = None,fl = 0):
 		AlbumArtDialog.__init__(self,parent,name,fl)
-		self.coverPixmap = QPixmap("cover.png")
-		self.noCoverPixmap = QPixmap("nocover.png")
+		self.coverPixmap = QPixmap(os.path.join(getShareDir(),"cover.png"))
+		self.noCoverPixmap = QPixmap(os.path.join(getShareDir(),"nocover.png"))
 
 	def fileExit(self):
 		# delete the downloaded covers
@@ -88,7 +100,6 @@ class AlbumArt(AlbumArtDialog):
 
 	def process(self, root, dirname, names):
 		path = dirname
-		if dirname == root: return
 
 		# ugly portability hack
 		if "\\" in root:
@@ -114,7 +125,7 @@ class AlbumArt(AlbumArtDialog):
 
 	def helpAbout(self):
 		QMessageBox.information(self, __program__, """%s version %s by %s.
-Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program__,__version__,__author__))
+Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__program__,version.__version__,version.__author__))
 
 	def fileOpen(self):
 		dir=str(QFileDialog.getExistingDirectory("",self,"Choose a directory that contains one or more albums","Choose a directory", 1))
@@ -182,11 +193,11 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 			self.statusBar().message("%d covers found. Done." % len(self.coverfiles.keys()),5000)
 
 			if not len(self.coverfiles.keys()):
-				QMessageBox.information(self, __program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
+				QMessageBox.information(self, version.__program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
 
 			self.pushDownload.setEnabled(1)
 		elif event.type()==QEvent.User+2:
-			QMessageBox.critical(self, __program__,"The following error occured while downloading cover images:\n%s"%str(event.exception))
+			QMessageBox.critical(self, version.__program__,"The following error occured while downloading cover images:\n%s"%str(event.exception))
 
 		del event
 

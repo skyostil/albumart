@@ -1,0 +1,12 @@
+include README
+include TODO
+include setup.py
+include bin/albumart-qt.py
+include share/albumart/cover.png
+include share/albumart/nocover.png
+include lib/albumart/albumart.py
+include lib/albumart/albumartdialog.py
+include lib/albumart/albumartdialog_qt230.py
+include lib/albumart/albumartdialog_qt300.py
+include lib/albumart/amazon.py
+include lib/albumart/version.py

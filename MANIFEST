@@ -1,0 +1,12 @@
+README
+TODO
+setup.py
+bin/albumart-qt.py
+lib/albumart/albumart.py
+lib/albumart/albumartdialog.py
+lib/albumart/albumartdialog_qt230.py
+lib/albumart/albumartdialog_qt300.py
+lib/albumart/amazon.py
+lib/albumart/version.py
+share/albumart/cover.png
+share/albumart/nocover.png
