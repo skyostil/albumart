@@ -3,20 +3,36 @@ import albumart
 import Image
 import os
 
+defaultConfig = {
+	"enabled":	1,
+	"filename":	"folder.jpg",
+}
+
+configDesc = {
+	"enabled":	("boolean", "Set image for Windows"),
+}
+
 class Windows(albumart.Target):
 	"""Windows XP(tm) Explorer."""
-	def __init__(self, config=None):
-		self.config = config
-		if config:
-			if config.has_section("Windows"):
-				self.filename = config.get("Windows", "filename")
-				self.enabled = config.getboolean("Windows", "enabled")
-			else:
-				self.filename = "folder.jpg"
-				self.enabled = 1
-				config.add_section("Windows")
-				config.set("Windows", "enabled", "yes")
-				config.set("Windows", "filename", self.filename)
+	def __init__(self):
+		self.configure(defaultConfig)
+
+#	def __init__(self, config=None):
+#		self.config = config
+#		if config:
+#			if config.has_section("Windows"):
+#				self.filename = config.get("Windows", "filename")
+#				self.enabled = config.getboolean("Windows", "enabled")
+#			else:
+#				self.filename = "folder.jpg"
+#				self.enabled = 1
+#				config.add_section("Windows")
+#				config.set("Windows", "enabled", "yes")
+#				config.set("Windows", "filename", self.filename)
+
+	def configure(self, config):
+		self.filename = config["filename"]
+		self.enabled = config["enabled"]
 
 	def getCover(self, path):
 		if not self.enabled: return
@@ -32,7 +48,7 @@ class Windows(albumart.Target):
 		if not self.enabled: return 0
 		return os.path.isfile(os.path.join(path,self.filename))
 
-	def setEnabled(self, enabled):
-		self.enabled = enabled
-		if self.config:
-			self.config.set("Windows", "enabled", str(enabled))
+#	def setEnabled(self, enabled):
+#		self.enabled = enabled
+#		if self.config:
+#			self.config.set("Windows", "enabled", str(enabled))

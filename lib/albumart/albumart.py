@@ -18,29 +18,24 @@ import os
 
 class Module:
 	"""Base class for a module that provides additional functionality."""
-	def __init__(self, config):
-		self.config = config
+	def configure(self, config):
+		"""Configure the module with the given dictionary of settings."""
+		pass
 
 class Source(Module):
 	"""A virtual base class that defines an album cover source."""
-	def __init__(self, config):
-		Module.__init__(self,config)
-
 	def findAlbum(self, name):
 		"""Return a list of matches for the given search string."""
 		pass
 	def getCover(self, name):
 		"""Download an album cover image for the given list of matches. Returns a list of file names."""
 		pass
-	def setEnabled(self, enabled):
-		"""Enables or disables this module."""
-		pass
+#	def setEnabled(self, enabled):
+#		"""Enables or disables this module."""
+#		pass
 
 class Target(Module):
 	"""A virtual base class that defines an album cover target."""
-	def __init__(self, config):
-		Module.__init__(self,config)
-
 	def getCover(self, path):
 		"""Returns a cover image for the given path or None if one isn't found."""
 		pass
@@ -50,9 +45,9 @@ class Target(Module):
 	def hasCover(self, path):
 		"""Returns 1 if the given path has an associated cover image and 0 otherwise."""
 		return 0
-	def setEnabled(self, enabled):
-		"""Enables or disables this module."""
-		pass
+#	def setEnabled(self, enabled):
+#		"""Enables or disables this module."""
+#		pass
 
 # the sources to use
 #from albumart_source_amazon import Amazon

@@ -4,6 +4,15 @@ import Image
 import ConfigParser
 import os
 
+defaultConfig = {
+	"enabled":	1,
+	"filename":	".folder.png",
+}
+
+configDesc = {
+	"enabled":	("boolean", "Set image for Freedesktop (KDE, Gnome, etc.)"),
+}
+
 # A wrapper around a file to work around the fact that
 # ConfigParser writes keys in lowercase.
 class MyWriter(file):
@@ -14,18 +23,25 @@ class MyWriter(file):
 
 class Freedesktop(albumart.Target):
 	"""Freedesktop.org's desktop file standard (for KDE, GNOME, etc.)"""
-	def __init__(self, config=None):
-		self.config = config
-		if config:
-			if config.has_section("Freedesktop"):
-				self.filename = config.get("Freedesktop", "filename")
-				self.enabled = config.getboolean("Freedesktop", "enabled")
-			else:
-				self.filename = ".folder.png"
-				self.enabled = 1
-				config.add_section("Freedesktop")
-				config.set("Freedesktop", "enabled", "yes")
-				config.set("Freedesktop", "filename", self.filename)
+	def __init__(self):
+		self.configure(defaultConfig)
+
+#	def __init__(self, config={}):
+#		self.config = config
+#		if config:
+#			if config.has_section("Freedesktop"):
+#				self.filename = config.get("Freedesktop", "filename")
+#				self.enabled = config.getboolean("Freedesktop", "enabled")
+#			else:
+#				self.filename = ".folder.png"
+#				self.enabled = 1
+#				config.add_section("Freedesktop")
+#				config.set("Freedesktop", "enabled", "yes")
+#				config.set("Freedesktop", "filename", self.filename)
+
+	def configure(self, config):
+		self.filename = config["filename"]
+		self.enabled = config["enabled"]
 
 	def getCover(self, path):
 		if not self.enabled: return
@@ -54,7 +70,7 @@ class Freedesktop(albumart.Target):
 		if not self.enabled: return 0
 		return os.path.isfile(os.path.join(path,self.filename))
 
-	def setEnabled(self, enabled):
-		self.enabled = enabled
-		if self.config:
-			self.config.set("Freedesktop", "enabled", str(enabled))
+#	def setEnabled(self, enabled):
+#		self.enabled = enabled
+#		if self.config:
+#			self.config.set("Freedesktop", "enabled", str(enabled))

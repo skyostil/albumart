@@ -91,8 +91,8 @@ class AlbumArt(AlbumArtDialog):
 		self.coverPixmap = QPixmap(os.path.join(getShareDir(),"cover.png"))
 		self.noCoverPixmap = QPixmap(os.path.join(getShareDir(),"nocover.png"))
 		self.config = ConfigParser.ConfigParser()
-		self.sourceModules = {}
-		self.targetModules = {}
+		self.moduleAttributeMap = {}
+		self.dir = ""
 
 		# load the configuration
 		try:
@@ -110,17 +110,42 @@ class AlbumArt(AlbumArtDialog):
 			self.menubar.insertItem("&Settings", self.settingsMenu, -1, 1)
 
 			for s in self.config.get("albumart", "sources").split(":"):
+				mod = self.loadModule(s)
+				albumart.addSource(mod)
+
+			self.settingsMenu.insertSeparator()
+
+			for t in self.config.get("albumart", "targets").split(":"):
+				mod = self.loadModule(t)
+				albumart.addTarget(mod)
+
+			"""
+			for s in self.config.get("albumart", "sources").split(":"):
 				try:
 					(mod, cls) = s.split(".")
-					exec("from %s import %s" % (mod,cls))
-					exec("c = %s(self.config)" % cls)
+					exec("import %s" % (mod))
+					exec("cfg = %s.defaultConfig.copy()" % (mod))
+					exec("cfgdesc = %s.configDesc" % (mod))
+					exec("c = %s.%s()" % (mod,cls))
+
+#					exec("c = %s(self.config)" % cls)
 					albumart.addSource(c)
-					id = self.settingsMenu.insertItem("Use %s as an image source" % cls)
-					self.settingsMenu.setItemChecked(id, c.enabled)
-					self.settingsMenu.setWhatsThis(id, c.__doc__)
-					self.sourceModules[id] = c
+#					id = self.settingsMenu.insertItem("Use %s as an image source" % cls)
+#					self.settingsMenu.setItemChecked(id, c.enabled)
+#					self.settingsMenu.setWhatsThis(id, c.__doc__)
+
+					for (key,value) in self.config.items(cls):
+						cfg[key] = value
+
+					for (key,desc) in cfgdesc.items():
+						id = self.settingsMenu.insertItem(desc[1])
+						self.moduleAttributeMap[id] = (c,key,desc)
+
+#					id = self.settingsMenu.insertItem("Use %s as an image source" % cls)
+					c.configure(cfg)
+#					self.sourceModules[id] = c
 				except:
-					pass
+					raise
 
 			self.settingsMenu.insertSeparator()
 
@@ -128,7 +153,7 @@ class AlbumArt(AlbumArtDialog):
 				try:
 					(mod, cls) = t.split(".")
 					exec("from %s import %s" % (mod,cls))
-					exec("c = %s(self.config)" % cls)
+					exec("c = %s()" % cls)
 					albumart.addTarget(c)
 					id = self.settingsMenu.insertItem("Set image for %s" % cls)
 					self.settingsMenu.setItemChecked(id, c.enabled)
@@ -136,6 +161,7 @@ class AlbumArt(AlbumArtDialog):
 					self.targetModules[id] = c
 				except:
 					pass
+			"""
 		except:
 			raise
 
@@ -146,9 +172,48 @@ class AlbumArt(AlbumArtDialog):
 		except:
 			pass
 
+	def loadModule(self,id):
+		try:
+			(mod, cls) = id.split(".")
+			exec("import %s" % (mod))
+			exec("cfg = %s.defaultConfig.copy()" % (mod))
+			exec("cfgdesc = %s.configDesc" % (mod))
+			exec("c = %s.%s()" % (mod,cls))
+
+			# load configuration
+			try:
+				for (key,value) in self.config.items(mod):
+					cfg[key] = value
+			except:
+				pass
+
+			c.__configuration__ = cfg
+
+			for (key,desc) in cfgdesc.items():
+				id = self.settingsMenu.insertItem(desc[1])
+				self.moduleAttributeMap[id] = (c,key,desc)
+				if desc[0]=="boolean" and self.config.getboolean(mod,key):
+					self.settingsMenu.setItemChecked(id, 1)
+
+			c.configure(cfg)
+			return c
+		except:
+			sys.stderr.write("Unable to load module '%s'.\n" % id)
+			raise
+
+
 	def settingsMenuActivated(self, id):
 		enabled = not self.settingsMenu.isItemChecked(id)
 
+		if self.moduleAttributeMap.has_key(id):
+			(mod,key,desc) = self.moduleAttributeMap[id]
+
+			if desc[0] == "boolean":
+				mod.__configuration__[key] = enabled
+				self.settingsMenu.setItemChecked(id, enabled)
+				mod.configure(mod.__configuration__)
+
+		"""
 		if self.sourceModules.has_key(id):
 			m = self.sourceModules[id]
 			if enabled:
@@ -164,6 +229,7 @@ class AlbumArt(AlbumArtDialog):
 
 		self.settingsMenu.setItemChecked(id, enabled)
 		m.setEnabled(enabled)
+		"""
 
 	def fileExit(self):
 		self.close()
@@ -178,10 +244,16 @@ class AlbumArt(AlbumArtDialog):
 
 		# save the configuration
 		try:
+			for mod in albumart.sources + albumart.targets:
+				for (key,value) in mod.__configuration__.items():
+					if not self.config.has_section(mod.__module__):
+						self.config.add_section(mod.__module__)
+					self.config.set(mod.__module__, key, value)
+
 			fn = os.path.join(config.getConfigPath("albumart"), "config")
 			self.config.write(open(fn,"w"))
 		except:
-			pass
+			raise
 
 		ce.accept()
 
@@ -248,10 +320,10 @@ class AlbumArt(AlbumArtDialog):
 Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (version.__program__,version.__version__,version.__author__))
 
 	def fileOpen(self):
-		dir=self.getQString(QFileDialog.getExistingDirectory(self.dir,self,"Choose a directory that contains one or more albums","Choose a directory", 1))
-		if dir and len(dir):
-			self.config.set("albumart", "lastDirectory", dir)
-			self.walk(dir)
+		d=self.getQString(QFileDialog.getExistingDirectory(self.dir,self,"Choose a directory that contains one or more albums","Choose a directory", 1))
+		if d and len(d):
+			self.config.set("albumart", "lastDirectory", d)
+			self.walk(d)
 
 	def dirlist_selectionChanged(self,a0):
 		self.selectedAlbum = a0
@@ -419,8 +491,9 @@ if __name__=="__main__":
 	mainwin = AlbumArt()
 	app.setMainWidget(mainwin)
 
-	if "--help" in sys.argv:
-		print """Usage:
+ 	if "--help" in sys.argv or "-h" in sys.argv:
+		print """Assings cover images to directories holding albums.
+Usage:
 %s	[directory]""" % sys.argv[0]
 		sys.exit(1)
 
