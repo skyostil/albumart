@@ -14,10 +14,11 @@ class CoverDownloadedEvent(QCustomEvent):
 
 class TaskFinishedEvent(QCustomEvent):
   id = QEvent.User + 1
-  def __init__(self, thread, message = None):
+  def __init__(self, thread, message = None, result = True):
     QCustomEvent.__init__(self, self.id)
     self.thread = thread
     self.message = message
+    self.result = result
 
 class ExceptionEvent(QCustomEvent):
   id = QEvent.User + 2

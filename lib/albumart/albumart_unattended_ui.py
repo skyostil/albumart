@@ -172,7 +172,8 @@ class AlbumArtUnattendedUi(QWidget):
 
       if event.message:
         print event.message.replace("\n", "")
-      self.close()
+      
+      QApplication.exit(not event.result)
 
     elif event.type() == ExceptionEvent.id:
       self.reportException(self.tr("Downloading cover images"), event.exception)
@@ -208,6 +209,6 @@ class AlbumArtUnattendedUi(QWidget):
   #  
   def tr(self, identifier, context = None):
     if qVersion().split(".")[0] == "2":
-        # tr is static in old Qt
-        return self.getQString(QObject.tr(identifier, context))
+      # tr is static in old Qt
+      return self.getQString(QObject.tr(identifier, context))
     return self.getQString(QObject.tr(self, identifier, context))

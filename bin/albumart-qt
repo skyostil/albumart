@@ -68,6 +68,7 @@ Options:
 #
 # @param albumPath Initial album path.
 #                  Pass None to have it read from the config file.
+# @returns a numeric exit code (0 for success)
 #
 def runGui(albumPath = None):
   # load the heavy modules on demand
@@ -78,10 +79,12 @@ def runGui(albumPath = None):
   mainwin = albumart_ui.AlbumArtUi(dataPath = getShareDir(), albumPath = albumPath)
   app.setMainWidget(mainwin)
   mainwin.show()
-  app.exec_loop()
+  return app.exec_loop()
 
 #
 # Run the unattended graphical user interface
+#
+# @returns a numeric exit code (0 for success)
 #
 def runUnattendedGui(operation, albumPath):
   # load the heavy modules on demand
@@ -99,7 +102,7 @@ def runUnattendedGui(operation, albumPath):
   elif operation == "synchronize":
     ui.synchronizeCovers(albumPath)
     
-  app.exec_loop()
+  return app.exec_loop()
 
 if __name__=="__main__":
   try:
@@ -123,9 +126,9 @@ if __name__=="__main__":
       operation = "synchronize"
       
   if not args:
-    runGui()
+    sys.exit(runGui())
   else:
     if operation:
-      runUnattendedGui(operation, args[0])
+      sys.exit(runUnattendedGui(operation, args[0]))
     else:
-      runGui(args[0])
+      sys.exit(runGui(args[0]))

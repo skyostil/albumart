@@ -35,8 +35,8 @@ class Process(QThread):
   def setStatusText(self, text):
     self.postEvent(self.dialog, StatusEvent(self, text))
     
-  def setComplete(self, message = None):
-    self.postEvent(self.dialog, TaskFinishedEvent(self, message))
+  def setComplete(self, message = None, result = True):
+    self.postEvent(self.dialog, TaskFinishedEvent(self, message, result))
 
   def triggerReload(self):
     self.postEvent(self.dialog, ReloadEvent(self))
@@ -165,7 +165,8 @@ class AutoDownloadProcess(Process):
         "Out of a total of %d items, %d were recognized, \n" +
         "%d matching covers were found and \n" +
         "%d were installed.") % \
-      (len(items), recognized, coversFound, coversInstalled))
+      (len(items), recognized, coversFound, coversInstalled),
+      result = (len(items) == coversInstalled))
 
 class SynchronizeProcess(Process):
   "Cover Image Synchronization"
