@@ -199,7 +199,7 @@
     </connection>
     <connection>
         <sender>pageView</sender>
-        <signal>clicked(QListViewItem*)</signal>
+        <signal>currentChanged(QListViewItem*)</signal>
         <receiver>ConfigurationDialogBase</receiver>
         <slot>setPage(QListViewItem*)</slot>
     </connection>
