@@ -6,4 +6,5 @@ PYUIC=pyuic
 	@$(PYUIC) $< > $@
 
 all: albumart_dialog_base.py \
-     albumart_configuration_dialog_base.py
+     albumart_configuration_dialog_base.py \
+     albumart_about_dialog_base.py
