@@ -1,6 +1,20 @@
+1.3:
+
+	- Upgraded to the new Amazon web services API.
+	- Added ability to save images into ID3 v2 tags.
+	- Made the freedesktop image path relative, see http://bugs.kde.org/show_bug.cgi?id=73463
+	- Added automatic image downloader.
+	- Added automatic image synchronizer, that makes sure all the image
+	  targets have the same picture.
+	- Added better status information and error reporting.
+	- Made the folder icon size configurable.
+	- The main window now looks nicer when you maximize it.
+	- Switched to nicer icons.
+
 1.2:
 
-	- Made sure the images are saved in a proper format. Thanks to Josh Portner for pointing this out.
+	- Made sure the images are saved in a proper format. Thanks to Josh
+	  Portner for pointing this out.
 	- Paths with non-ascii characters are now handled properly.
 	- Don't freeze the UI while reading a directory.
 	- Save settings for the user (last directory, etc.).
@@ -9,3 +23,4 @@
 	- Reload UI icons to restore alpha transparency.
 	- New keyboard shortcuts and actions for navigating the directory list.
 	- Ability to remove cover images.
+
