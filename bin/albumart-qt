@@ -515,7 +515,7 @@ class AlbumArt(AlbumArtDialog):
                 self.albumIcon.setEnabled(0)
                 self.autoDownloadAction.setEnabled(0)
                 self.synchronizeAction.setEnabled(0)
-                self.dirlist.setEnabled(0)
+                self.dirlist.setEnabled(1)
                 self.dirlist.clear()
 
                 self.statusBar().message("Reading directory...")
@@ -533,7 +533,6 @@ class AlbumArt(AlbumArtDialog):
                         self.autoDownloadAction.setEnabled(1)
                         self.synchronizeAction.setEnabled(1)
                         self.fileOpenAction.setEnabled(1)
-	                self.dirlist.setEnabled(1)
                 except:
                         pass
 
@@ -654,6 +653,13 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                 self.startProcess(SynchronizeProcess(self, self.dir, items))
 
         def dirlist_selectionChanged(self,a0):
+		# delete downloaded covers
+                try:
+                        for f in self.covers:
+                                os.unlink(f)
+                except:
+                        pass
+	
                 self.selectedAlbum = a0
                 self.coverview.clear()
                 self.artistEdit.setText(a0.text(1))
@@ -744,7 +750,6 @@ PyID3 by Myers Carpenter (http://icepick.info/projects/pyid3/)
                         pass
             
                 if event.type()==CoverDownloadedEvent.id:
-			print event.filename
                         self.covers.append(event.filename)
                         self.addCoverToList(event.filename)
                 elif event.type()==TaskFinishedEvent.id:
