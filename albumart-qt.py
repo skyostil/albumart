@@ -40,6 +40,11 @@ class TaskFinishedEvent(QCustomEvent):
 	def __init__(self):
 		QCustomEvent.__init__(self,QEvent.User+1)
 
+class ExceptionEvent(QCustomEvent):
+	def __init__(self,x):
+		QCustomEvent.__init__(self,QEvent.User+2)
+		self.exception = x
+
 class CoverDownloader(QThread):
 	def __init__(self,dialog,artist,album):
 		QThread.__init__(self)
@@ -52,7 +57,7 @@ class CoverDownloader(QThread):
 			for c in albumart.getAvailableCovers(self.artist, self.album):
 				self.postEvent(self.dialog, CoverDownloadedEvent(c))
 		except Exception,x:
-			QMessageBox.critical(self, __program__,"The following error occured while downloading cover images:\n%s"%str(x))
+			self.postEvent(self.dialog, ExceptionEvent(x))
 
 		self.postEvent(self.dialog, TaskFinishedEvent())
 
@@ -162,6 +167,9 @@ Amazon web api wrapper by Mark Pilgrim (f8dy@diveintomark.org).""" % (__program_
 				QMessageBox.information(self, __program__,"Sorry, no cover images were found. Try simpler keywords.\nHowever, if you already have a cover image you'd like to use,\ngo ahead drop it on the cover image list.")
 
 			self.pushDownload.setEnabled(1)
+		elif event.type()==QEvent.User+2:
+			QMessageBox.critical(self, __program__,"The following error occured while downloading cover images:\n%s"%str(event.exception))
+
 		del event
 
 	def pushDownload_clicked(self):
