@@ -18,7 +18,7 @@ defaultConfig = {
 
 configDesc = {
   "enabled":        ("boolean", "Enable"),
-  "locale":         ("stringlist",  "Country",
+  "locale":         ("choice",  "Country",
                      ["us", "uk", "de", "jp"]),
   "proxy":          ("string",  "Proxy server"),
   "minsize":        ("integer",  "Only accept images at least this big (pixels)", (0, 1024))

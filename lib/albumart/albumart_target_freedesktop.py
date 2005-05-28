@@ -9,6 +9,8 @@ import os
 
 scales = {
   "Default": None,
+  "512x512 pixels": 512,
+  "256x256 pixels": 256,
   "128x128 pixels": 128,
   "64x64 pixels": 64,
   "48x48 pixels": 48,
@@ -25,7 +27,7 @@ defaultConfig = {
 configDesc = {
   "enabled":   ("boolean", "Enable"),
   "relpaths":  ("boolean", "Use relative paths"),
-  "scale":     ("stringlist", "Image size", scales.keys())
+  "scale":     ("choice", "Image size", scales.keys())
 }
 
 class MyParser(ConfigParser.ConfigParser):

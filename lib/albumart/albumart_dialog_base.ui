@@ -348,6 +348,11 @@
     </item>
     <item text="&amp;View" name="View">
         <action name="hideAlbumsWithCovers"/>
+        <action name="viewView_ModeAction"/>
+        <item text="View mode" name="popupMenu_11" accel="">
+            <action name="viewAlbumsAction"/>
+            <action name="viewFoldersAction"/>
+        </item>
     </item>
     <item text="&amp;Settings" name="Settings">
         <action name="configureAction"/>
@@ -371,6 +376,9 @@
         <action name="autoDownloadAction"/>
         <action name="removeAction"/>
         <action name="viewCoverAction"/>
+        <separator/>
+        <action name="viewAlbumsAction"/>
+        <action name="viewFoldersAction"/>
     </toolbar>
 </toolbars>
 <actions>
@@ -567,6 +575,48 @@
             <string>Esc</string>
         </property>
     </action>
+    <action>
+        <property name="name">
+            <cstring>viewAlbumsAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image13</iconset>
+        </property>
+        <property name="text">
+            <string>View the music collection sorted into albums</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewFoldersAction</cstring>
+        </property>
+        <property name="toggleAction">
+            <bool>true</bool>
+        </property>
+        <property name="on">
+            <bool>false</bool>
+        </property>
+        <property name="iconSet">
+            <iconset>image14</iconset>
+        </property>
+        <property name="text">
+            <string>View the music collection sorted into folders</string>
+        </property>
+    </action>
+    <action>
+        <property name="name">
+            <cstring>viewView_ModeAction</cstring>
+        </property>
+        <property name="text">
+            <string>View mode</string>
+        </property>
+        <property name="menuText">
+            <string>View mode</string>
+        </property>
+    </action>
 </actions>
 <images>
     <image name="image0">
@@ -607,6 +657,12 @@
     </image>
     <image name="image12">
         <data format="PNG" length="1271">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000004be49444154388d8595dd6f544518879f9973ce9efd6ccbb605aab0051154ca57a8805c88ca87501023624c3412129272cd8d1f7f000989b78470b1d1a8375e4862bc400860823680282cd6021222545b08ed6ebb1fe76c77f774cf99f1a2b45028f826bf8b49e67de637f3be3323784af476aeb3b4d6ad0ada343aaa011055054325cbcc6eb9787efc49b9e229d0f5c0fb5aeb5540ca82188087ae2818d4d0eb0b79eccbd52bcea5d3e9e07fc1bd9deb16093860c187d178bc293167b68ccc9d8bbb6431412442fc563feadf7fc8e54654359faf56953a57b6cc83dfaee8b8904ea7fd19c1bd9debda051c4d405774d54a12dbbbd0cb3bb05a5b11863131496bfc4291faeddbd44e9ea2d0d383e38dff55b0ed4fbf5bf6e28949b8f188d3230df1f8d6a6b7778ac89e8f30962cc6b06df07df4787d42f53ac230305b5ab0962dc39a3307dddfdf221ce7e585a3f94ca46bdb9d4c26a3cd49b0d6fae384105d8d9b3761ede8c2684e52bd7a0d00bb7dfefdcd69f44405191f180420b2b693a45f17eaab6f96f895ca7ea0b7bbbbbb6c005c5ebd76bd2dc4a186152bc256d73642ed29aa57afd1f0c66b44962ca6f4730fd2b6519e87f63c6a7fdf22b97307767b8a4a6f1fe6336d986315ea03030b52b991deeb735afb8d4babd758c081444362436cd346417216d6ecd94497be840c85d04140ac6329eeafbf21b4a69e1ba165f7ae8902494978d1738c9e3e836e6946f7f787fcb1b17ac9903d12680556353634487f561381e3e29ebf3005158681aad568d9bd0bdf7569d9bd0badd4b44e4af69ca3f9f80966bb65692ad531df71531268939012cdcda84a05bf50c0cfe7194a7f81300c824a05190e034c733a19ee077b08dfba8d9dcd11476020da42889404a23622568fc550a512ca71d09e87aed5b877f8084634fad8e5998cf11def10cd8ddc6f5c81006c882044626a69abe420878691d91cb2e460148bd8837770f6ed9f99ba611321d7c5181f0721a6e0004a086982a87ae84a64384bb8529dca135a1172cb18a78ecf0cfee527d8b0e9c1584ab452d4a0e60be14905430a06955322fc90ec6a6d021a3cf60c4c870398269826b57a9d009d1d936248962c33aba1370f4a9b16da9a90fcf1878924c378009a74e879d3e041384c60dbe405aa669a37079a1aefc92d17cf8ffb421e2b057ea960998cb5b6925dff0aba529966ced9bb0f67613bcede7d60db8f992f582685c01f1b0e874fe71a1bf206807c6bfb9d95778716d6d19d66fb7c84ef53bef207890daf0230fcc967f8f1187e3c463d16a37cfa0cf137370370efe0212ae110a30303143defe4f7cb977e0d64a75eb7b36bd62f8da9e0706cdebcd7e3cb974b331281472ec24ce17b1ee5be3e55ba7bf7f29fc9e4e797dae79d05f2530768ede81a6d1f2d5c328bc50edf711658f13866721632144284ac07b226846552cf8d50eaebc31d1abe94696d3994493dfb3b30924ea78329702693d1d1aeadf905a3f92b46c989d673d905be5b0ef9e1b0306331a46982940468c64647a95cbda6dc1b37ca6eb178f26a73f2e87d68369d4ed761861fa4bbbb5b02b1f7faae6f8cfbfebba6521dc230da8c44220210b86e4d0541b6669a3787c3e1d3675e78fe3c300c149ff8833c041740686136d734df715321440a21124a08e90be18d493134d0d4782fd7d890075ca09a4ea7a715e43fd8fc23cca1648a7b0000000049454e44ae426082</data>
+    </image>
+    <image name="image13">
+        <data format="PNG" length="567">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000001fe49444154388db595bf6a145114c67f333b4956020a366213888f20d82881ed1613cc8210b75d8c5bf90436fa14da6ca160e3822490d2c2ca47b04a29e203c46266ee9f7352cc9d9d3b9b35bb41f6c2e17c77ee3ddf7cf3dd333389aab28e913dfef0e7e376b733daeaa438eb714670c663437646b04bb2331e6f05f11e5ffe45ccc5a76cbbdb19f51fdea3345016509450142172c80bc8f31031ce4152300ac683a695d224b900f36d94dddacc284b30a60a6bc0da100e9c03ef434458a268b9d9d9206193ecf686f2e47e53e01cb840e2a2b031b64db656f11e541555f046f97c9292ddd982dececd0f47b5221311441411455531a5f2fd474a1a7745f17e6716006fbf9cdf88b4c6a89221abb5db743a5dba677f7f106e0299ae483c1c0e23a58dda58a9aae2455055b2d88aeeeb5fffa5b8df7f86cc8823c593c96486c7e371abe8e8e8c59c9f571537ebb415cf93d5a35df46fd27a7ec58aba1b625b16155e472a22802e3fbcbaf0f4f4eb528f7bbda78bad982784fa8d520e0f9f87a2c5bd5bcf6ba1ad3e9e7ffc189f9d9d2c55bcb7d74782d02c161c77c568f4b2457c70304084593b5de77d452c32233b3e7ed5daf866b01bcd5723d540978957ac75d5065f9daa97caabf85b50e36a2d5c0f9e8a36a4c618009247ef7eea83bb1dbcf578e7ab6c5d839d47e2b590c5374f3a3fce7fe724ebfae7a56b61052e015cf7ba111c3cc74c0000000049454e44ae426082</data>
+    </image>
+    <image name="image14">
+        <data format="PNG" length="535">89504e470d0a1a0a0000000d4948445200000016000000160806000000c4b46c3b000001de49444154388db595bf8a144110c67f33d3f7470e144cc4e4827b8403134dcc7c01a333700f597c0c9f4293b9e304731fc0c0c82710033132101fe00467a6bbabca607a6f66777b6f07611b8aaaa6babefefaab62a6303376b1dce377bfaf8e0eabd94155128310bd12bd10928f5e095b7cf48204454590ee0feaafdfbba3c36af6ecf4019d87ae85b683b64dd640d342d3241bc70d6809dec00b58d9332d8a6bf09f66eecebea3ebc0fbde8287109245881144928d621dd9929ad51e05fbb8bb7bc6938743418c1013481c5918c761f02118226066988178e3c3c71277ef009e1e0f17d675cd7c3edfda1cb31e4c555135540d33c377c6e72f25e5ff4cc526d0458c190e9d06dcbe3d5edabbd73fb3a0fd1e4a9b08bcba166cc7a06686a86266b89c14755d2fed739a0f72586adce282057086f194e6e5188fa5c8325e07b11b4dc74d5bd776f05ba72257781ba8aa02767bf336156e069d20c5b8c8ccb08b130aa04af9f6c5f795a6a5738968999be3ecd0afac8dac135197237c7979b1b43f3b7b79c3748af63db0ead2e1f3f3575936535ed54bd1e79d8a1142ec0f48df1cd15eabf1b7409f7f45d5524ed1bf2d9a34551b40bdf700148fde7cb393fb15120489d2fb1087380a3ace25afa26baf58ac1fbf1a8a5dfdf3ca9da002ff00bd02ca54693850af0000000049454e44ae426082</data>
     </image>
 </images>
 <connections>
@@ -760,6 +816,18 @@
         <receiver>AlbumArtDialogBase</receiver>
         <slot>stopAction_activated()</slot>
     </connection>
+    <connection>
+        <sender>viewAlbumsAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialogBase</receiver>
+        <slot>viewAlbumsAction_activated()</slot>
+    </connection>
+    <connection>
+        <sender>viewFoldersAction</sender>
+        <signal>activated()</signal>
+        <receiver>AlbumArtDialogBase</receiver>
+        <slot>viewFoldersAction_activated()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>dirlist</tabstop>
@@ -805,6 +873,8 @@
     <slot>dirlist_selectionChanged()</slot>
     <slot>showConfigurationDialog()</slot>
     <slot>stopAction_activated()</slot>
+    <slot>viewFoldersAction_activated()</slot>
+    <slot>viewAlbumsAction_activated()</slot>
 </slots>
 <layoutdefaults spacing="3" margin="6"/>
 </UI>

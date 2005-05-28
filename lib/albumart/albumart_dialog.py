@@ -28,7 +28,7 @@ import albumart
 import version
 import config
 from pixmap import getPixmapForPath
-from items import TrackItem, AlbumItem, CoverItem
+from items import TrackItem, AlbumItem, CoverItem, FolderItem, FileItem
 from event import *
 from process import *
 from albumart_dialog_base import AlbumArtDialogBase
@@ -95,18 +95,26 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.config.set("albumart", "sources",
                       "albumart_source_amazon.Amazon")
       self.config.set("albumart", "targets",
-                      "albumart_target_freedesktop.Freedesktop:" +
-                      "albumart_target_windows.Windows:" +
-                      "albumart_target_id3v2.ID3v2")
+                      ":".join([
+                        "albumart_target_freedesktop.Freedesktop",
+                        "albumart_target_windows.Windows",
+                        "albumart_target_id3v2.ID3v2",
+                        "albumart_target_generic.Generic"]))
       self.config.set("albumart", "recognizers",
                       "albumart_recognizer_id3v2.ID3v2Recognizer:" +
                       "albumart_recognizer_path.PathRecognizer")
       # global settings
-      #self.settingsMenu.clear()
       try:
         self.hideAlbumsWithCovers.setOn(self.config.getboolean("albumart", "hide_albums_with_covers"))
       except Exception,x:
         self.hideAlbumsWithCovers.setOn(False)
+
+      try:
+        self.viewAlbumsAction.setOn(self.config.get("albumart", "view_mode") == "0")
+        self.viewFoldersAction.setOn(self.config.get("albumart", "view_mode") == "1")
+      except Exception,x:
+        self.viewAlbumsAction.setOn(True)
+        self.viewFoldersAction.setOn(False)
 
       for s in self.config.get("albumart", "sources").split(":"):
         mod = self.loadModule(s)
@@ -256,6 +264,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
             self.config.add_section(mod.__module__)
           self.config.set(mod.__module__, key, value)
       fn = os.path.join(config.getConfigPath("albumart"), "config")
+      self.config.set("albumart", "view_mode", self.viewAlbumsAction.isOn() and "0" or "1")
       self.config.write(open(fn,"w"))
     except Exception, x:
       self.reportException(self.tr("Saving settings"), x)
@@ -285,7 +294,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     """Walk the given path and fill the album list with all the albums found."""
     try:
       self.dir = path
-  
+
       # update the widget states
       self.setCursor(Qt.waitCursor)
       self.fileOpenAction.setEnabled(0)
@@ -295,13 +304,17 @@ class AlbumArtDialog(AlbumArtDialogBase):
       # clear the db
       self.albums = {}
       self.stopped = False
+
+      # if we are in 'folder' mode, we don't need to read anything yet
+      if self.viewFoldersAction.isOn():
+        return
   
       # check the cache
       try:
         (cachePath, cacheTime, cacheAlbums) = pickle.load(open(self.cachePath, "rb"))
       except:
         cachePath = None
-  
+
       if cachePath == path and os.stat(path).st_mtime <= cacheTime:
         self.albums = cacheAlbums
       else:
@@ -333,8 +346,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         pickle.dump((path, time.time(), self.albums), open(self.cachePath, "wb"))
     finally:
       self.refreshAlbumList()
-      self.statusBar().message(self.tr("%d albums found. Ready.") % len(self.albums))
-  
+      self.statusBar().message(self.tr("%d items found. Ready.") % self.dirlist.childCount())
       self.stopped = False
       self.stopAction.setEnabled(0)
       self.reloadAction.setEnabled(1)
@@ -345,22 +357,33 @@ class AlbumArtDialog(AlbumArtDialogBase):
     """Refreshes the album list according to the current search string."""
     self.setCursor(Qt.waitCursor)
     self.dirlist.clear()
-    for (artist, album), tracks in self.albums.items():
-      if len(tracks) and self.matchesFilter(artist, album, tracks):
-        filteredTracks = []
 
-        # filter the tracks
-        for t in tracks:
-          if self.hideAlbumsWithCovers.isOn() and \
-             not albumart.hasCover(t) or \
-             not self.hideAlbumsWithCovers.isOn():
-            filteredTracks.append(t)
-
-        # if the album is not empty, add it to the list
-        if len(filteredTracks):
-          a = AlbumItem(self.dirlist, os.path.dirname(tracks[0]), artist, album)
-          for t in filteredTracks:
-            a.addTrack(t)
+    if self.viewFoldersAction.isOn():
+      for fn in os.listdir(self.dir):
+        if fn.startswith(".") or not self.matchesFilter(fn, "", ""):
+          continue
+        fullname = os.path.join(self.dir, fn)
+        if os.path.isdir(fullname):
+          FolderItem(self.dirlist, fullname)
+        elif os.path.isfile(fullname):
+          FileItem(self.dirlist, fullname)
+    else:
+      for (artist, album), tracks in self.albums.items():
+        if len(tracks) and self.matchesFilter(artist, album, tracks):
+          filteredTracks = []
+  
+          # filter the tracks
+          for t in tracks:
+            if self.hideAlbumsWithCovers.isOn() and \
+              not albumart.hasCover(t) or \
+              not self.hideAlbumsWithCovers.isOn():
+              filteredTracks.append(t)
+  
+          # if the album is not empty, add it to the list
+          if len(filteredTracks):
+            a = AlbumItem(self.dirlist, os.path.dirname(tracks[0]), artist, album)
+            for t in filteredTracks:
+              a.addTrack(t)
     self.setCursor(Qt.arrowCursor)
 
   def matchesFilter(self, artist, album, tracks):
@@ -569,8 +592,9 @@ class AlbumArtDialog(AlbumArtDialogBase):
       return None
 
     if not image.isNull() and image.width() > 1 and image.height() > 1:
+      text = str(imghdr.what(coverfile)).upper() + " Image - %dx%d pixels" % (image.width(), image.height())
       image = image.smoothScale(256, 256, QImage.ScaleMin)
-      return CoverItem(self.coverview, QPixmap(image), coverfile, delete)
+      return CoverItem(self.coverview, QPixmap(image), coverfile, delete, text = text)
 
   def customEvent(self, event):
     """Handle events from processes"""
@@ -754,3 +778,16 @@ class AlbumArtDialog(AlbumArtDialogBase):
   def stopAction_activated(self):
     self.stopAction.setEnabled(0)
     self.stopped = True
+
+  def viewFoldersAction_activated(self):
+    if not self.viewFoldersAction.isOn():
+      self.viewFoldersAction.setOn(True)
+    self.viewAlbumsAction.setOn(False)
+    self.refreshAlbumList()
+
+  def viewAlbumsAction_activated(self):
+    if not self.viewAlbumsAction.isOn():
+      self.viewAlbumsAction.setOn(True)
+    self.viewFoldersAction.setOn(False)
+    self.walk(self.dir)
+    self.refreshAlbumList()

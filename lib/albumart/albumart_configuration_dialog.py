@@ -39,12 +39,12 @@ class ConfigurationDialog(ConfigurationDialogBase):
       elif desc[0] == "string":
         f = QWidget(parent)
         l = QHBoxLayout(f)
-        w = QLabel(desc[1] + ":", f)
+        w = QLabel(desc[1] + ((desc[1][0] == "<") and " " or ":"), f)
         l.addWidget(w)
         k = w = QLineEdit(config[key], f, key)
         l.addWidget(w)
         w = f
-      elif desc[0] == "stringlist":
+      elif desc[0] == "choice":
         f = QWidget(parent)
         l = QHBoxLayout(f)
         w = QLabel(desc[1] + ":", f)
@@ -107,7 +107,7 @@ class ConfigurationDialog(ConfigurationDialogBase):
         cfg = module.__configuration__
         if isinstance(widget, QCheckBox):
           cfg[widget.name()] = widget.isChecked() and 1 or 0
-        elif isinstance(widget, QCheckBox):
+        elif isinstance(widget, QLineEdit):
           cfg[widget.name()] = str(widget.text())
         elif isinstance(widget, QComboBox):
           cfg[widget.name()] = str(widget.currentText())

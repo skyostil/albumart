@@ -8,6 +8,8 @@ import os
 
 scales = {
   "Default": None,
+  "512x512 pixels": 512,
+  "256x256 pixels": 256,
   "128x128 pixels": 128,
   "64x64 pixels": 64,
   "48x48 pixels": 48,
@@ -22,8 +24,7 @@ defaultConfig = {
 
 configDesc = {
   "enabled":  ("boolean", "Enable"),
-  "filename": ("string", "File name for image"),
-  "scale":    ("stringlist", "Image size", scales.keys())
+  "scale":    ("choice", "Image size", scales.keys())
 }
 
 class Windows(albumart.Target):
@@ -54,8 +55,8 @@ class Windows(albumart.Target):
 
   def hasCover(self, path):
     if self.enabled and not os.path.isfile(path):
-      return os.path.isfile(os.path.join(path,self.filename))
-    return 0
+      return os.path.isfile(os.path.join(path, self.filename))
+    return False
 
   def removeCover(self, path):
     if not self.enabled or os.path.isfile(path):

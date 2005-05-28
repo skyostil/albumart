@@ -19,7 +19,7 @@ defaultConfig = {
 
 configDesc = {
   "enabled":      ("boolean", "Enable"),
-  "type":         ("stringlist", "Output image type",
+  "type":         ("choice", "Output image type",
                    ["%02X: %s" % (ord(c), d) for c, d in pictureTypes.items()]),
 }
 
