@@ -557,18 +557,21 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
   def getSelectedItems(self):
     """@returns a list of selected media items to process"""
-    albumItem = self.dirlist.firstChild()
     items = []
 
-    while albumItem:
-      if albumItem.isSelected():
-        items.append(albumItem)
-      trackItem = albumItem.firstChild()
-      while trackItem:
-        if trackItem.isSelected() or albumItem.isSelected():
-          items.append(trackItem)
-        trackItem = trackItem.nextSibling()
-      albumItem = albumItem.nextSibling()
+    def addSelectedChildren(item, force = False):
+      if item.isSelected() or force:
+        items.append(item)
+      child = item.firstChild()
+      while child:
+        addSelectedChildren(child, item.isSelected())
+        child = child.nextSibling()
+
+    item = self.dirlist.firstChild()
+    while item:
+      addSelectedChildren(item, item.isSelected())
+      item = item.nextSibling()
+      
     return items
 
   def getCurrentItems(self):
@@ -576,7 +579,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     item = self.dirlist.currentItem()
     items = [item]
 
-    if isinstance(item, AlbumItem):
+    if isinstance(item, AlbumItem) or isinstance(item, FolderItem):
       trackItem = item.firstChild()
       while trackItem:
         items.append(trackItem)
@@ -592,7 +595,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       return None
 
     if not image.isNull() and image.width() > 1 and image.height() > 1:
-      text = str(imghdr.what(coverfile)).upper() + " Image - %dx%d pixels" % (image.width(), image.height())
+      text = str(imghdr.what(str(coverfile))).upper() + " Image - %dx%d pixels" % (image.width(), image.height())
       image = image.smoothScale(256, 256, QImage.ScaleMin)
       return CoverItem(self.coverview, QPixmap(image), coverfile, delete, text = text)
 
@@ -725,12 +728,14 @@ class AlbumArtDialog(AlbumArtDialogBase):
         item = self.dirlist.itemAt(event.pos())
         if item:
           items = [item]
-          if isinstance(item, AlbumItem):
-            trackItem = item.firstChild()
-            while trackItem:
-              items.append(trackItem)
-              trackItem = trackItem.nextSibling()
-
+          if isinstance(item, AlbumItem) or isinstance(item, FolderItem):
+            def addChildren(item):
+              child = item.firstChild()
+              while child:
+                if isinstance(child, FileItem) or isinstance(child, TrackItem):
+                  items.append(child)
+                child = child.nextSibling()
+            addChildren(item)
           self.setCoverForItems(fn, items)
 
         os.unlink(fn)
