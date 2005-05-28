@@ -1,4 +1,5 @@
 from albumart_configuration_dialog_base import ConfigurationDialogBase
+from albumart_string_list_widget import StringListWidget
 from qt import *
 import albumart
 import version
@@ -33,13 +34,14 @@ class ConfigurationDialog(ConfigurationDialogBase):
     config = module.__configuration__
     self.widgets[module] = []
     for key, desc in configDesc.items():
+      labelText = desc[1] + ((desc[1][0] == "<") and " " or ":")
       if desc[0] == "boolean":
         k = w = QCheckBox(desc[1], parent, key)
         w.setChecked(config[key])
       elif desc[0] == "string":
         f = QWidget(parent)
         l = QHBoxLayout(f)
-        w = QLabel(desc[1] + ((desc[1][0] == "<") and " " or ":"), f)
+        w = QLabel(labelText, f)
         l.addWidget(w)
         k = w = QLineEdit(config[key], f, key)
         l.addWidget(w)
@@ -47,7 +49,7 @@ class ConfigurationDialog(ConfigurationDialogBase):
       elif desc[0] == "choice":
         f = QWidget(parent)
         l = QHBoxLayout(f)
-        w = QLabel(desc[1] + ":", f)
+        w = QLabel(labelText, f)
         l.addWidget(w)
         k = w = QComboBox(False, f, key)
         items = desc[2]
@@ -60,10 +62,18 @@ class ConfigurationDialog(ConfigurationDialogBase):
       elif desc[0] == "integer":
         f = QWidget(parent)
         l = QHBoxLayout(f)
-        w = QLabel(desc[1] + ":", f)
+        w = QLabel(labelText, f)
         l.addWidget(w)
         k = w = QSpinBox(desc[2][0], desc[2][1], 1, f, key)
         w.setValue(int(config[key]))
+        l.addWidget(w)
+        w = f
+      elif desc[0] == "stringlist":
+        f = QWidget(parent)
+        l = QHBoxLayout(f)
+        w = QLabel(labelText, f)
+        l.addWidget(w)
+        k = w = StringListWidget(f, key, config[key])
         l.addWidget(w)
         w = f
       else:
@@ -113,6 +123,8 @@ class ConfigurationDialog(ConfigurationDialogBase):
           cfg[widget.name()] = str(widget.currentText())
         elif isinstance(widget, QSpinBox):
           cfg[widget.name()] = widget.value()
+        elif isinstance(widget, StringListWidget):
+          cfg[widget.name()] = widget.getItems()
       module.configure(module.__configuration__)
     ConfigurationDialogBase.accept(self)
 

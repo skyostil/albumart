@@ -51,7 +51,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
        @param dataPath Path to data files
        @param albumPath Path to walk at startup"""
     AlbumArtDialogBase.__init__(self, parent, name, fl)
-    self.config = ConfigParser.ConfigParser()
+    self.config = ConfigParser.RawConfigParser()
     self.moduleAttributeMap = {}
     self.iconSize = 64
     self.dir = ""
@@ -191,8 +191,11 @@ class AlbumArtDialog(AlbumArtDialogBase):
               cfg[key] = True
             else:
               cfg[key] = False
+          elif desc[0] == "stringlist":
+            if type(cfg[key]) != type([]):
+              cfg[key] = cfg[key].split(";")
         except:
-          pass
+          raise
 
       c.configure(cfg)
       return c
@@ -224,35 +227,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.config.set("albumart", "hide_albums_with_covers", enabled)
     self.refreshAlbumList()
 
-  def settingsMenuActivated(self, id):
-    enabled = not self.settingsMenu.isItemChecked(id)
-
-    # display a dialog for editing the given setting item
-    if self.moduleAttributeMap.has_key(id):
-      (mod,key,desc) = self.moduleAttributeMap[id]
-
-      if desc[0] == "boolean":
-        self.settingsMenu.setItemChecked(id, enabled)
-        mod.__configuration__[key] = enabled
-        mod.configure(mod.__configuration__)
-      elif desc[0] == "string":
-        (text, status) = QInputDialog.getText(desc[1], desc[2], QLineEdit.Normal, mod.__configuration__[key], self)
-        if status:
-          mod.__configuration__[key] = unicode(text)
-          mod.configure(mod.__configuration__)
-      elif desc[0] == "stringlist":
-        items = QStringList()
-        map(lambda i: items.append(i), desc[3])
-        selected = 0
-        for i in xrange(0, len(desc[3])):
-            if mod.__configuration__[key] == desc[3][i]:
-                selected = i
-
-        (text, status) = QInputDialog.getItem(desc[1], desc[2], items, selected, True)
-        if status:
-          mod.__configuration__[key] = unicode(text)
-          mod.configure(mod.__configuration__)
-
   def fileExit(self):
     self.close()
 
@@ -262,7 +236,10 @@ class AlbumArtDialog(AlbumArtDialogBase):
         for (key, value) in mod.__configuration__.items():
           if not self.config.has_section(mod.__module__):
             self.config.add_section(mod.__module__)
-          self.config.set(mod.__module__, key, value)
+          if type(value) == type([]):
+            self.config.set(mod.__module__, key, ";".join(value))
+          else:
+            self.config.set(mod.__module__, key, value)
       fn = os.path.join(config.getConfigPath("albumart"), "config")
       self.config.set("albumart", "view_mode", self.viewAlbumsAction.isOn() and "0" or "1")
       self.config.write(open(fn,"w"))

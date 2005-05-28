@@ -6,15 +6,7 @@ import albumart
 import re
 import os
 
-defaultConfig = {
-  "enabled":        1,
-}
-
-configDesc = {
-  "enabled":        ("boolean", "Enable"),
-}
-
-# Here are the list of patterns to match against.
+# Here is the list of patterns to match against.
 # You can use the following tags:
 #
 #   %(artist)
@@ -26,7 +18,7 @@ configDesc = {
 #
 # The patterns are evaluated in sequential order
 # until a match is found.
-patterns = [
+PATTERNS = [
   "%(year)/%(artist)/%(album)",
   "%(year)/%(artist) - %(album)",
   "%(any)/%(year) %(artist) - %(album)",
@@ -36,6 +28,30 @@ patterns = [
   "%(artist)/%(album)"
 ]
 
+defaultConfig = {
+  "enabled":        1,
+  "patterns":       list(PATTERNS),
+}
+
+configDesc = {
+  "enabled":        ("boolean", "Enable"),
+  "patterns":       ("stringlist", """<qt>
+Here is the list of patterns to match against.
+You can use the following tags:
+
+<ul>
+  <li><strong>%(artist)</strong> - Artist name</li>
+  <li><strong>%(album)</strong> - Album name</li>
+  <li><strong>%(title)</strong> - Song title</li>
+  <li><strong>%(track)</strong> - Track number</li>
+  <li><strong>%(year)</strong> - Year published</li>
+  <li><strong>%(any)</strong> - Any sequence of characters</li>
+</ul>
+The patterns are evaluated in sequential order
+until a match is found.
+</qt>"""),
+}
+
 class PathRecognizer(albumart.Recognizer):
   """Path name"""
   def __init__(self):
@@ -43,6 +59,7 @@ class PathRecognizer(albumart.Recognizer):
 
   def configure(self, config):
     self.enabled = config["enabled"]
+    self.patterns = config["patterns"]
     
   def patternToRegex(self, pattern):
     inTag = False
@@ -90,7 +107,7 @@ class PathRecognizer(albumart.Recognizer):
     # look at the last two path elements at most
     path = "/".join(path.split("/")[-2:])
       
-    for p in patterns:
+    for p in self.patterns:
       (regex, key) = self.patternToRegex(p)
       m = re.search(regex, path)
       if m:

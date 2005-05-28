@@ -1,0 +1,105 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>StringListWidgetBase</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>StringListWidgetBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>445</width>
+            <height>356</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>StringListWidget</string>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QListBox">
+            <property name="name">
+                <cstring>listBox</cstring>
+            </property>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout6</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLineEdit">
+                    <property name="name">
+                        <cstring>lineEdit</cstring>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>addButton</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Add</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+A</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>removeButton</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Remove</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+R</string>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>listBox</sender>
+        <signal>selectionChanged()</signal>
+        <receiver>StringListWidgetBase</receiver>
+        <slot>itemSelected()</slot>
+    </connection>
+    <connection>
+        <sender>addButton</sender>
+        <signal>clicked()</signal>
+        <receiver>StringListWidgetBase</receiver>
+        <slot>addButtonClicked()</slot>
+    </connection>
+    <connection>
+        <sender>removeButton</sender>
+        <signal>clicked()</signal>
+        <receiver>StringListWidgetBase</receiver>
+        <slot>removeButtonClicked()</slot>
+    </connection>
+    <connection>
+        <sender>lineEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>StringListWidgetBase</receiver>
+        <slot>textChanged()</slot>
+    </connection>
+</connections>
+<slots>
+    <slot>itemSelected()</slot>
+    <slot>addButtonClicked()</slot>
+    <slot>removeButtonClicked()</slot>
+    <slot>textChanged()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>
