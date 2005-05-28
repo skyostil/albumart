@@ -5,6 +5,15 @@ import os
 import sys
 import glob
 
+# Make sure all the files are up to date.
+# This is somewhat of a hack but it works.
+if len(sys.argv) > 1:
+  for arg in sys.argv:
+    if arg[0] == "-" and "help" in arg or arg == "-h":
+      break
+  else:
+    os.system("make")
+
 setup(
 	name="albumart", 
 	author="Sami Kyöstilä", 
@@ -12,7 +21,7 @@ setup(
 	contact="Sami Kyöstilä", 
 	contact_email="skyostil@kempele.fi",
 	url="http://kempele.fi/~skyostil/projects/albumart",
-	version="1.5.0",
+	version="1.5.1",
 	license="GPL",
 	description="Downloads album cover images semi-automatically from the Internet.",
 	long_description="Album Cover Art Downloader is a utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
