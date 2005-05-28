@@ -57,6 +57,15 @@ class ConfigurationDialog(ConfigurationDialogBase):
         w.setCurrentText(config[key])
         l.addWidget(w)
         w = f
+      elif desc[0] == "integer":
+        f = QWidget(parent)
+        l = QHBoxLayout(f)
+        w = QLabel(desc[1] + ":", f)
+        l.addWidget(w)
+        k = w = QSpinBox(desc[2][0], desc[2][1], 1, f, key)
+        w.setValue(int(config[key]))
+        l.addWidget(w)
+        w = f
       else:
         continue
       self.widgets[module].append(k)
@@ -102,6 +111,8 @@ class ConfigurationDialog(ConfigurationDialogBase):
           cfg[widget.name()] = str(widget.text())
         elif isinstance(widget, QComboBox):
           cfg[widget.name()] = str(widget.currentText())
+        elif isinstance(widget, QSpinBox):
+          cfg[widget.name()] = widget.value()
       module.configure(module.__configuration__)
     ConfigurationDialogBase.accept(self)
 

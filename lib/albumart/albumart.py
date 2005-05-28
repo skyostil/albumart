@@ -129,7 +129,8 @@ def getAvailableCovers(artist, album, requireExactMatch = False):
             pass
 
       for a in results:
-        yield s.getCover(a)
+        c = s.getCover(a)
+        if c: yield c
   except Exception, x:
     traceback.print_exc(file = sys.stderr)
     raise

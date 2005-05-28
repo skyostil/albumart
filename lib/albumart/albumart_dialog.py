@@ -499,7 +499,8 @@ class AlbumArtDialog(AlbumArtDialogBase):
        resulting list of filenames."""
     files = []
     if albumart.hasCover(item.getPath()):
-      files.append(albumart.getCover(item.getPath()))
+      cover = albumart.getCover(item.getPath())
+      if cover: files.append(cover)
     if os.path.isdir(item.getPath()):
       for f in os.listdir(item.getPath()):
         try:

@@ -7,9 +7,11 @@ import re
 import os
 
 defaultConfig = {
+  "enabled":        1,
 }
 
 configDesc = {
+  "enabled":        ("boolean", "Enable"),
 }
 
 # Here are the list of patterns to match against.
@@ -40,7 +42,7 @@ class PathRecognizer(albumart.Recognizer):
     self.configure(defaultConfig)
 
   def configure(self, config):
-    pass
+    self.enabled = config["enabled"]
     
   def patternToRegex(self, pattern):
     inTag = False
@@ -77,6 +79,8 @@ class PathRecognizer(albumart.Recognizer):
     return (regex, key)
     
   def guessArtistAndAlbum(self, path):
+    if not self.enabled: return (None, None)
+    
     if os.path.isfile(path):
       path = os.path.dirname(path)
       
@@ -112,6 +116,3 @@ if __name__ == "__main__":
   print p.guessArtistAndAlbum(r"2004\artist\album")
   print p.guessArtistAndAlbum(r"foo\2004 artist - album")
   print p.guessArtistAndAlbum(r"artist - album")
-
-
-  

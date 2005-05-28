@@ -6,19 +6,22 @@ import urllib
 import amazon
 import albumart
 import tempfile
+import Image
 
 defaultConfig = {
   "enabled":        1,
   "licensenumber":  "D1ESMA5AOEZB24",
   "locale":         "us",
   "proxy":          amazon.getProxy() or "",
+  "minsize":        0
 }
 
 configDesc = {
   "enabled":        ("boolean", "Enable"),
   "locale":         ("stringlist",  "Country",
                      ["us", "uk", "de", "jp"]),
-  "proxy":          ("string",  "Proxy server")
+  "proxy":          ("string",  "Proxy server"),
+  "minsize":        ("integer",  "Only accept images at least this big (pixels)", (0, 1024))
 }
 
 class Amazon(albumart.Source):
@@ -28,6 +31,7 @@ class Amazon(albumart.Source):
 
   def configure(self, config):
     self.enabled = config["enabled"]
+    self.minsize = config["minsize"]
     l = config["licensenumber"]
     if l and len(l):
       amazon.setLicense(l)
@@ -45,7 +49,14 @@ class Amazon(albumart.Source):
       except amazon.AmazonError:
         pass
 
-  def getCover(self,album):
+  def verifyCover(self, filename):
+    try:
+      img = Image.open(filename)
+      return img.size[0] > self.minsize or img.size[1] > self.minsize
+    except:
+      return False
+
+  def getCover(self, album):
     if self.enabled:
       try:
         i = urllib.urlopen(album.ImageUrlLarge)
@@ -53,6 +64,10 @@ class Amazon(albumart.Source):
         o = open(output, "wb")
         o.write(i.read())
         o.close()
-        return output
+        if self.verifyCover(output):
+          return output
+        else:
+          os.unlink(output)
+          return None
       except:
         return None

@@ -8,9 +8,11 @@ import os
 import glob
 
 defaultConfig = {
+  "enabled":        1,
 }
 
 configDesc = {
+  "enabled":        ("boolean", "Enable"),
 }
 
 class ID3v2Recognizer(albumart.Recognizer):
@@ -19,7 +21,7 @@ class ID3v2Recognizer(albumart.Recognizer):
     self.configure(defaultConfig)
 
   def configure(self, config):
-    pass
+    self.enabled = config["enabled"]
     
   def getFileList(self, path):
     if os.path.isfile(path) and path.lower().endswith(".mp3"):
@@ -27,6 +29,8 @@ class ID3v2Recognizer(albumart.Recognizer):
     return glob.glob(os.path.join(path, "*.mp3"))
     
   def guessArtistAndAlbum(self, path):
+    if not self.enabled: return (None, None)
+    
     artist = None
     album = None
       
