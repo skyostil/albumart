@@ -13,6 +13,7 @@ class AboutDialog(AboutDialogBase):
 <p>Amazon web api wrapper by <b>Mark Pilgrim</b> and <b>Michael Josephson</b> (http://www.josephson.org/projects/pyamazon/)</p>
 <p>Icons by <b>Everaldo Coelho</b> (http://www.everaldo.com) et al from the KDE project (http://www.kde.org)</p>
 <p>PyID3 by <b>Myers Carpenter</b> (http://icepick.info/projects/pyid3/)</p>
+<p>Walmart image source based on code by by <b>Filip Kalinski</b></p>
 """ % \
     {
       "author" : version.__author__

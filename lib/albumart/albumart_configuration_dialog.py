@@ -14,7 +14,7 @@ class ConfigurationDialog(ConfigurationDialogBase):
     self.categories = {
       albumart.Source: QListViewItem(self.pageView, "Sources"),
       albumart.Target: QListViewItem(self.pageView, "Targets"),
-      albumart.Recognizer: QListViewItem(self.pageView, "Recognizers"),
+      albumart.Recognizer: QListViewItem(self.pageView, "Recognizers")
     }
     self.pages = {}
 
@@ -29,11 +29,14 @@ class ConfigurationDialog(ConfigurationDialogBase):
     for c, i in self.categories.items():
       if isinstance(module, c):
         return i
+    return self.pageView
 
   def createConfigurationWidgets(self, module, parent, layout, configDesc):
     config = module.__configuration__
     self.widgets[module] = []
     for key, desc in configDesc.items():
+      if len(desc) == 1:
+        continue
       labelText = desc[1] + ((desc[1][0] == "<") and " " or ":")
       if desc[0] == "boolean":
         k = w = QCheckBox(desc[1], parent, key)
@@ -89,7 +92,7 @@ class ConfigurationDialog(ConfigurationDialogBase):
     m = __import__(module.__module__)
     configDesc = m.configDesc
 
-    if configDesc or 1:
+    if configDesc:
       page = QWidget(self)
       layout = QVBoxLayout(page)
       layout.setSpacing(8)

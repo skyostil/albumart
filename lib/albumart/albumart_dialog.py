@@ -10,6 +10,8 @@
 # at your option) any later version.
 #
 
+"""Album Cover Art Downloader"""
+
 import os
 import sys
 import traceback
@@ -36,13 +38,43 @@ from albumart_configuration_dialog import ConfigurationDialog
 from albumart_about_dialog import AboutDialog
 from albumart_exception_dialog import ExceptionDialog
 
+defaultConfig = {
+  "last_directory":  "",
+  "media_extensions": ["mp3", "ogg", "wma", "flac", "wav", "mpa", "mp2", "m4a", "mp4", "m4p", "aac",
+                       "la", "pac", "ape", "ofr", "rka", "shn", "tta", "wv", "mpc", "vqf", "ra",
+                       "rm", "swa", "mid", "mod", "nsf", "s3m", "xm", "it", "mt2", "sid"],
+  "hide_albums_with_covers": "0",
+  "view_mode": "0",
+  "sources": ["albumart_source_amazon.Amazon",
+              "albumart_source_walmart.Walmart",
+              "albumart_source_buy.Buy",
+              "albumart_source_yahoo.Yahoo"],
+  "targets": ["albumart_target_freedesktop.Freedesktop",
+              "albumart_target_windows.Windows",
+              "albumart_target_id3v2.ID3v2",
+              "albumart_target_generic.Generic"],
+  "recognizers": ["albumart_recognizer_id3v2.ID3v2Recognizer",
+                  "albumart_recognizer_path.PathRecognizer"]
+}
+
+configDesc = {
+  "media_extensions": ("stringlist", """<qt>
+<p>Media file extensions.</p>
+<p>The file types listed here
+will be treated as media files.</p>
+</qt>"""),
+  "sources": ("stringlist",),
+  "targets": ("stringlist",),
+  "recognizers": ("stringlist",),
+}
+
 class AlbumArtDialog(AlbumArtDialogBase):
-  """Main window."""
+  """General"""
   def __init__(self, parent = None,
                name = "AlbumArtDialog",
                fl = 0,
                dataPath = ".",
-               albumPath = None):
+               albumPath = ""):
     """Constructor.
 
        @param parent Parent widget
@@ -51,9 +83,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
        @param dataPath Path to data files
        @param albumPath Path to walk at startup"""
     AlbumArtDialogBase.__init__(self, parent, name, fl)
-    self.config = ConfigParser.RawConfigParser()
     self.moduleAttributeMap = {}
-    self.iconSize = 64
     self.dir = ""
     self.dataPath = dataPath
     self.albums = {}
@@ -69,19 +99,44 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.dirlist.__class__.dragEnterEvent = self.dirlist_dragEnterEvent
     self.coverview.__class__.dragObject = self.coverview_dragObject
 
-    self.loadIcons()
     self.show()
+    
+    # load configuration
+    self.config = ConfigParser.RawConfigParser()
     self.loadConfiguration()
+
+    if albumPath:
+      self.dir = albumPath
 
     # restore the previous directory
     try:
-      if albumPath:
-        self.walk(albumPath)
-      elif self.config.has_option("albumart", "lastDirectory"):
-        self.walk(self.config.get("albumart", "lastDirectory"))
+      if self.dir:
+        self.walk(self.dir)
     except Exception, x:
       self.reportException(self.tr("Reading the previous album directory"), x,
                            silent = False)
+
+  def configure(self, config):
+    # some day we might find the plugins dynamically
+    for c in ["sources", "targets", "recognizers"]:
+      config[c] = defaultConfig[c]
+    
+    self.mediaExtensions = config["media_extensions"]
+    self.dir = config["last_directory"]
+    self.hideAlbumsWithCovers.setOn(config["hide_albums_with_covers"] and True or False)
+    self.viewAlbumsAction.setOn(config["view_mode"] == "0")
+    self.viewFoldersAction.setOn(config["view_mode"] == "1")
+
+    # only load plugins at startup
+    if not self.modules:
+      for id in config["sources"]:
+        albumart.addSource(self.loadModule(id))
+  
+      for id in config["targets"]:
+        albumart.addTarget(self.loadModule(id))
+  
+      for id in config["recognizers"]:
+        albumart.addRecognizer(self.loadModule(id))
 
   def loadConfiguration(self):
     """Load the settings from the configuration file"""
@@ -92,112 +147,19 @@ class AlbumArtDialog(AlbumArtDialogBase):
       if not self.config.has_section("albumart"):
         self.config.add_section("albumart")
 
-      self.config.set("albumart", "sources",
-                      "albumart_source_amazon.Amazon")
-      self.config.set("albumart", "targets",
-                      ":".join([
-                        "albumart_target_freedesktop.Freedesktop",
-                        "albumart_target_windows.Windows",
-                        "albumart_target_id3v2.ID3v2",
-                        "albumart_target_generic.Generic"]))
-      self.config.set("albumart", "recognizers",
-                      "albumart_recognizer_id3v2.ID3v2Recognizer:" +
-                      "albumart_recognizer_path.PathRecognizer")
-      # global settings
-      try:
-        self.hideAlbumsWithCovers.setOn(self.config.getboolean("albumart", "hide_albums_with_covers"))
-      except Exception,x:
-        self.hideAlbumsWithCovers.setOn(False)
-
-      try:
-        self.viewAlbumsAction.setOn(self.config.get("albumart", "view_mode") == "0")
-        self.viewFoldersAction.setOn(self.config.get("albumart", "view_mode") == "1")
-      except Exception,x:
-        self.viewAlbumsAction.setOn(True)
-        self.viewFoldersAction.setOn(False)
-
-      for s in self.config.get("albumart", "sources").split(":"):
-        mod = self.loadModule(s)
-        albumart.addSource(mod)
-
-      #self.settingsMenu.insertSeparator()
-
-      for t in self.config.get("albumart", "targets").split(":"):
-        mod = self.loadModule(t)
-        albumart.addTarget(mod)
-
-      for t in self.config.get("albumart", "recognizers").split(":"):
-        mod = self.loadModule(t)
-        albumart.addRecognizer(mod)
-
+      config.configureObject(self, self.config)
     except Exception, x:
       self.reportException(self.tr("Loading settings"), x)
 
-  def scaleIconPixmap(self, pixmap):
-    """@returns the given pixmap scaled to icon size"""
-    return self.scalePixmap(pixmap, self.iconSize)
-
-  def scalePixmap(self, pixmap, size):
-    """@returns the given pixmap scaled to a new size
-       @param size New pixel size."""
-    if not pixmap.isNull() and pixmap.width() > 0 and pixmap.height() > 0:
-      try:
-        pixmap.convertFromImage(pixmap.convertToImage().scale(size, size))
-      except AttributeError:
-        # for older Qt 2.x
-        pixmap.convertFromImage(pixmap.convertToImage().smoothScale(size, size))
-    return pixmap
-
-  def getResourcePath(self, fileName):
-    """@returns a full path to the given file in the data directory"""
-    return os.path.join(self.dataPath, fileName)
-
-  def loadIcons(self):
-    """Load icons for various ui elements."""
-    self.coverPixmap = QPixmap(self.getResourcePath("cover.png"))
-    self.noCoverPixmap = QPixmap(self.getResourcePath("nocover.png"))
-
-    self.coverPixmap = self.scaleIconPixmap(self.coverPixmap)
-    self.noCoverPixmap = self.scaleIconPixmap(self.noCoverPixmap)
-
+  
   def loadModule(self, id):
     """Load a module with the given name (id)"""
     try:
       (mod, cls) = id.split(".")
       module = __import__(mod)
-      cfg = module.defaultConfig.copy()
-      cfgdesc = module.configDesc
       c = module.__dict__[cls]()
-
-      # load configuration
-      try:
-        if sys.version_info[:2] == (2,2):
-            for key in self.config.options(mod):
-              cfg[key] = self.config.get(mod,key)
-        else:
-            for (key,value) in self.config.items(mod):
-              cfg[key] = value
-      except:
-        pass
-
-      c.__configuration__ = cfg
+      config.configureObject(c, self.config)
       self.modules.append(c)
-
-      for (key,desc) in cfgdesc.items():
-        # fix the types
-        try:
-          if desc[0] == "boolean":
-            if cfg[key] == 1 or self.config.getboolean(mod,key):
-              cfg[key] = True
-            else:
-              cfg[key] = False
-          elif desc[0] == "stringlist":
-            if type(cfg[key]) != type([]):
-              cfg[key] = cfg[key].split(";")
-        except:
-          raise
-
-      c.configure(cfg)
       return c
     except Exception, x:
       self.reportException(self.tr("Loading module '%s'") % (id), x)
@@ -231,21 +193,17 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.close()
 
   def saveConfiguration(self):
+    self.__configuration__["view_mode"] = self.viewAlbumsAction.isOn() and "0" or "1"
+    self.__configuration__["last_directory"] = self.dir
+
     try:
-      for mod in self.modules:
-        for (key, value) in mod.__configuration__.items():
-          if not self.config.has_section(mod.__module__):
-            self.config.add_section(mod.__module__)
-          if type(value) == type([]):
-            self.config.set(mod.__module__, key, ";".join(value))
-          else:
-            self.config.set(mod.__module__, key, value)
+      for object in self.modules + [self]:
+        config.readObjectConfiguration(object, self.config)
       fn = os.path.join(config.getConfigPath("albumart"), "config")
-      self.config.set("albumart", "view_mode", self.viewAlbumsAction.isOn() and "0" or "1")
-      self.config.write(open(fn,"w"))
+      self.config.write(open(fn, "w"))
     except Exception, x:
       self.reportException(self.tr("Saving settings"), x)
-
+    
   def closeEvent(self, ce):
     # stop any ongoing processes
     self.stopAction.activate()
@@ -258,14 +216,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
     ce.accept()
     sys.exit(0)
-
-  def getIconForPath(self, path):
-    """@returns a QPixmap that can be used as an icon for the given path."""
-    if self.showCoversAction and not self.showCoversAction.isOn():
-      if albumart.hasCover(path):
-        return self.scaleIconPixmap(self.coverPixmap)
-      return self.scaleIconPixmap(self.noCoverPixmap)
-    return self.scaleIconPixmap(self.getPixmapForPath(path))
 
   def walk(self, path):
     """Walk the given path and fill the album list with all the albums found."""
@@ -303,7 +253,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
           for n in files:
             if self.stopped:
               break
-            if os.path.splitext(n)[1].lower() in albumart.mediaExtensions:
+            if os.path.splitext(n)[1].lower()[1:] in self.mediaExtensions:
               # update status bar often enough
               if time.time() > lastRepaintTime + 0.2:
                 self.statusBar().message(self.tr("Reading %s") % n)
@@ -335,14 +285,17 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.setCursor(Qt.waitCursor)
     self.dirlist.clear()
 
+    if not self.dir:
+      return
+
     if self.viewFoldersAction.isOn():
       for fn in os.listdir(self.dir):
         if fn.startswith(".") or not self.matchesFilter(fn, "", ""):
           continue
         fullname = os.path.join(self.dir, fn)
         if os.path.isdir(fullname):
-          FolderItem(self.dirlist, fullname)
-        elif os.path.isfile(fullname):
+          FolderItem(self.dirlist, fullname, self.mediaExtensions)
+        elif os.path.isfile(fullname) and os.path.splitext(fn)[1].lower()[1:] in self.mediaExtensions:
           FileItem(self.dirlist, fullname)
     else:
       for (artist, album), tracks in self.albums.items():
@@ -753,7 +706,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.reportException(self.tr("Adding the cover image"), x)
 
   def showConfigurationDialog(self):
-    c = ConfigurationDialog(self, self.modules)
+    c = ConfigurationDialog(self, [self] + self.modules)
     if c.exec_loop() == QDialog.Accepted:
       self.saveConfiguration()
 
@@ -771,5 +724,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
     if not self.viewAlbumsAction.isOn():
       self.viewAlbumsAction.setOn(True)
     self.viewFoldersAction.setOn(False)
-    self.walk(self.dir)
+    if self.dir:
+      self.walk(self.dir)
     self.refreshAlbumList()

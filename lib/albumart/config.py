@@ -24,3 +24,43 @@ def getConfigPath(appname):
       except:
         pass
   return "."
+
+def configureObject(object, config):
+  """Configure the given module with values from 'config'"""
+  modName = object.__module__
+  mod = __import__(modName)
+  object.__configuration__ = cfg = mod.defaultConfig.copy()
+
+  # load configuration
+  try:
+    for (key, value) in config.items(modName):
+      cfg[key] = value
+  except:
+    pass
+
+  for (key, desc) in mod.configDesc.items():
+    # fix the types
+    try:
+      if desc[0] == "boolean":
+        if cfg[key] == 1 or config.getboolean(modName, key):
+          cfg[key] = True
+        else:
+          cfg[key] = False
+      elif desc[0] == "stringlist":
+        if type(cfg[key]) != type([]):
+          cfg[key] = cfg[key].split(";")
+    except:
+      pass
+
+  object.configure(cfg)
+
+def readObjectConfiguration(object, config):
+  for (key, value) in object.__configuration__.items():
+    if not config.has_section(object.__module__):
+      config.add_section(object.__module__)
+    if type(value) == type([]):
+      config.set(object.__module__, key, ";".join(value))
+    else:
+      config.set(object.__module__, key, value)
+  
+

@@ -4,6 +4,20 @@ from qt import *
 import albumart
 from pixmap import getPixmapForPath, resizePixmap
 
+def fillHorizontalGradient(painter, rect, c1, c2):
+  def lerp(a, b, f):
+    return a + ((f * ((b - a) << 8)) >> 16)
+
+  w = rect.width()
+  h = rect.height()
+  for x in range(0, w):
+    f = (x << 8) / w
+    c = QColor(
+      lerp(c1.red(), c2.red(), f),
+      lerp(c1.green(), c2.green(), f),
+      lerp(c1.blue(), c2.blue(), f))
+    painter.fillRect(rect.x() + x, rect.y(), 1, h, QBrush(c))
+
 class TrackItem(QListViewItem):
   """A track list item"""
   def __init__(self, album, path):
@@ -20,7 +34,9 @@ class TrackItem(QListViewItem):
       self.refresh()
 
     if self.isSelected():
-      painter.fillRect(0, 0, width, self.height(), QBrush(colorGroup.mid().light(120)))
+      c1 = colorGroup.highlight().light(110)
+      c2 = QColor(255, 255, 255)
+      fillHorizontalGradient(painter, QRect(0, 0, width, self.height()), c1, c2)
     else:
       painter.eraseRect(0, 0, width, self.height())
 
@@ -81,7 +97,9 @@ class AlbumItem(QListViewItem):
       self.refresh()
 
     if self.isSelected():
-      painter.fillRect(0, 0, width, self.height(), QBrush(colorGroup.mid().light(120)))
+      c1 = colorGroup.highlight().light(110)
+      c2 = QColor(255, 255, 255)
+      fillHorizontalGradient(painter, QRect(0, 0, width, self.height()), c1, c2)
     else:
       painter.eraseRect(0, 0, width, self.height())
 
@@ -107,8 +125,13 @@ class AlbumItem(QListViewItem):
                      width, self.height() / 2, 0, self.artist)
 
     # draw the open indicator
-    painter.setPen(colorGroup.mid())
-    painter.setBrush(colorGroup.mid())
+    if self.isSelected():
+      painter.setPen(colorGroup.highlight())
+      painter.setBrush(colorGroup.highlight())
+    else:
+      painter.setPen(colorGroup.mid())
+      painter.setBrush(colorGroup.mid())
+      
     smallFontSize = fontSize - 1
     arrow = QPointArray(3)
     if self.isOpen():
@@ -179,7 +202,7 @@ FileItem = TrackItem
 
 class FolderItem(QListViewItem):
   """A folder item that directly corresponds to a filesystem directory"""
-  def __init__(self, parent, path):
+  def __init__(self, parent, path, extensions):
     QListViewItem.__init__(self, parent)
     self.setDropEnabled(True)
     self.path = path
@@ -191,6 +214,7 @@ class FolderItem(QListViewItem):
     self.openTrigger = QRect()
     self.titleFont = QFont(QFont().family(), QFont().pointSize() + 3, QFont.Bold)
     self.setText(0, os.path.basename(self.path))
+    self.extensions = extensions
 
   def acceptDrops(self, mimeSource):
     return True
@@ -203,7 +227,9 @@ class FolderItem(QListViewItem):
       self.refresh()
 
     if self.isSelected():
-      painter.fillRect(0, 0, width, self.height(), QBrush(colorGroup.mid().light(120)))
+      c1 = colorGroup.highlight().light(110)
+      c2 = QColor(255, 255, 255)
+      fillHorizontalGradient(painter, QRect(0, 0, width, self.height()), c1, c2)
     else:
       painter.eraseRect(0, 0, width, self.height())
 
@@ -223,8 +249,13 @@ class FolderItem(QListViewItem):
     titleRect = painter.boundingRect(0, 0, width, self.height(), 0, self.text(0))
 
     # draw the open indicator
-    painter.setPen(colorGroup.mid())
-    painter.setBrush(colorGroup.mid())
+    if self.isSelected():
+      painter.setPen(colorGroup.highlight())
+      painter.setBrush(colorGroup.highlight())
+    else:
+      painter.setPen(colorGroup.mid())
+      painter.setBrush(colorGroup.mid())
+      
     smallFontSize = fontSize - 1
     arrow = QPointArray(3)
     if self.isOpen():
@@ -268,9 +299,12 @@ class FolderItem(QListViewItem):
           continue
         fullname = os.path.join(self.path, fn)
         if os.path.isdir(fullname):
-          FolderItem(self, fullname)
+          FolderItem(self, fullname, self.extensions)
         elif os.path.isfile(fullname):
+          if self.extensions and os.path.splitext(fn)[1].lower()[1:] not in self.extensions:
+            continue
           FileItem(self, fullname)
+      self.itemCount = self.childCount()
     
     # open the album if the cursor is within the trigger
     p = self.listView().mapFromGlobal(QCursor.pos())
@@ -331,7 +365,7 @@ class CoverItem(QIconViewItem):
     
   def paintItem(self, painter, colorGroup):
     if self.isSelected():
-      painter.setBrush(colorGroup.mid().light(120))
+      painter.setBrush(colorGroup.highlight().light(120))
       painter.setPen(colorGroup.dark())
       painter.drawRoundRect(self.x(), self.y(),
                             self.width(), self.height(),
