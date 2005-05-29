@@ -126,8 +126,8 @@ class AlbumItem(QListViewItem):
 
     # draw the open indicator
     if self.isSelected():
-      painter.setPen(colorGroup.highlight())
-      painter.setBrush(colorGroup.highlight())
+      painter.setPen(colorGroup.highlight().dark())
+      painter.setBrush(colorGroup.highlight().dark())
     else:
       painter.setPen(colorGroup.mid())
       painter.setBrush(colorGroup.mid())
@@ -250,8 +250,8 @@ class FolderItem(QListViewItem):
 
     # draw the open indicator
     if self.isSelected():
-      painter.setPen(colorGroup.highlight())
-      painter.setBrush(colorGroup.highlight())
+      painter.setPen(colorGroup.highlight().dark())
+      painter.setBrush(colorGroup.highlight().dark())
     else:
       painter.setPen(colorGroup.mid())
       painter.setBrush(colorGroup.mid())
