@@ -10,11 +10,13 @@ import os
 
 defaultConfig = {
   "enabled":        0,
-  "appid":          "albumart"
+  "appid":          "albumart",
+  "max_results":    10,
 }
 
 configDesc = {
   "enabled":        ("boolean", "Enable"),
+  "max_results":    ("integer",),
 }
 
 class Yahoo(albumart.Source):
@@ -25,12 +27,13 @@ class Yahoo(albumart.Source):
   def configure(self, config):
     self.enabled = config["enabled"]
     self.appid = config["appid"]
+    self.maxResults = config["max_results"]
 
   def findAlbum(self, name):
     try:
       searcher = ImageSearch(self.appid)
       searcher.query = name
-      searcher.results = 10
+      searcher.results = self.maxResults
       return list(searcher.parse_results())
     except:
       pass

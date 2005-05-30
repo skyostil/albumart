@@ -15,6 +15,8 @@ include lib/albumart/*.py
 include lib/albumart/*.ui
 include lib/albumart/Makefile
 include lib/albumart/id3/*.py
+include lib/albumart/yahoo/*.py
+include lib/albumart/yahoo/search/*.py
 include debian/*
 include MANIFEST.in
 

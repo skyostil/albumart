@@ -1,3 +1,12 @@
+albumart (1.6.0-1) stable; urgency=low
+
+  * New image sources added: Walmart, Buy.com, Yahoo! Image search.
+  * Made media file extensions configurable.
+  * Added a generic image target which can save cover images flexibly.
+  * Added a folder-based view in addition to the default album view.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Mon, 30 Jun 2005 23:05:00 +0200 
+
 albumart (1.5.0-1) stable; urgency=low
 
   * User interface overhauled.

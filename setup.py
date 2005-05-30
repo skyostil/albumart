@@ -38,6 +38,16 @@ setup(
 			'lib/albumart/id3/binfuncs.py',
 			'lib/albumart/id3/ID3v2Frames.py',
 		]),
+		('lib/albumart/yahoo',[
+			'lib/albumart/yahoo/__init__.py',
+		]),
+		('lib/albumart/yahoo/search',[
+			'lib/albumart/yahoo/search/domparsers.py',
+			'lib/albumart/yahoo/search/debug.py',
+			'lib/albumart/yahoo/search/__init__.py',
+			'lib/albumart/yahoo/search/webservices.py',
+			'lib/albumart/yahoo/search/version.py',
+		]),
 		('share/doc/albumart', ['README', 'TODO', 'CHANGELOG']),
 	]
 )
