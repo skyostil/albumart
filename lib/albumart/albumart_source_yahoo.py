@@ -9,7 +9,7 @@ import tempfile
 import os
 
 defaultConfig = {
-  "enabled":        1,
+  "enabled":        0,
   "appid":          "albumart"
 }
 

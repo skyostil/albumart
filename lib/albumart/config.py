@@ -25,9 +25,9 @@ def getConfigPath(appname):
         pass
   return "."
 
-def configureObject(object, config):
+def configureObject(object, config, modName = None):
   """Configure the given module with values from 'config'"""
-  modName = object.__module__
+  modName = modName or object.__module__
   mod = __import__(modName)
   object.__configuration__ = cfg = mod.defaultConfig.copy()
 
@@ -46,6 +46,8 @@ def configureObject(object, config):
           cfg[key] = True
         else:
           cfg[key] = False
+      elif desc[0] == "integer":
+        cfg[key] = int(cfg[key])
       elif desc[0] == "stringlist":
         if type(cfg[key]) != type([]):
           cfg[key] = cfg[key].split(";")

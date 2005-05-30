@@ -24,6 +24,9 @@ import config
 from event import *
 from process import *
 
+# use the configuration from the main program
+from albumart_dialog import defaultConfig, configDesc
+
 class AlbumArtUnattendedUi(QWidget):
   def __init__(self, parent = None,
                name = "AlbumArtUnattendedUi",
@@ -34,31 +37,41 @@ class AlbumArtUnattendedUi(QWidget):
        @param name Widget name
        @param showSummary Show a summary dialog when done."""
     QObject.__init__(self, parent, name)
-    self.config = ConfigParser.ConfigParser()
+    self.modules = []
+    self.config = ConfigParser.RawConfigParser()
     self.showSummary = showSummary
     self.hidden = hidden
+    self.loadConfiguration()
+
+  def configure(self, config):
+    # some day we might find the plugins dynamically
+    for c in ["sources", "targets", "recognizers"]:
+      config[c] = defaultConfig[c]
+
+    self.requireExactMatch = config["require_exact_match"]
     
+    # only load plugins at startup
+    if not self.modules:
+      for id in config["sources"]:
+        albumart.addSource(self.loadModule(id))
+  
+      for id in config["targets"]:
+        albumart.addTarget(self.loadModule(id))
+  
+      for id in config["recognizers"]:
+        albumart.addRecognizer(self.loadModule(id))
+
+  def loadConfiguration(self):
+    """Load the settings from the configuration file"""
     try:
-      # load the configuration
       fn = os.path.join(config.getConfigPath("albumart"), "config")
       self.config.read(fn)
-  
+
       if not self.config.has_section("albumart"):
         raise RuntimeError(
           self.tr("Album Cover Art Downloader has not been configured yet. " +
                   "Please run it in standard mode first."))
-                  
-      for s in self.config.get("albumart", "sources").split(":"):
-        mod = self.loadModule(s)
-        albumart.addSource(mod)
-  
-      for t in self.config.get("albumart", "targets").split(":"):
-        mod = self.loadModule(t)
-        albumart.addTarget(mod)
-        
-      for t in self.config.get("albumart", "recognizers").split(":"):
-        mod = self.loadModule(t)
-        albumart.addRecognizer(mod)
+      config.configureObject(self, self.config, "albumart_dialog")
     except Exception, x:
       self.reportException(self.tr("Loading settings"), x)
   
@@ -66,24 +79,10 @@ class AlbumArtUnattendedUi(QWidget):
     """Load a module with the given name (id)"""
     try:
       (mod, cls) = id.split(".")
-      exec("import %s" % (mod))
-      exec("cfg = %s.defaultConfig.copy()" % (mod))
-      exec("cfgdesc = %s.configDesc" % (mod))
-      exec("c = %s.%s()" % (mod,cls))
-
-      # load configuration
-      try:
-        if sys.version_info[:2] == (2,2):
-            for key in self.config.options(mod):
-              cfg[key] = self.config.get(mod,key)
-        else:
-            for (key,value) in self.config.items(mod):
-              cfg[key] = value
-      except:
-        pass
-
-      c.__configuration__ = cfg
-      c.configure(cfg)
+      module = __import__(mod)
+      c = module.__dict__[cls]()
+      config.configureObject(c, self.config)
+      self.modules.append(c)
       return c
     except Exception, x:
       self.reportException(self.tr("Loading module '%s'") % (id), x)
@@ -119,7 +118,7 @@ class AlbumArtUnattendedUi(QWidget):
     """Download images automatically for the given path"""
     items = self.getItems(path)
     items = filter(lambda i: not albumart.hasCover(i), items)
-    self.startProcess(AutoDownloadProcess(self, path, items))
+    self.startProcess(AutoDownloadProcess(self, path, items, self.requireExactMatch))
 
   def synchronizeCovers(self, path):
     """Make sure all the albums have same images in all their targets
@@ -170,7 +169,6 @@ class AlbumArtUnattendedUi(QWidget):
         self.progressDialog.setLabelText(event.text)
     elif event.type() == ReloadEvent.id:
       pass
-
     del event
     
   def getItems(self, path):

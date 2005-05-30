@@ -44,6 +44,7 @@ defaultConfig = {
                        "la", "pac", "ape", "ofr", "rka", "shn", "tta", "wv", "mpc", "vqf", "ra",
                        "rm", "swa", "mid", "mod", "nsf", "s3m", "xm", "it", "mt2", "sid"],
   "hide_albums_with_covers": "0",
+  "require_exact_match": True,
   "view_mode": "0",
   "sources": ["albumart_source_amazon.Amazon",
               "albumart_source_walmart.Walmart",
@@ -66,6 +67,7 @@ will be treated as media files.</p>
   "sources": ("stringlist",),
   "targets": ("stringlist",),
   "recognizers": ("stringlist",),
+  "require_exact_match": ("boolean", "Require an exact match when searching for covers automatically."),
 }
 
 class AlbumArtDialog(AlbumArtDialogBase):
@@ -123,6 +125,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     
     self.mediaExtensions = config["media_extensions"]
     self.dir = config["last_directory"]
+    self.requireExactMatch = config["require_exact_match"]
     self.hideAlbumsWithCovers.setOn(config["hide_albums_with_covers"] and True or False)
     self.viewAlbumsAction.setOn(config["view_mode"] == "0")
     self.viewFoldersAction.setOn(config["view_mode"] == "1")
@@ -406,7 +409,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     items = [item.getPath() for item in self.getSelectedItems() if not albumart.hasCover(item.getPath())]
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message("")
-    self.startProcess(AutoDownloadProcess(self, self.dir, items))
+    self.startProcess(AutoDownloadProcess(self, self.dir, items, self.requireExactMatch))
 
   def synchronizeAction_activated(self):
     """Make sure all the albums have same images in all their targets
@@ -494,12 +497,12 @@ class AlbumArtDialog(AlbumArtDialogBase):
         items.append(item)
       child = item.firstChild()
       while child:
-        addSelectedChildren(child, item.isSelected())
+        addSelectedChildren(child)
         child = child.nextSibling()
 
     item = self.dirlist.firstChild()
     while item:
-      addSelectedChildren(item, item.isSelected())
+      addSelectedChildren(item)
       item = item.nextSibling()
       
     return items
@@ -618,16 +621,12 @@ class AlbumArtDialog(AlbumArtDialogBase):
     if QTextDrag.canDecode(event):
       s = QString()
       if QTextDrag.decode(event, s):
-        url = urllib.unquote(self.getQString(s))
-        if url.startswith("file:///"):
-          url = url[len("file:///"):]
-        if os.path.exists(url):
-          url = urllib.pathname2url(url)
+        url = self.getQString(s).strip()
         f = urllib.urlopen(url)
         fn = tempfile.mktemp()
 
         # write to a temporary file
-        o = open(fn,"wb")
+        o = open(fn, "wb")
         o.write(f.read())
         o.close()
 

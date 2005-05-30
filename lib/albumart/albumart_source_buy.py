@@ -10,7 +10,7 @@ import tempfile
 import albumart
 
 defaultConfig = {
-  "enabled":        1,
+  "enabled":        0,
 }
 
 configDesc = {

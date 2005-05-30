@@ -92,10 +92,11 @@ class CoverDownloaderProcess(Process):
 
 class AutoDownloadProcess(Process):
   """Automatic Cover Download"""
-  def __init__(self, dialog, dir, items):
+  def __init__(self, dialog, dir, items, requireExactMatch):
     Process.__init__(self, dialog)
     self.items = items
     self.dir = dir
+    self.requireExactMatch = requireExactMatch
 
   def run(self):
     itemsProcessed = 0
@@ -105,11 +106,6 @@ class AutoDownloadProcess(Process):
     failures = 0
     cache = {}
     
-    #items = self.items
-    #for path in self.items:
-    #  items.append(path)
-    #  items += filter(lambda fn: os.path.isfile(fn), map(lambda fn: os.path.join(path, fn), os.listdir(path)))
-
     try:
       for path in self.items:
         if self.isCanceled():
@@ -131,7 +127,7 @@ class AutoDownloadProcess(Process):
               traceback.print_exc(file = sys.stderr)
           else:
             foundAny = False
-            for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = True):
+            for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = self.requireExactMatch):
               foundAny = True
               try:
                 img = Image.open(cover)
@@ -152,12 +148,10 @@ class AutoDownloadProcess(Process):
               break
             if not foundAny:
               failures += 1
-                
         itemsProcessed += 1
         self.setProgress(itemsProcessed, len(self.items))
     except Exception, x:    
       self.postEvent(self.dialog, ExceptionEvent(self, x))
-        
     self.triggerReload()
     
     # clear the cache

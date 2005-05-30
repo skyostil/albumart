@@ -1,5 +1,8 @@
-1.5.1:
-	- FIXME
+1.6.0:
+	- New image sources added: Walmart, Buy.com, Yahoo! Image search.
+	- Made media file extensions configurable.
+	- Added a generic image target which can save cover images flexibly.
+	- Added a folder-based view in addition to the default album view.
 
 1.5.0:
 	- User interface overhauled.
