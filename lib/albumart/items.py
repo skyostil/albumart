@@ -214,9 +214,7 @@ class FolderItem(QListViewItem):
     self.titleFont = QFont(QFont().family(), QFont().pointSize() + 3, QFont.Bold)
     self.setText(0, os.path.basename(self.path))
     self.extensions = extensions
-    # count the number of items
-    self.itemCount = len([None for f in os.listdir(self.path) \
-                          if os.path.splitext(os.path.join(self.path, f))[1].lower()[1:] in self.extensions])
+    self.itemCount = len(self.getChildren())
 
   def acceptDrops(self, mimeSource):
     return True
@@ -292,20 +290,24 @@ class FolderItem(QListViewItem):
     
   def setup(self):
     self.setHeight(self.iconSize + self.margin * 2)
+
+  def getChildren(self):
+    try:
+      return [os.path.join(self.path, fn) for fn in os.listdir(self.path) \
+              if (os.path.isdir(os.path.join(self.path, fn)) or \
+                  os.path.splitext(fn)[1].lower()[1:] in self.extensions) and \
+                not fn.startswith(".")]
+    except:
+      return []
     
   def activate(self):
     # read our contents if it hasn't been done before
     if self.childCount() == 0:
-      for fn in os.listdir(self.path):
-        if fn.startswith("."):
-          continue
-        fullname = os.path.join(self.path, fn)
-        if os.path.isdir(fullname):
-          FolderItem(self, fullname, self.extensions)
-        elif os.path.isfile(fullname):
-          if self.extensions and os.path.splitext(fn)[1].lower()[1:] not in self.extensions:
-            continue
-          FileItem(self, fullname)
+      for fileName in self.getChildren():
+        if os.path.isdir(fileName):
+          FolderItem(self, fileName, self.extensions)
+        elif os.path.isfile(fileName):
+          FileItem(self, fileName)
     
     # open the album if the cursor is within the trigger
     p = self.listView().mapFromGlobal(QCursor.pos())

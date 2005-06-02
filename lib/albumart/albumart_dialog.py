@@ -68,6 +68,7 @@ will be treated as media files.</p>
   "targets": ("stringlist",),
   "recognizers": ("stringlist",),
   "require_exact_match": ("boolean", "Require an exact match when searching for covers automatically."),
+  "hide_albums_with_covers": ("boolean",),
 }
 
 class AlbumArtDialog(AlbumArtDialogBase):
@@ -222,6 +223,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
   def walk(self, path):
     """Walk the given path and fill the album list with all the albums found."""
+
     try:
       path = unicode(path)
       self.dir = path
@@ -286,39 +288,41 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
   def refreshAlbumList(self):
     """Refreshes the album list according to the current search string."""
-    self.setCursor(Qt.waitCursor)
     self.dirlist.clear()
 
     if not self.dir:
       return
 
-    if self.viewFoldersAction.isOn():
-      for fn in os.listdir(self.dir):
-        if fn.startswith(".") or not self.matchesFilter(fn, "", ""):
-          continue
-        fullname = os.path.join(self.dir, fn)
-        if os.path.isdir(fullname):
-          FolderItem(self.dirlist, fullname, self.mediaExtensions)
-        elif os.path.isfile(fullname) and os.path.splitext(fn)[1].lower()[1:] in self.mediaExtensions:
-          FileItem(self.dirlist, fullname)
-    else:
-      for (artist, album), tracks in self.albums.items():
-        if len(tracks) and self.matchesFilter(artist, album, tracks):
-          filteredTracks = []
-  
-          # filter the tracks
-          for t in tracks:
-            if self.hideAlbumsWithCovers.isOn() and \
-              not albumart.hasCover(t) or \
-              not self.hideAlbumsWithCovers.isOn():
-              filteredTracks.append(t)
-  
-          # if the album is not empty, add it to the list
-          if len(filteredTracks):
-            a = AlbumItem(self.dirlist, os.path.dirname(tracks[0]), artist, album)
-            for t in filteredTracks:
-              a.addTrack(t)
-    self.setCursor(Qt.arrowCursor)
+    try:
+      self.setCursor(Qt.waitCursor)
+      if self.viewFoldersAction.isOn():
+        for fn in os.listdir(self.dir):
+          if fn.startswith(".") or not self.matchesFilter(fn, "", ""):
+            continue
+          fullname = os.path.join(self.dir, fn)
+          if os.path.isdir(fullname):
+            FolderItem(self.dirlist, fullname, self.mediaExtensions)
+          elif os.path.isfile(fullname) and os.path.splitext(fn)[1].lower()[1:] in self.mediaExtensions:
+            FileItem(self.dirlist, fullname)
+      else:
+        for (artist, album), tracks in self.albums.items():
+          if len(tracks) and self.matchesFilter(artist, album, tracks):
+            filteredTracks = []
+    
+            # filter the tracks
+            for t in tracks:
+              if self.hideAlbumsWithCovers.isOn() and \
+                not albumart.hasCover(t) or \
+                not self.hideAlbumsWithCovers.isOn():
+                filteredTracks.append(t)
+    
+            # if the album is not empty, add it to the list
+            if len(filteredTracks):
+              a = AlbumItem(self.dirlist, os.path.dirname(tracks[0]), artist, album)
+              for t in filteredTracks:
+                a.addTrack(t)
+    finally:
+      self.setCursor(Qt.arrowCursor)
 
   def matchesFilter(self, artist, album, tracks):
     """Tests whether the given artist, album or track list matches
@@ -346,7 +350,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
        self.tr("Choose a directory"),
        1))
     if d and len(d):
-      self.config.set("albumart", "lastDirectory", d)
       self.walk(d)
 
   def reloadAction_activated(self):
@@ -627,7 +630,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
         if "\n" in url: url = url.split("\n")[0]
         if url.startswith("file:///"): url = url[8:]
         if os.path.exists(url): url = "file:" + url
-        print url
         f = urllib.urlopen(url)
         fn = tempfile.mktemp()
 
@@ -664,6 +666,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         if item:
           items = [item]
           if isinstance(item, AlbumItem) or isinstance(item, FolderItem):
+            item.setOpen(True)
             def addChildren(item):
               child = item.firstChild()
               while child:
