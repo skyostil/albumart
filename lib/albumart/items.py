@@ -210,11 +210,13 @@ class FolderItem(QListViewItem):
     self.tracks = []
     self.margin = 8
     self.iconSize = 64
-    self.itemCount = len(os.listdir(self.path))
     self.openTrigger = QRect()
     self.titleFont = QFont(QFont().family(), QFont().pointSize() + 3, QFont.Bold)
     self.setText(0, os.path.basename(self.path))
     self.extensions = extensions
+    # count the number of items
+    self.itemCount = len([None for f in os.listdir(self.path) \
+                          if os.path.splitext(os.path.join(self.path, f))[1].lower()[1:] in self.extensions])
 
   def acceptDrops(self, mimeSource):
     return True
@@ -304,7 +306,6 @@ class FolderItem(QListViewItem):
           if self.extensions and os.path.splitext(fn)[1].lower()[1:] not in self.extensions:
             continue
           FileItem(self, fullname)
-      self.itemCount = self.childCount()
     
     # open the album if the cursor is within the trigger
     p = self.listView().mapFromGlobal(QCursor.pos())

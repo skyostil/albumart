@@ -1,5 +1,5 @@
-# @(#) $Id: ID3v2Frames.py,v 1.1 2004-05-10 22:02:59 skyostil Exp $
-__version__ = "$Revision: 1.1 $"
+# @(#) $Id: ID3v2Frames.py,v 1.2 2005-06-02 18:14:33 skyostil Exp $
+__version__ = "$Revision: 1.2 $"
 
 import sys, re, zlib, warnings, imghdr, struct
 
@@ -225,7 +225,7 @@ class ID3v2Frame(object):
         
         try:
             if self._encoding == '\x00' or self._encoding == '\x03':
-                nullindex = data.index('\x00') 
+                nullindex = data.index('\x00')
                 return (data[:nullindex], data[nullindex+1:],)
             elif self._encoding == '\x01' or self._encoding == '\x02':
                 nullindex = 0
@@ -234,7 +234,6 @@ class ID3v2Frame(object):
                     if nullindex % 2 == 0:
                         break
                     nullindex = nullindex + 1
-                    
                 return (data[:nullindex], data[nullindex+2:],)
         except ValueError, err:
             raise id3.BrokenFrameError, "Corrupt tag, orig error: " + str(err)
@@ -275,6 +274,8 @@ class ID3v2Frame(object):
             value = unicode(value, 'utf-8')
         else:
             raise id3.BrokenFrameError, "Encoding scheme not in spec (%r). Corrupt tag?" % (self._encoding,)
+        # strip any trailing nulls
+        value = value.replace('\x00', '')
         return value
 
     def encode(self, value):

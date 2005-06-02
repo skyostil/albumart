@@ -94,7 +94,7 @@ class Freedesktop(albumart.Target):
       cf.add_section("Desktop Entry")
 
     if self.relpaths or os.name == "nt":
-      cf.set("Desktop Entry", "Icon", os.path.join(".", self.filename))
+      cf.set("Desktop Entry", "Icon", "./" + self.filename)
     else:
       cf.set("Desktop Entry", "Icon", os.path.join(path, self.filename))
     cf.write(open(os.path.join(path, ".directory"), "w"))

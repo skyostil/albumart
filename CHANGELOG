@@ -3,6 +3,8 @@
 	- Made media file extensions configurable.
 	- Added a generic image target which can save cover images flexibly.
 	- Added a folder-based view in addition to the default album view.
+	- Strip null characters from id3v2 tags.
+	- Fixed freedesktop.org target under Windows.
 
 1.5.0:
 	- User interface overhauled.

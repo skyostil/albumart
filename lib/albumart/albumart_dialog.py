@@ -223,6 +223,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
   def walk(self, path):
     """Walk the given path and fill the album list with all the albums found."""
     try:
+      path = unicode(path)
       self.dir = path
 
       # update the widget states
@@ -622,6 +623,11 @@ class AlbumArtDialog(AlbumArtDialogBase):
       s = QString()
       if QTextDrag.decode(event, s):
         url = self.getQString(s).strip()
+        # decode weird drag'n'drop data formats
+        if "\n" in url: url = url.split("\n")[0]
+        if url.startswith("file:///"): url = url[8:]
+        if os.path.exists(url): url = "file:" + url
+        print url
         f = urllib.urlopen(url)
         fn = tempfile.mktemp()
 
@@ -643,8 +649,8 @@ class AlbumArtDialog(AlbumArtDialogBase):
       s = QString()
       if QTextDrag.decode(event, s):
         url = urllib.unquote(self.getQString(s)).strip()
-        if url.startswith("file:"):
-          url = url[len("file:"):]
+        if url.startswith("file:///"): url = url[8:]
+        elif url.startswith("file:"): url = url[len("file:"):]
         if os.path.isdir(url):
           self.walk(url)
           return
