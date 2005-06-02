@@ -174,7 +174,7 @@ class AlbumArtUnattendedUi(QWidget):
   def getItems(self, path):
     """Returns a list of processable items under the given path"""
     items = []
-    for root, dirs, files in os.walk(path):
+    for root, dirs, files in os.walk(unicode(path)):
       items.append(root)
     return filter(lambda x: not os.path.basename(x).startswith("."), items)
 
