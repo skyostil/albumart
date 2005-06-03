@@ -628,7 +628,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         url = self.getQString(s).strip()
         # decode weird drag'n'drop data formats
         if "\n" in url: url = url.split("\n")[0]
-        if url.startswith("file:///"): url = url[8:]
+        if url.startswith("file:///") and os.path.exists(url[8:]): url = url[8:]
         if os.path.exists(url): url = "file:" + url
         f = urllib.urlopen(url)
         fn = tempfile.mktemp()
@@ -651,7 +651,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       s = QString()
       if QTextDrag.decode(event, s):
         url = urllib.unquote(self.getQString(s)).strip()
-        if url.startswith("file:///"): url = url[8:]
+        if url.startswith("file:///") and os.path.isdir(url[8:]): url = url[8:]
         elif url.startswith("file:"): url = url[len("file:"):]
         if os.path.isdir(url):
           self.walk(url)
