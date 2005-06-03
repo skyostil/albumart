@@ -176,7 +176,8 @@ class AlbumArtUnattendedUi(QWidget):
     items = []
     for root, dirs, files in os.walk(unicode(path)):
       items.append(root)
-    return filter(lambda x: not os.path.basename(x).startswith("."), items)
+      items += [os.path.join(root, f) for f in files if not f.startswith(".")]
+    return items
 
   def getQString(self, qstring):
     """@returns a python string representation of the given QString"""
