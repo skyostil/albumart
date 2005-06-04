@@ -74,7 +74,6 @@ class ID3v2(albumart.Target):
     errors = ""
 
     for f in self.getFileList(path):
-      print "Writing APIC tag to", f
       try:
         stat = os.stat(f)
         id3v2 = id3.ID3v2(f)
