@@ -11,18 +11,22 @@
    Currently supported image providers:
 
      * Amazon.com
+     * Yahoo! Images
+     * Wal-Mart
+     * Buy.com
 
    At least the following programs make use of the cover
    images:
 
-     * Ones that follow the FreeDesktop.org .desktop-entry
-       spec, for example KDE and GNOME.
+     * KDE, GNOME and others that follow the FreeDesktop.org
+       .desktop-entry spec
      * Windows XP Explorer
      * Windows Media Player 9+
      * CDcover, an XMMS plugin
      * CoverViewer, another XMMS plugin.
      * wmalbum, a WindowMaker dock applet
      * Various WinAMP plugins, for example ShowCover.
+
    In addition, some portable music players can show the cover
    image if it is embedded in the MP3 file.
 
@@ -82,3 +86,5 @@
      * .folder.png and an Icon entry in .directory for
        Konqueror, etc.
      * ID3v2 APIC frame, which is embedded into the MP3 files.
+     * Additional custom image targets are supported
+
