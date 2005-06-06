@@ -7,3 +7,4 @@ python %INSTALLER% albumart-qt-w32.spec
 copy ..\..\README %DIST%\Readme.txt
 copy ..\..\COPYING %DIST%\Copying.txt
 copy ..\..\CHANGELOG %DIST%\Changelog.txt
+unix2dos %DIST%/*.txt

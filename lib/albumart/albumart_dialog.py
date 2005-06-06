@@ -435,7 +435,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.startProcess(SynchronizeProcess(self, self.dir, items))
 
   def dirlist_selectionChanged(self):
-    flag = len(self.getSelectedItems()) > 0
+    flag = len(self.getSelectedItems(expand = False)) > 0
     self.autoDownloadAction.setEnabled(flag)
     self.removeAction.setEnabled(flag)
     self.viewCoverAction.setEnabled(flag)
@@ -492,35 +492,24 @@ class AlbumArtDialog(AlbumArtDialogBase):
     """@returns a python string representation of the given QString"""
     return unicode(qstring).encode("latin-1", "replace")
 
-  def getSelectedItems(self):
+  def getSelectedItems(self, expand = True):
     """@returns a list of selected media items to process"""
     items = []
 
     def addSelectedChildren(item, force = False):
       if item.isSelected() or force:
         items.append(item)
+        if expand: item.setOpen(True)
       child = item.firstChild()
       while child:
-        addSelectedChildren(child)
+        addSelectedChildren(child, item.isSelected() or force)
         child = child.nextSibling()
 
     item = self.dirlist.firstChild()
     while item:
-      addSelectedChildren(item)
+      addSelectedChildren(item, item.isSelected())
       item = item.nextSibling()
       
-    return items
-
-  def getCurrentItems(self):
-    """@returns a list of current (i.e. focused) media items to process"""
-    item = self.dirlist.currentItem()
-    items = [item]
-
-    if isinstance(item, AlbumItem) or isinstance(item, FolderItem):
-      trackItem = item.firstChild()
-      while trackItem:
-        items.append(trackItem)
-        trackItem = trackItem.nextSibling()
     return items
 
   def addCoverToList(self, coverfile, delete = False):
@@ -615,9 +604,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
     self.setCursor(Qt.arrowCursor)
     self.statusBar().message(self.tr("Ready"), 5000)
-
-  def setCoverForCurrentItems(self, coverPath):
-    return self.setCoverForItems(coverPath, self.getCurrentItems())
 
   def decodeDropEventAsCover(self, event):
     """@returns a file name for the given cover drop event or None or error.
