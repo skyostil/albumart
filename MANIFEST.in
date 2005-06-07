@@ -1,4 +1,5 @@
 # these are included in the source repository
+include Makefile
 include README
 include INSTALL
 include TODO
