@@ -4,6 +4,9 @@ albumart (1.6.0-1) stable; urgency=low
   * Made media file extensions configurable.
   * Added a generic image target which can save cover images flexibly.
   * Added a folder-based view in addition to the default album view.
+  * Made media file extensions configurable.
+  * Strip null characters from id3v2 tags.
+  * Fixed freedesktop.org target under Windows.
 
  -- Sami Kyöstilä <skyostil@kempele.fi>  Mon, 30 Jun 2005 23:05:00 +0200 
 

@@ -278,13 +278,13 @@ class AlbumArtDialog(AlbumArtDialogBase):
         # save a fresh copy to the cache
         pickle.dump((path, time.time(), self.albums), open(self.cachePath, "wb"))
     finally:
-      self.refreshAlbumList()
-      self.statusBar().message(self.tr("%d items found. Ready.") % self.dirlist.childCount())
       self.stopped = False
       self.stopAction.setEnabled(0)
       self.reloadAction.setEnabled(1)
       self.fileOpenAction.setEnabled(1)
       self.setCursor(Qt.arrowCursor)
+      self.refreshAlbumList()
+      self.statusBar().message(self.tr("%d items found. Ready.") % self.dirlist.childCount())
 
   def refreshAlbumList(self):
     """Refreshes the album list according to the current search string."""
