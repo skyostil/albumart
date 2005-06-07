@@ -48,7 +48,14 @@ lib/albumart/albumart_images.py
 lib/albumart/albumart_recognizer_id3v2.py
 lib/albumart/albumart_recognizer_path.py
 lib/albumart/albumart_source_amazon.py
+lib/albumart/albumart_source_buy.py
+lib/albumart/albumart_source_walmart.py
+lib/albumart/albumart_source_yahoo.py
+lib/albumart/albumart_string_list_widget.py
+lib/albumart/albumart_string_list_widget_base.py
+lib/albumart/albumart_string_list_widget_base.ui
 lib/albumart/albumart_target_freedesktop.py
+lib/albumart/albumart_target_generic.py
 lib/albumart/albumart_target_id3v2.py
 lib/albumart/albumart_target_windows.py
 lib/albumart/albumart_unattended_ui.py
@@ -62,6 +69,12 @@ lib/albumart/version.py
 lib/albumart/id3/ID3v2Frames.py
 lib/albumart/id3/__init__.py
 lib/albumart/id3/binfuncs.py
+lib/albumart/yahoo/__init__.py
+lib/albumart/yahoo/search/__init__.py
+lib/albumart/yahoo/search/debug.py
+lib/albumart/yahoo/search/domparsers.py
+lib/albumart/yahoo/search/version.py
+lib/albumart/yahoo/search/webservices.py
 share/albumart/1leftarrow.png
 share/albumart/1rightarrow.png
 share/albumart/albumart.ico
