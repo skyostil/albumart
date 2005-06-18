@@ -48,6 +48,12 @@ def resizePixmap(pixmap, size, width = None, height = None):
   if not pixmap.isNull() and pixmap.width() > 0 and pixmap.height() > 0:
     if not width and not height:
       width = height = size
+      if pixmap.width() > size:
+        width = size
+        height = int(pixmap.height() * float(size) / pixmap.width())
+      if pixmap.height() > size:
+        width = int(pixmap.width() * float(size) / pixmap.height())
+        height = size
     p = QPixmap()
     try:
       p.convertFromImage(pixmap.convertToImage().scale(width, height))

@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+f# -*- coding: iso-8859-1 -*-
 #
 # QT-frontend for the album image downloader.
 #
@@ -439,6 +439,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.autoDownloadAction.setEnabled(flag)
     self.removeAction.setEnabled(flag)
     self.viewCoverAction.setEnabled(flag)
+    self.pushSet.setEnabled(0)
 
   def dirlist_currentChanged(self, a0):
     self.artistEdit.setText(a0.getArtistName())
@@ -580,7 +581,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
   def coverview_dragObject(self):
     if self.coverview.currentItem():
       d = QTextDrag(self.coverview.currentItem().getPath(), self.coverview)
-      d.setPixmap(self.coverview.currentItem().pixmap())
+      d.setPixmap(resizePixmap(self.coverview.currentItem().pixmap(), 64))
       return d
 
   def pushSet_clicked(self):
