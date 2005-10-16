@@ -26,11 +26,11 @@ walmart = { 'search' : { 'url'   : 'http://www.walmart.com/catalog/search-ng.gsp
 			 'args'  : { 'search_constraint': '4104', 'ics' : '5', 'ico': '0' },
 			 're' :
 			[ r'<input type="hidden" name="product_id" value="(\d+)">' ] },
-            'result' : { 'url'   : 'http://www.walmart.com/catalog/product.gsp?',
+            'result' : { 'url'   : 'http://www.walmart.com/catalog/product.do?',
 	                 'query' : 'product_id',
 			 'args'  : { },
 			 're' :
-			[ r'<a href="javascript:photo_opener\(\'(\S+.jpg)&product_id=',
+			[ r'<a href="javascript:photo_opener\(\'(\S+.jpg)&amp;product_id=',
 			  r'<meta name="Description" content="(.+) at Wal-Mart.*">' ] }
 	  }
 
@@ -68,7 +68,7 @@ class Walmart(albumart.Source):
   def getCover(self, id):
     if self.enabled:
       try:
-        url1, url2, name = id
+        url1, name = id
         i = urllib.urlopen(url1)
         output = tempfile.mktemp(".jpg")
         o = open(output, "wb")
