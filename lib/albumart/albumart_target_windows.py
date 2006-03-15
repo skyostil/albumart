@@ -51,6 +51,7 @@ class Windows(albumart.Target):
       if self.scale:
         i = i.resize((self.scale, self.scale), resample = 1)
 
+      i.convert("RGB")
       i.save(target, "JPEG")
 
   def hasCover(self, path):
