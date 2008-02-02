@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 # Image collection for project 'albumart'.
 #
 # Generated from reading image files: 
