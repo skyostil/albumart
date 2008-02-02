@@ -1,3 +1,6 @@
+1.6.1:
+	- Minor source file encoding change to fix crash on Python 2.5.
+
 1.6.0:
 	- New image sources added: Walmart, Buy.com, Yahoo! Image search.
 	- Made media file extensions configurable.

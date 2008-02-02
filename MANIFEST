@@ -20,7 +20,6 @@ debian/docs
 debian/emacsen-install.ex
 debian/emacsen-remove.ex
 debian/emacsen-startup.ex
-debian/files
 debian/init.d.ex
 debian/manpage.1.ex
 debian/manpage.sgml.ex
@@ -43,6 +42,7 @@ lib/albumart/albumart_dialog.py
 lib/albumart/albumart_dialog_base.py
 lib/albumart/albumart_dialog_base.ui
 lib/albumart/albumart_exception_dialog.py
+lib/albumart/albumart_exception_dialog.ui
 lib/albumart/albumart_exception_dialog_base.py
 lib/albumart/albumart_exception_dialog_base.ui
 lib/albumart/albumart_images.py
@@ -78,6 +78,7 @@ lib/albumart/yahoo/search/version.py
 lib/albumart/yahoo/search/webservices.py
 share/albumart/1leftarrow.png
 share/albumart/1rightarrow.png
+share/albumart/Thumbs.db
 share/albumart/albumart.ico
 share/albumart/albumart.png
 share/albumart/albumart.svg
