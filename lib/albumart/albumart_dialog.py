@@ -1,4 +1,4 @@
-f# -*- coding: iso-8859-1 -*-
+# -*- coding: iso-8859-1 -*-
 #
 # QT-frontend for the album image downloader.
 #
