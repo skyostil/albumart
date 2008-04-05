@@ -1,5 +1,5 @@
                           Album Cover Art Downloader
-                  http://kempele.fi/~skyostil/projects/albumart
+                 http://unrealvoodoo.org/hiteck/projects/albumart
 
    Here's a program that will semi-automatically download album
    cover images for your music collection. All you have to do
@@ -10,7 +10,6 @@
 
    Currently supported image providers:
 
-     * Amazon.com
      * Yahoo! Images
      * Wal-Mart
      * Buy.com

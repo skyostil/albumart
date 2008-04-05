@@ -21,10 +21,10 @@ setup(
 	contact="Sami Kyöstilä", 
 	contact_email="sami.kyostila@gmail.com",
 	url="http://unrealvoodoo.org/hiteck/projects/albumart",
-	version="1.6.1",
+	version="1.6.3",
 	license="GPL",
 	description="Downloads album cover images semi-automatically from the Internet.",
-	long_description="Album Cover Art Downloader is a utility for semi-automatically downloading matching cover images from Amazon.com for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
+	long_description="Album Cover Art Downloader is a utility for semi-automatically downloading matching cover images for each album in your music collection. It saves the cover images so that they will be automatically used by programs such as Konqueror, various XMMS plugins, Windows Media Player, etc.",
 
         scripts = None,
 	data_files=[

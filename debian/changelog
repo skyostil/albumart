@@ -1,3 +1,21 @@
+albumart (1.6.3-1) stable; urgency=medium
+
+  * Removed obsolete Amazon Web Services API.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Sat, 5 Apr 2008 23:05:00 +0200 
+
+albumart (1.6.2-1) stable; urgency=low
+
+  * Source file encoding fix.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Mon, 30 Jun 2005 23:05:00 +0200 
+
+albumart (1.6.1-1) stable; urgency=low
+
+  * Build fix.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Mon, 30 Jun 2005 23:05:00 +0200 
+
 albumart (1.6.0-1) stable; urgency=low
 
   * New image sources added: Walmart, Buy.com, Yahoo! Image search.
