@@ -29,7 +29,7 @@ from qt import *
 import albumart
 import version
 import config
-from pixmap import getPixmapForPath
+from pixmap import getPixmapForPath, resizePixmap
 from items import TrackItem, AlbumItem, CoverItem, FolderItem, FileItem
 from event import *
 from process import *
