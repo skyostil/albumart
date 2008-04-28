@@ -29,14 +29,15 @@ class Yahoo(albumart.Source):
     self.appid = config["appid"]
     self.maxResults = config["max_results"]
 
-  def findAlbum(self, name):
-    try:
-      searcher = ImageSearch(self.appid)
-      searcher.query = name
-      searcher.results = self.maxResults
-      return list(searcher.parse_results())
-    except:
-      pass
+  def findAlbum(self, artist, album):
+    if self.enabled:
+      try:
+        searcher = ImageSearch(self.appid)
+        searcher.query = artist+" "+album
+        searcher.results = self.maxResults
+        return list(searcher.parse_results())
+      except:
+        pass
 
   def getCover(self, cover):
     if self.enabled:

@@ -50,11 +50,12 @@ class Buy(albumart.Source):
 
       return result
 
-  def findAlbum(self, name):
-    try:
-      return self.search(buy, 'search', name)[:20]
-    except:
-      pass
+  def findAlbum(self, artist, album):
+    if self.enabled:
+      try:
+        return self.search(buy, 'search', artist+" "+album)[:20]
+      except:
+        pass
 
   def getCover(self, id):
     if self.enabled:

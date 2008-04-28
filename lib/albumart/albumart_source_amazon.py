@@ -10,7 +10,7 @@ import Image
 
 defaultConfig = {
   "enabled":        1,
-  "licensenumber":  "D1ESMA5AOEZB24",
+  "licensenumber":  "1HQ4DDKC5D23SWM4V2R2", 
   "locale":         "us",
   "proxy":          amazon.getProxy() or "",
   "minsize":        0
@@ -33,6 +33,10 @@ class Amazon(albumart.Source):
     self.enabled = config["enabled"]
     self.minsize = config["minsize"]
     l = config["licensenumber"]
+    # Override the old access key
+    if l == "D1ESMA5AOEZB24":
+       l = defaultConfig["licensenumber"]
+       config["licensenumber"] = l
     if l and len(l):
       amazon.setLicense(l)
     l = config["locale"]
@@ -42,10 +46,10 @@ class Amazon(albumart.Source):
     if l and len(l):
       amazon.setProxy(l)
 
-  def findAlbum(self,name):
+  def findAlbum(self,artist, album):
     if self.enabled:
       try:
-        return amazon.searchByKeyword(name,type="lite",product_line="music")
+        return amazon.searchByKeyword(artist,album)
       except amazon.AmazonError:
         pass
 
@@ -59,7 +63,7 @@ class Amazon(albumart.Source):
   def getCover(self, album):
     if self.enabled:
       try:
-        i = urllib.urlopen(album.ImageUrlLarge)
+        i = urllib.urlopen(album, proxies=amazon.getProxies())
         output = tempfile.mktemp(".jpg")
         o = open(output, "wb")
         o.write(i.read())

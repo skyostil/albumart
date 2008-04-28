@@ -58,12 +58,13 @@ class Walmart(albumart.Source):
     
       return result
 
-  def findAlbum(self, name):
-    try:
-      albums = self.search(walmart, 'search', name)
-      return [self.search(walmart, 'result', album) for album in albums]
-    except:
-      pass
+  def findAlbum(self, artist, album):
+    if self.enabled:
+      try:
+        albums = self.search(walmart, 'search', artist+" "+album)
+        return [self.search(walmart, 'result', albumResults) for albumResults in albums]
+      except:
+        pass
 
   def getCover(self, id):
     if self.enabled:

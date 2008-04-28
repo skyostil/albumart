@@ -4,7 +4,7 @@
 for Amazon web APIs
 
 This module allows you to access Amazon's web APIs,
-to do things like search Amazon and get the results programmatically.
+to do things like search Amazon and get the rc programmatically.
 Described here:
   http://www.amazon.com/webservices
 
@@ -55,8 +55,8 @@ Other usage notes:
 
 __author__ = "Mark Pilgrim (f8dy@diveintomark.org)"
 __version__ = "0.64.1"
-__cvsversion__ = "$Revision: 1.4 $"[11:-2]
-__date__ = "$Date: 2005-01-30 18:35:10 $"[7:-2]
+__cvsversion__ = "$Revision: 1.5 $"[11:-2]
+__date__ = "$Date: 2008-04-28 19:13:33 $"[7:-2]
 __copyright__ = "Copyright (c) 2002 Mark Pilgrim"
 __license__ = "Python"
 # Powersearch and return object type fix by Joseph Reagle <geek@goatee.net>
@@ -102,10 +102,10 @@ _licenseLocations = (
     (lambda key: _contentsOf(_getScriptDir(), _amazonfile2), '%s in the amazon.py directory' % _amazonfile2)
     )
 _supportedLocales = {
-        "us" : (None, "xml.amazon.com"),   
-        "uk" : ("uk", "xml-eu.amazon.com"),
-        "de" : ("de", "xml-eu.amazon.com"),
-        "jp" : ("jp", "xml.amazon.co.jp")
+        "us" : (None, "ecs.amazonaws.com"),   
+        "uk" : ("uk", "ecs.amazonaws.co.uk"),
+        "de" : ("de", "ecs.amazonaws.de"),
+        "jp" : ("jp", "ecs.amazonaws.jp")
     }
 
 ## administrative functions
@@ -188,56 +188,39 @@ def _getScriptDir():
 class Bag: pass
 
 def unmarshal(element):
+    results = []
     rc = Bag()
-    if isinstance(element, minidom.Element) and (element.tagName == 'Details'):
-        rc.URL = element.attributes["url"].value
-    childElements = [e for e in element.childNodes if isinstance(e, minidom.Element)]
-    if childElements:
-        for child in childElements:
-            key = child.tagName
-            if hasattr(rc, key):
-                if type(getattr(rc, key)) <> type([]):
-                    setattr(rc, key, [getattr(rc, key)])
-                setattr(rc, key, getattr(rc, key) + [unmarshal(child)])
-            elif isinstance(child, minidom.Element) and (child.tagName == 'Details'):
-                # make the first Details element a key
-                setattr(rc,key,[unmarshal(child)])
-                #dbg: because otherwise 'hasattr' only tests
-                #dbg: on the second occurence: if there's a
-                #dbg: single return to a query, it's not a
-                #dbg: list. This module should always
-                #dbg: return a list of Details objects.
-            else:
-                setattr(rc, key, unmarshal(child))
-    else:
-        rc = "".join([e.data for e in element.childNodes if isinstance(e, minidom.Text)])
-        if element.tagName == 'SalesRank':
-            rc = rc.replace('.', '')
-            rc = rc.replace(',', '')
-            rc = int(rc)
-    return rc
+    largeImageElements = [e for e in element.getElementsByTagName("LargeImage") if isinstance(e, minidom.Element)]
+    if largeImageElements:
+        for largeImageElement in largeImageElements:
+            url = largeImageElement.getElementsByTagName("URL")[0].firstChild.data
+            # Skip any duplicated images
+            if hasattr(rc, url):
+                continue
+            setattr(rc, url, "")
+            results.append(url)
+    return results
 
-def buildURL(search_type, keyword, product_line, type, page, license_key, locale, associate):
+def buildURL(artist, album, license_key, locale):
     _checkLocaleSupported(locale)
-    url = "http://" + _supportedLocales[locale][1] + "/onca/xml3?f=xml"
-    url += "&t=%s" % associate
-    url += "&dev-t=%s" % license_key.strip()
-    url += "&type=%s" % type
-    if _supportedLocales[locale][0]:
-        url += "&locale=%s" % _supportedLocales[locale][0]
-    if page:
-        url += "&page=%s" % page
-    if product_line:
-        url += "&mode=%s" % product_line
-    url += "&%s=%s" % (search_type, urllib.quote(keyword))
+    url = "http://" + _supportedLocales[locale][1] + "/onca/xml?Service=AWSECommerceService"
+    url += "&AWSAccessKeyId=%s" % license_key.strip()
+    url += "&Operation=ItemSearch"
+    url += "&SearchIndex=Music"
+    if artist and len(artist):
+        url += "&Artist=%s" % (urllib.quote(artist))
+    if album and len(album):
+        url += "&Keywords=%s" % (urllib.quote(album))
+    # just return the image information
+    url += "&ResponseGroup=Images"
+    print url
     return url
 
 
 ## main functions
 
 
-def search(search_type, keyword, product_line, type = "heavy", page = None,
-           license_key=None, http_proxy = None, locale = None, associate = None):
+def search(artist, album, license_key = None, http_proxy = None, locale = None, associate = None):
     """search Amazon
 
     You need a license key to call this function; see
@@ -246,119 +229,28 @@ def search(search_type, keyword, product_line, type = "heavy", page = None,
     this function every time, or set it globally; see the module docs for details.
 
     Parameters:
-    keyword - keyword to search
-    search_type - in (KeywordSearch, BrowseNodeSearch, AsinSearch, UpcSearch, AuthorSearch, ArtistSearch, ActorSearch, DirectorSearch, ManufacturerSearch, ListManiaSearch, SimilaritySearch)
-    product_line - type of product to search for.  restrictions based on search_type
-        UpcSearch - in (music, classical)
-        AuthorSearch - must be "books"
-        ArtistSearch - in (music, classical)
-        ActorSearch - in (dvd, vhs, video)
-        DirectorSearch - in (dvd, vhs, video)
-        ManufacturerSearch - in (electronics, kitchen, videogames, software, photo, pc-hardware)
-    http_proxy (optional) - address of HTTP proxy to use for sending and receiving SOAP messages
-
-    Returns: list of Bags, each Bag may contain the following attributes:
-      Asin - Amazon ID ("ASIN" number) of this item
-      Authors - list of authors
-      Availability - "available", etc.
-      BrowseList - list of related categories
-      Catalog - catalog type ("Book", etc)
-      CollectiblePrice - ?, format "$34.95"
-      ImageUrlLarge - URL of large image of this item
-      ImageUrlMedium - URL of medium image of this item
-      ImageUrlSmall - URL of small image of this item
-      Isbn - ISBN number
-      ListPrice - list price, format "$34.95"
-      Lists - list of ListMania lists that include this item
-      Manufacturer - manufacturer
-      Media - media ("Paperback", "Audio CD", etc)
-      NumMedia - number of different media types in which this item is available
-      OurPrice - Amazon price, format "$24.47"
-      ProductName - name of this item
-      ReleaseDate - release date, format "09 April, 1999"
-      Reviews - reviews (AvgCustomerRating, plus list of CustomerReview with Rating, Summary, Content)
-      SalesRank - sales rank (integer)
-      SimilarProducts - list of Product, which is ASIN number
-      ThirdPartyNewPrice - ?, format "$34.95"
-      URL - URL of this item
+    Read the Amazon Associates Web Service API (http://developer.amazonwebservices.com/connect/kbcategory.jspa?categoryID=118)
     """
+
     license_key = getLicense(license_key)
     locale = getLocale(locale)
     associate = getAssociate(associate)
-    url = buildURL(search_type, keyword, product_line, type, page, 
-            license_key, locale, associate)
+    url = buildURL(artist, album, license_key, locale)
     proxies = getProxies(http_proxy)
     u = urllib.FancyURLopener(proxies)
     usock = u.open(url)
     xmldoc = minidom.parse(usock)
 
-#     from xml.dom.ext import PrettyPrint
-#     PrettyPrint(xmldoc)
+#    from xml.dom.ext import PrettyPrint
+#    PrettyPrint(xmldoc)
 
     usock.close()
-    if search_type == "BlendedSearch":
-        data = unmarshal(xmldoc).BlendedSearch
-    else:    
-        data = unmarshal(xmldoc).ProductInfo        
+    data = unmarshal(xmldoc)        
         
     if hasattr(data, 'ErrorMsg'):
         raise AmazonError, data.ErrorMsg
     else:
-        if search_type == "BlendedSearch":
-            # a list of ProductLine containing a list of ProductInfo
-            # containing a list of Details.
-            return data 
-        else:            
-            return data.Details
+        return data
 
-def searchByKeyword(keyword, product_line="books", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("KeywordSearch", keyword, product_line, type, page, license_key, http_proxy, locale, associate)
-
-def browseBestSellers(browse_node, product_line="books", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("BrowseNodeSearch", browse_node, product_line, type, page, license_key, http_proxy, locale, associate)
-
-def searchByASIN(ASIN, type="heavy", license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("AsinSearch", ASIN, None, type, None, license_key, http_proxy, locale, associate)
-
-def searchByUPC(UPC, type="heavy", license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("UpcSearch", UPC, None, type, None, license_key, http_proxy, locale, associate)
-
-def searchByAuthor(author, type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("AuthorSearch", author, "books", type, page, license_key, http_proxy, locale, associate)
-
-def searchByArtist(artist, product_line="music", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    if product_line not in ("music", "classical"):
-        raise AmazonError, "product_line must be in ('music', 'classical')"
-    return search("ArtistSearch", artist, product_line, type, page, license_key, http_proxy, locale, associate)
-
-def searchByActor(actor, product_line="dvd", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    if product_line not in ("dvd", "vhs", "video"):
-        raise AmazonError, "product_line must be in ('dvd', 'vhs', 'video')"
-    return search("ActorSearch", actor, product_line, type, page, license_key, http_proxy, locale, associate)
-
-def searchByDirector(director, product_line="dvd", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    if product_line not in ("dvd", "vhs", "video"):
-        raise AmazonError, "product_line must be in ('dvd', 'vhs', 'video')"
-    return search("DirectorSearch", director, product_line, type, page, license_key, http_proxy, locale, associate)
-
-def searchByManufacturer(manufacturer, product_line="pc-hardware", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    if product_line not in ("electronics", "kitchen", "videogames", "software", "photo", "pc-hardware"):
-        raise AmazonError, "product_line must be in ('electronics', 'kitchen', 'videogames', 'software', 'photo', 'pc-hardware')"
-    return search("ManufacturerSearch", manufacturer, product_line, type, page, license_key, http_proxy, locale, associate)
-
-def searchByListMania(listManiaID, type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("ListManiaSearch", listManiaID, None, type, page, license_key, http_proxy, locale, associate)
-
-def searchSimilar(ASIN, type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("SimilaritySearch", ASIN, None, type, page, license_key, http_proxy, locale, associate)
-
-def searchByWishlist(wishlistID, type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("WishlistSearch", wishlistID, None, type, page, license_key, http_proxy, locale, associate)
-
-def searchByPower(keyword, product_line="books", type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("PowerSearch", keyword, product_line, type, page, license_key, http_proxy, locale, associate)
-    # >>> RecentKing = amazon.searchByPower('author:Stephen King and pubdate:2003')
-    # >>> SnowCrash = amazon.searchByPower('title:Snow Crash')
-
-def searchByBlended(keyword, type="heavy", page=1, license_key=None, http_proxy=None, locale=None, associate=None):
-    return search("BlendedSearch", keyword, None, type, page, license_key, http_proxy, locale, associate)
+def searchByKeyword(artist, album, license_key=None, http_proxy=None, locale=None, associate=None):
+    return search(artist, album, license_key, http_proxy, locale, associate)
