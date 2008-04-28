@@ -42,9 +42,9 @@ class TrackItem(QListViewItem):
 
     m = self.listView().itemMargin()
     painter.drawPixmap(m, 0, self.pixmap(0))
-    painter.drawText(2 * m + self.pixmap(0).width(), m, 
+    painter.drawText(2 * m + self.pixmap(0).width(), m,
                      width, self.height(), Qt.AlignVCenter, self.name)
-    
+
   def paintFocus(self, painter, colorGroup, rect):
     pass
 
@@ -58,7 +58,7 @@ class TrackItem(QListViewItem):
     if self.pixmap(0):
       return self.pixmap(0).width() + fontMetrics.width(self.name) + 16
     return 0
-    
+
   def getAlbumName(self):
     """@returns the album name"""
     return self.album.getAlbumName()
@@ -70,7 +70,7 @@ class TrackItem(QListViewItem):
   def getPath(self):
     """@returns the path for this item"""
     return self.path
-                  
+
 class AlbumItem(QListViewItem):
   """An album list item"""
   def __init__(self, parent, path, artist, album):
@@ -131,7 +131,7 @@ class AlbumItem(QListViewItem):
     else:
       painter.setPen(colorGroup.mid())
       painter.setBrush(colorGroup.mid())
-      
+
     smallFontSize = fontSize - 1
     arrow = QPointArray(3)
     if self.isOpen():
@@ -152,10 +152,10 @@ class AlbumItem(QListViewItem):
     text = str(len(self.tracks)) + (len(self.tracks) == 1 and " track" or " tracks")
     painter.drawText(self.openTrigger.width() + m, 0,
                      width, self.height() / 2, 0, text)
-    
+
   def paintFocus(self, painter, colorGroup, rect):
     pass
-    
+
   def paintBranches(self, painter, colorGroup, w, y, h, style = None):
     painter.eraseRect(0, 0, w, h)
 
@@ -163,10 +163,10 @@ class AlbumItem(QListViewItem):
     if self.pixmap(0):
       return self.pixmap(0).width() + QFontMetrics(self.titleFont).width(self.album) + 16
     return 0
-    
+
   def setup(self):
     self.setHeight(self.iconSize + self.margin * 2)
-    
+
   def activate(self):
     # open the album if the cursor is within the trigger
     p = self.listView().mapFromGlobal(QCursor.pos())
@@ -255,7 +255,7 @@ class FolderItem(QListViewItem):
     else:
       painter.setPen(colorGroup.mid())
       painter.setBrush(colorGroup.mid())
-      
+
     smallFontSize = fontSize - 1
     arrow = QPointArray(3)
     if self.isOpen():
@@ -276,10 +276,10 @@ class FolderItem(QListViewItem):
     text = str(self.itemCount) + (self.itemCount == 1 and " item" or " items")
     painter.drawText(self.openTrigger.width() + m, 0,
                      width, self.height() / 2, 0, text)
-    
+
   def paintFocus(self, painter, colorGroup, rect):
     pass
-    
+
   def paintBranches(self, painter, colorGroup, w, y, h, style = None):
     painter.eraseRect(0, 0, w, h)
 
@@ -287,7 +287,7 @@ class FolderItem(QListViewItem):
     if self.pixmap(0):
       return self.pixmap(0).width() + QFontMetrics(self.titleFont).width(self.text(0)) + 16
     return 0
-    
+
   def setup(self):
     self.setHeight(self.iconSize + self.margin * 2)
 
@@ -299,7 +299,7 @@ class FolderItem(QListViewItem):
                 not fn.startswith(".")]
     except:
       return []
-    
+
   def activate(self):
     # read our contents if it hasn't been done before
     if self.childCount() == 0:
@@ -308,7 +308,7 @@ class FolderItem(QListViewItem):
           FolderItem(self, fileName, self.extensions)
         elif os.path.isfile(fileName):
           FileItem(self, fileName)
-    
+
     # open the album if the cursor is within the trigger
     p = self.listView().mapFromGlobal(QCursor.pos())
     p.setY(p.y() - self.itemPos() + self.listView().contentsY())
@@ -346,10 +346,12 @@ class CoverItem(QIconViewItem):
     self.margin = 6
     self.path = path
     self.text = text
+    self.url  = "Click here to buy on amazon.com"
     self.delete = delete
     self.setItemRect(QRect(0, 0,
                      self.pixmap().width() + self.margin * 2,
                      self.pixmap().height() + self.margin * 2 + 16))
+    self._hover = False
 
   def __del__(self):
     # delete the temporary file if needed
@@ -358,14 +360,24 @@ class CoverItem(QIconViewItem):
         os.unlink(self.path)
     except:
       pass
-                     
+
   def getPath(self):
     """@returns the path for this item"""
     return self.path
-                         
+
   def paintFocus(self, painter, colorGroup):
     pass
-    
+
+  def onEnterHover(self):
+    if not self._hover:
+      self._hover = True
+      self.repaint()
+
+  def onLeaveHover(self):
+    if self._hover:
+      self._hover = False
+      self.repaint()
+
   def paintItem(self, painter, colorGroup):
     if self.isSelected():
       painter.setBrush(colorGroup.highlight().light(120))
@@ -373,7 +385,7 @@ class CoverItem(QIconViewItem):
       painter.drawRoundRect(self.x(), self.y(),
                             self.width(), self.height(),
                             self.margin, self.margin)
-      
+
     painter.drawPixmap(self.x() + self.margin,
                        self.y() + self.margin, self.pixmap())
     if self.text:
@@ -381,3 +393,14 @@ class CoverItem(QIconViewItem):
                 self.y() + self.margin + self.pixmap().height(),
                 self.pixmap().width(), 16)
       painter.drawText(r, Qt.AlignCenter, self.text)
+
+    if self._hover and self.url:
+      r = QRect(self.x() + self.margin * 3 / 2,
+                self.y() + self.margin * 3 / 2,
+                self.pixmap().width() - self.margin, 16)
+      r2 = painter.boundingRect(r, Qt.AlignRight, self.url)
+      r2.setBottomLeft(r2.bottomLeft() + QPoint(-self.margin, self.margin))
+      painter.setBrush(colorGroup.base())
+      painter.setPen(colorGroup.buttonText())
+      painter.drawRoundRect(r2, 16, 16)
+      painter.drawText(r2, Qt.AlignCenter, self.url)

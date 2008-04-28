@@ -93,6 +93,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.modules = []
     self.cachePath = os.path.join(config.getConfigPath("albumart"), "cache")
     self.currentCoverItems = []
+    self.previousHoveredItem = None
 
     # tweak the ui
     self.dirlist.header().hide()
@@ -102,8 +103,10 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.dirlist.__class__.dragEnterEvent = self.dirlist_dragEnterEvent
     self.coverview.__class__.dragObject = self.coverview_dragObject
 
+    self.coverview.connect(self.coverview, SIGNAL("onItem(QIconViewItem*)"), self.coverview_onItem)
+
     self.show()
-    
+
     # load configuration
     self.config = ConfigParser.RawConfigParser()
     self.loadConfiguration()
@@ -119,11 +122,17 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.reportException(self.tr("Reading the previous album directory"), x,
                            silent = False)
 
+  def coverview_onItem(self, item):
+    item.onEnterHover()
+    if self.previousHoveredItem and self.previousHoveredItem != item:
+      self.previousHoveredItem.onLeaveHover()
+    self.previousHoveredItem = item
+
   def configure(self, config):
     # some day we might find the plugins dynamically
     for c in ["sources", "targets", "recognizers"]:
       config[c] = defaultConfig[c]
-    
+
     self.mediaExtensions = config["media_extensions"]
     self.dir = config["last_directory"]
     self.requireExactMatch = config["require_exact_match"]
@@ -135,10 +144,10 @@ class AlbumArtDialog(AlbumArtDialogBase):
     if not self.modules:
       for id in config["sources"]:
         albumart.addSource(self.loadModule(id))
-  
+
       for id in config["targets"]:
         albumart.addTarget(self.loadModule(id))
-  
+
       for id in config["recognizers"]:
         albumart.addRecognizer(self.loadModule(id))
 
@@ -155,7 +164,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     except Exception, x:
       self.reportException(self.tr("Loading settings"), x)
 
-  
+
   def loadModule(self, id):
     """Load a module with the given name (id)"""
     try:
@@ -207,7 +216,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.config.write(open(fn, "w"))
     except Exception, x:
       self.reportException(self.tr("Saving settings"), x)
-    
+
   def closeEvent(self, ce):
     # stop any ongoing processes
     self.stopAction.activate()
@@ -233,7 +242,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.fileOpenAction.setEnabled(0)
       self.reloadAction.setEnabled(0)
       self.stopAction.setEnabled(1)
-  
+
       # clear the db
       self.albums = {}
       self.stopped = False
@@ -241,7 +250,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       # if we are in 'folder' mode, we don't need to read anything yet
       if self.viewFoldersAction.isOn():
         return
-  
+
       # check the cache
       try:
         (cachePath, cacheTime, cacheAlbums) = pickle.load(open(self.cachePath, "rb"))
@@ -265,14 +274,14 @@ class AlbumArtDialog(AlbumArtDialogBase):
                 self.statusBar().message(self.tr("Reading %s") % n)
                 lastRepaintTime = time.time()
                 qApp.processEvents()
-  
+
               p = os.path.join(root, n)
               (artist, album) = albumart.guessArtistAndAlbum(p)
-  
+
               # get the album for this track
               if not (artist, album) in self.albums:
                 self.albums[(artist, album)] = []
-  
+
               # add the track to the album
               self.albums[(artist, album)].append(p)
         # save a fresh copy to the cache
@@ -308,14 +317,14 @@ class AlbumArtDialog(AlbumArtDialogBase):
         for (artist, album), tracks in self.albums.items():
           if len(tracks) and self.matchesFilter(artist, album, tracks):
             filteredTracks = []
-    
+
             # filter the tracks
             for t in tracks:
               if self.hideAlbumsWithCovers.isOn() and \
                 not albumart.hasCover(t) or \
                 not self.hideAlbumsWithCovers.isOn():
                 filteredTracks.append(t)
-    
+
             # if the album is not empty, add it to the list
             if len(filteredTracks):
               a = AlbumItem(self.dirlist, os.path.dirname(tracks[0]), artist, album)
@@ -454,7 +463,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     # add new ones for this item
     [self.currentCoverItems.append(self.addCoverToList(f)) \
      for f in self.scanItemForCovers(a0)]
-      
+
   def scanItemForCovers(self, item):
     """Scans the given item for cover images and the
        resulting list of filenames."""
@@ -476,7 +485,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
             files.append(f)
         except:
           pass
-    return files    
+    return files
 
   def dirlist_contextMenuRequested(self, item, point, column):
     if item:
@@ -510,7 +519,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     while item:
       addSelectedChildren(item, item.isSelected())
       item = item.nextSibling()
-      
+
     return items
 
   def addCoverToList(self, coverfile, delete = False):
@@ -532,7 +541,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     if self.__dict__.has_key("thread"):
       if self.thread != event.thread:
         return
-      
+
     if event.type() == CoverDownloadedEvent.id:
       self.addCoverToList(event.filename, delete = True)
     elif event.type() == TaskFinishedEvent.id:
