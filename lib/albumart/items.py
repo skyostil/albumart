@@ -346,12 +346,14 @@ class CoverItem(QIconViewItem):
     self.margin = 6
     self.path = path
     self.text = text
-    self.url  = "Click here to buy on amazon.com"
+    self.url  = "Click here to buy on Amazon.com"
     self.delete = delete
     self.setItemRect(QRect(0, 0,
                      self.pixmap().width() + self.margin * 2,
                      self.pixmap().height() + self.margin * 2 + 16))
     self._hover = False
+    h = self.iconView().font().pixelSize() + 4
+    print h
 
   def __del__(self):
     # delete the temporary file if needed

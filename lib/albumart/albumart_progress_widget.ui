@@ -1,0 +1,66 @@
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
+<class>ProgressWidget</class>
+<widget class="QWidget">
+    <property name="name">
+        <cstring>ProgressWidget</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>633</width>
+            <height>49</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Form1</string>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLabel">
+            <property name="name">
+                <cstring>textLabel</cstring>
+            </property>
+            <property name="text">
+                <string>Loading</string>
+            </property>
+        </widget>
+        <widget class="QProgressBar">
+            <property name="name">
+                <cstring>progressBar</cstring>
+            </property>
+        </widget>
+        <widget class="QToolButton">
+            <property name="name">
+                <cstring>buttonCancel</cstring>
+            </property>
+            <property name="text">
+                <string></string>
+            </property>
+            <property name="accel">
+                <string></string>
+            </property>
+            <property name="iconSet">
+                <iconset>image0</iconset>
+            </property>
+            <property name="usesTextLabel">
+                <bool>true</bool>
+            </property>
+            <property name="textLabel">
+                <string>Cancel</string>
+            </property>
+            <property name="textPosition">
+                <enum>BesideIcon</enum>
+            </property>
+        </widget>
+    </hbox>
+</widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="1264">89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7af4000004b7494441545885c5976f6c136518c07f77ebe8baf6d675ebb6b60c3647d60d456099a1a893934e04c20724612a3106f90031e027132631210c8c2644f9134288f0c10006a2b9f8c118135104a68b04154551716341e228316c6047d9a0eded5e3fdcda8db5dd9f0b896f7279efcde5eef77b9fbcf73c79242104ffebc826d01362ddb510d1d38ff238300d90ac7eff5c050d3f5470e674191b003b208f7e2e8f7da127c43a193e98565bedaecae7c4a11a9e1e7e71ca12e72a6890e1b41228565d70f06337af0185f7714747a027c4ba480831b07f8330ce7e2efa363e26bae772fbc04c960205539118de79f4afa702c278638de87d6eae38e7411c5568055c2989b4496ae7c52f6fc0d1b81286744a9edf4251a8416976a1edaf449d6c24523bf70603eeaa2754482428adaca626544fadc4ce234e36a62221e782a3276148c7bbfa75dc0be6296117dabec0c412d9e02493a6847f3ab31a6aa895d979b8d0949031bfb627bfb63a038e9e045da77cd5263c8d7394b0136daf2fb7c478f0d4ec2d2fa7a8c4c143125b01af0c707990e577feb81abbf5e1b60c786a5db1723d9e867a25ec40db5d9e293119388924dd172fd1d77777e0509ccde9082cbec8f9935156473b7e8cf51d7b3b038e9e846412ff8ab578e607957001da2eef88c454e0d77bfa07de8fd37a4ce767a05f124220499204d80fcc446d76a1b917cc53ca576dba0f6e4a99d7b5cf8ed177e14aecd4002d7579447d799c980afc239df34004e84b090c1f05ecfb2b51c32e344fe31ca562e5fa0c3849f3eaf9e2136efc72352604a22c1828b20207e2a305d212fb02a861279aa7a15ef1af589b0127993023d1fe250c092a1b175a820362ac405a62af0f35ec40f3cc0f2ad397bd90011f59272dc301b209a4257697a3860bd04ae6d62895cdab1e387c3c81b4c42e2feae202b4d247aa9519eab2070a9f48202df19e0755b5a395cd9ea1cc7c72f1038343966a386608205e9747540884d087c6859b91311006d84d602f7033177c321198748633efcdf5e5aebfb97e63f0ce573a6bded1f91ab8974b60dc085881134f52eb2bc5efb6bb96c81cdf616311e314b09c0256e1c41310d7099628f89d36a509b4ed79b90b585681a9e4f6ee8b5d19701249b89724e8b0e3cf979426d0dae4ec12196760aa85451810282b74d6fa4aef8313d7cdf9ae4e67c2206210eb809636413bb9129195aa6687f82b36f6fadd7657b044c980933060083a258840ac43d0d2c688445ac00a7cf83fef7dd3c6c34b648efb9d3625e8b067c053a39361094624242104dffb24abf008e67fce0e1b8b9a40f3e74b4a1d52063c97842484e0bc4ffad715282e0e3ebbdc6a8603b06fcf436d022d004a5d16786a5c006e41ec19982d03f41b6c895d8b72b3f377abe95500f16d43b47f2b688918c43a73e4b67f802870160e026e19a0b99723dd09365f69ff959bdd5d5673bb00e26d06ed1dd01281586716f89fc037b0672b7c0a0ca61a1319701d55683d5b84b8a1d608a365a1e8aa778b334eeebc68632310022a99b84191808236587a126e5f026180b80ee2148836d80d3401b300d7e8ce48065c479cb47ea7207eab7258816795f829171ce4b1cda90cb80e17d2daee24f6928d572dc0b34abc05ef66c0c95e0d65ccb6c93b3cf73341499d40c20e94026e6010f3fc0c0206c07f05832745b555d8d50000000049454e44ae426082</data>
+    </image>
+</images>
+<layoutdefaults spacing="6" margin="0"/>
+</UI>

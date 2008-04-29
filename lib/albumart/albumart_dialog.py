@@ -37,6 +37,7 @@ from albumart_dialog_base import AlbumArtDialogBase
 from albumart_configuration_dialog import ConfigurationDialog
 from albumart_about_dialog import AboutDialog
 from albumart_exception_dialog import ExceptionDialog
+from albumart_progress_widget import ProgressWidget
 
 defaultConfig = {
   "last_directory":  "",
@@ -94,6 +95,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.cachePath = os.path.join(config.getConfigPath("albumart"), "cache")
     self.currentCoverItems = []
     self.previousHoveredItem = None
+    self.progressWidget = None
 
     # tweak the ui
     self.dirlist.header().hide()
@@ -104,7 +106,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.coverview.__class__.dragObject = self.coverview_dragObject
 
     self.coverview.connect(self.coverview, SIGNAL("onItem(QIconViewItem*)"), self.coverview_onItem)
-
     self.show()
 
     # load configuration
@@ -293,7 +294,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.fileOpenAction.setEnabled(1)
       self.setCursor(Qt.arrowCursor)
       self.refreshAlbumList()
-      self.statusBar().message(self.tr("%d items found. Ready.") % self.dirlist.childCount())
+      self.statusBar().message(self.tr("%d items found. Ready.") % self.dirlist.childCount(), 5000)
 
   def refreshAlbumList(self):
     """Refreshes the album list according to the current search string."""
@@ -388,22 +389,25 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
       [item.refresh() for item in self.getSelectedItems()]
       self.setCursor(Qt.arrowCursor)
-      self.statusBar().message("Ready",5000)
+      self.statusBar().message("Ready", 5000)
 
   def selectAllAction_activated(self):
     self.dirlist.selectAll(True)
 
   def startProcess(self, process):
     """Runs the given process instance. @see process.Process"""
-    self.progressDialog = QProgressDialog(self, "progress", 1)
-    self.progressDialog.setCaption(process.__doc__)
+    self.progressWidget = ProgressWidget(self)
+    self.progressWidget.textLabel.setText(process.__doc__)
     self.thread = process
-    self.progressDialog.connect(self.progressDialog, SIGNAL("canceled()"), self.processCanceled)
-    self.progressDialog.show()
+    self.connect(self.progressWidget.buttonCancel, SIGNAL("clicked()"), self.processCanceled)
+    self.statusBar().clear()
+    self.statusBar().addWidget(self.progressWidget)
     self.thread.start()
 
   def processCanceled(self):
     """Cancels the active process"""
+    self.statusBar().removeWidget(self.progressWidget)
+    self.progressWidget.close()
     if self.thread:
       self.thread.cancel()
 
@@ -547,9 +551,8 @@ class AlbumArtDialog(AlbumArtDialogBase):
     elif event.type() == TaskFinishedEvent.id:
       self.thread.wait()
       self.thread = None
-
-      if self.progressDialog:
-        self.progressDialog.close()
+      self.statusBar().removeWidget(self.progressWidget)
+      self.progressWidget.close()
 
       if event.message:
         QMessageBox.information(self, version.__program__,event.message)
@@ -560,12 +563,12 @@ class AlbumArtDialog(AlbumArtDialogBase):
                            event.exception,
                            description = event.description)
     elif event.type() == ProgressEvent.id:
-      if self.progressDialog:
-        self.progressDialog.setTotalSteps(event.total)
-        self.progressDialog.setProgress(event.progress)
+      if self.progressWidget:
+        self.progressWidget.progressBar.setTotalSteps(event.total)
+        self.progressWidget.progressBar.setProgress(event.progress)
     elif event.type() == StatusEvent.id:
-      if self.progressDialog:
-        self.progressDialog.setLabelText(event.text)
+      if self.progressWidget:
+        self.progressWidget.textLabel.setText(event.text)
     elif event.type() == ReloadEvent.id:
       [item.refresh() for item in self.getSelectedItems()]
 
