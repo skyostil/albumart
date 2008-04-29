@@ -50,11 +50,12 @@ class ID3v2(albumart.Target):
               file = open(self.tempfile, "wb")
               file.write(frame.image)
               file.close()
-              return self.tempfile
+              return albumart.Cover(self.tempfile)
         except:
           pass
 
   def setCover(self, path, cover):
+    cover = cover.path
     if not self.enabled: return
 
     img = Image.open(cover)

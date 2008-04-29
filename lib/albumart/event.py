@@ -7,9 +7,9 @@ import sys
 
 class CoverDownloadedEvent(QCustomEvent):
   id = QEvent.User
-  def __init__(self, thread, filename):
+  def __init__(self, thread, cover):
     QCustomEvent.__init__(self, self.id)
-    self.filename = filename
+    self.cover = cover
     self.thread = thread
 
 class TaskFinishedEvent(QCustomEvent):

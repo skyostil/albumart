@@ -1,3 +1,10 @@
+albumart (1.6.4-1) stable; urgency=medium
+
+  * Added support for Amazon S4.0 web service. Thanks to Chris Brooker for this!
+  * Made a nicer download progress widget.
+
+ -- Sami Kyöstilä <skyostil@kempele.fi>  Tue, 29 Apr 2008 23:05:00 +0200 
+
 albumart (1.6.3-1) stable; urgency=medium
 
   * Removed obsolete Amazon Web Services API.

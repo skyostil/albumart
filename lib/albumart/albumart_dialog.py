@@ -94,7 +94,6 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.modules = []
     self.cachePath = os.path.join(config.getConfigPath("albumart"), "cache")
     self.currentCoverItems = []
-    self.previousHoveredItem = None
     self.progressWidget = None
 
     # tweak the ui
@@ -105,7 +104,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.dirlist.__class__.dragEnterEvent = self.dirlist_dragEnterEvent
     self.coverview.__class__.dragObject = self.coverview_dragObject
 
-    self.coverview.connect(self.coverview, SIGNAL("onItem(QIconViewItem*)"), self.coverview_onItem)
+    self.coverview.connect(self.coverview, SIGNAL("clicked(QIconViewItem*,const QPoint&)"), self.coverview_itemClicked)
     self.show()
 
     # load configuration
@@ -123,11 +122,16 @@ class AlbumArtDialog(AlbumArtDialogBase):
       self.reportException(self.tr("Reading the previous album directory"), x,
                            silent = False)
 
-  def coverview_onItem(self, item):
-    item.onEnterHover()
-    if self.previousHoveredItem and self.previousHoveredItem != item:
-      self.previousHoveredItem.onLeaveHover()
-    self.previousHoveredItem = item
+  def coverview_itemClicked(self, item, pos):
+    # For some reason, clicks on the cover text labels are not associated
+    # with the item itself
+    pos = self.coverview.mapFromGlobal(pos)
+    if not item:
+      item = self.coverview.findItem(pos)
+    if item:
+      itemPos = self.coverview.contentsToViewport(item.pos())
+      pos = QPoint(pos.x() - itemPos.x(), pos.y() - itemPos.y())
+      item.onClicked(pos)
 
   def configure(self, config):
     # some day we might find the plugins dynamically
@@ -465,7 +469,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         pass
     self.currentCoverItems = []
     # add new ones for this item
-    [self.currentCoverItems.append(self.addCoverToList(f)) \
+    [self.currentCoverItems.append(self.addCoverToList(f.path)) \
      for f in self.scanItemForCovers(a0)]
 
   def scanItemForCovers(self, item):
@@ -486,7 +490,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
             continue
           i = QImage(f)
           if not i.isNull():
-            files.append(f)
+            files.append(albumart.Cover(f))
         except:
           pass
     return files
@@ -526,7 +530,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
     return items
 
-  def addCoverToList(self, coverfile, delete = False):
+  def addCoverToList(self, coverfile, delete = False, linkUrl = None, linkText = None):
     """Adds the given cover to the list of available album covers.
        @returns the cover item or None on error."""
     try:
@@ -537,7 +541,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     if not image.isNull() and image.width() > 1 and image.height() > 1:
       text = str(imghdr.what(str(coverfile))).upper() + " Image - %dx%d pixels" % (image.width(), image.height())
       image = image.smoothScale(256, 256, QImage.ScaleMin)
-      return CoverItem(self.coverview, QPixmap(image), coverfile, delete, text = text)
+      return CoverItem(self.coverview, QPixmap(image), coverfile, delete, text = text, linkUrl = linkUrl, linkText = linkText)
 
   def customEvent(self, event):
     """Handle events from processes"""
@@ -547,7 +551,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         return
 
     if event.type() == CoverDownloadedEvent.id:
-      self.addCoverToList(event.filename, delete = True)
+      self.addCoverToList(event.cover.path, delete = True, linkUrl = event.cover.linkUrl, linkText = event.cover.linkText)
     elif event.type() == TaskFinishedEvent.id:
       self.thread.wait()
       self.thread = None
@@ -608,7 +612,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
     for item in items:
       try:
-        albumart.setCover(item.getPath(), coverPath)
+        albumart.setCover(item.getPath(), albumart.Cover(coverPath))
         self.statusBar().message(self.tr("Writing %s") % os.path.basename(item.getPath()))
         item.refresh()
         qApp.processEvents()
@@ -642,7 +646,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
         img.load()
         img = img.convert("RGB")
         img.save(fn, "JPEG", quality = 100)
-        return fn
+        return albumart.Cover(fn)
 
   def dirlist_dropEvent(self, event):
     # check whether it is a path
@@ -673,9 +677,9 @@ class AlbumArtDialog(AlbumArtDialogBase):
                   items.append(child)
                 child = child.nextSibling()
             addChildren(item)
-          self.setCoverForItems(fn, items)
+          self.setCoverForItems(fn.path, items)
 
-        os.unlink(fn)
+        os.unlink(fn.path)
     except Exception, x:
       self.reportException(self.tr("Setting the cover image"), x)
 
@@ -708,7 +712,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     try:
       fn = self.decodeDropEventAsCover(event)
       if fn:
-        self.addCoverToList(fn, delete = True)
+        self.addCoverToList(fn.path, delete = True)
     except Exception, x:
       self.reportException(self.tr("Adding the cover image"), x)
 

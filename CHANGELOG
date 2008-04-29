@@ -1,3 +1,7 @@
+1.6.4:
+	- Added support for Amazon S4.0 web service. Thanks to Chris Brooker for this!
+	- Made a nicer download progress widget.
+
 1.6.3:
 	- Removed support for obsolete Amazon S3.0 web service.
 

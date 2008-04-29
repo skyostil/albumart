@@ -64,9 +64,10 @@ class Freedesktop(albumart.Target):
   def getCover(self, path):
     if self.enabled:
       if self.hasCover(path):
-        return os.path.join(path, self.filename)
+        return albumart.Cover(os.path.join(path, self.filename))
 
   def setCover(self, path, cover):
+    cover = cover.path
     target = os.path.join(path, self.filename)
   
     if not self.enabled or target == cover:

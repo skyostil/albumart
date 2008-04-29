@@ -58,18 +58,21 @@ class Recognizer(Module):
   def guessArtistAndAlbum(self, path):
     """Returns an (artist, album) tuple for the given path."""
     pass
-    
+
+class Cover(object):
+  """A cover image"""
+  def __init__(self, path, linkUrl = None, linkText = None):
+    self.path = path
+    self.linkUrl = linkUrl
+    self.linkText = linkText
+
 # the sources to use
-#from albumart_source_amazon import Amazon
-#sources = [Amazon]
+sources = []
 
 # the targets to use
-#from albumart_target_freedesktop import Freedesktop
-#from albumart_target_windows import Windows
-#targets = [Freedesktop, Windows]
-
-sources = []
 targets = []
+
+# the recognizers to use
 recognizers = []
 
 def addSource(source):
@@ -95,7 +98,7 @@ def addRecognizer(recognizer):
 def removeRecognizer(recognizer):
   global recognizers
   recognizers.remove(recognizer)
-  
+
 def getAvailableCovers(artist, album, requireExactMatch = False):
   """
   Downloads a set of cover images for the given artist/album pair and
@@ -127,7 +130,9 @@ def getAvailableCovers(artist, album, requireExactMatch = False):
 
       for a in results:
         c = s.getCover(a)
-        if c: yield c
+        if c:
+          assert isinstance(c, Cover)
+          yield c
   except Exception, x:
     traceback.print_exc(file = sys.stderr)
     raise
@@ -184,12 +189,12 @@ def hasCover(path):
   return False
 
 def setCover(path,cover):
-  """Sets the specified album image for the given path."""
+  """Sets the specified album cover for the given path."""
   for t in targets:
     t.setCover(path, cover)
 
 def getCover(path):
-  """Returns an album cover image file for the given path, or None if no image is found."""
+  """Returns an album cover for the given path, or None if no image is found."""
   for t in targets:
     c = t.getCover(path)
     if c: return c

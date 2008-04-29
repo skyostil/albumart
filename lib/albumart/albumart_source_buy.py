@@ -66,6 +66,6 @@ class Buy(albumart.Source):
         o = open(output, "wb")
         o.write(i.read())
         o.close()
-        return output
+        return albumart.Cover(output)
       except:
         return None

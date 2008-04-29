@@ -2,6 +2,7 @@ import os
 from qt import *
 
 import albumart
+import webbrowser
 from pixmap import getPixmapForPath, resizePixmap
 
 def fillHorizontalGradient(painter, rect, c1, c2):
@@ -341,19 +342,19 @@ class FolderItem(QListViewItem):
 
 class CoverItem(QIconViewItem):
   """A cover image item"""
-  def __init__(self, parent, pixmap, path, delete = False, text = None):
+  def __init__(self, parent, pixmap, path, delete = False, text = None, linkUrl = None, linkText = None):
     QListViewItem.__init__(self, parent, "", pixmap)
     self.margin = 6
     self.path = path
     self.text = text
-    self.url  = "Click here to buy on Amazon.com"
+    self.linkUrl = linkUrl
+    self.linkText = linkText
     self.delete = delete
+    self.fontHeight = self.iconView().fontInfo().pixelSize() + 2
+    lines = self.linkUrl and 2 or 1
     self.setItemRect(QRect(0, 0,
-                     self.pixmap().width() + self.margin * 2,
-                     self.pixmap().height() + self.margin * 2 + 16))
-    self._hover = False
-    h = self.iconView().font().pixelSize() + 4
-    print h
+                           self.pixmap().width() + self.margin * 2,
+                           self.pixmap().height() + self.margin * 2 + self.fontHeight * lines))
 
   def __del__(self):
     # delete the temporary file if needed
@@ -370,15 +371,10 @@ class CoverItem(QIconViewItem):
   def paintFocus(self, painter, colorGroup):
     pass
 
-  def onEnterHover(self):
-    if not self._hover:
-      self._hover = True
-      self.repaint()
-
-  def onLeaveHover(self):
-    if self._hover:
-      self._hover = False
-      self.repaint()
+  def onClicked(self, itemPos):
+    if self.linkUrl and itemPos.y() >= self.height() - self.fontHeight:
+      print "Browsing to", self.linkUrl
+      webbrowser.open(self.linkUrl)
 
   def paintItem(self, painter, colorGroup):
     if self.isSelected():
@@ -393,16 +389,15 @@ class CoverItem(QIconViewItem):
     if self.text:
       r = QRect(self.x() + self.margin,
                 self.y() + self.margin + self.pixmap().height(),
-                self.pixmap().width(), 16)
+                self.pixmap().width(), self.fontHeight)
       painter.drawText(r, Qt.AlignCenter, self.text)
 
-    if self._hover and self.url:
-      r = QRect(self.x() + self.margin * 3 / 2,
-                self.y() + self.margin * 3 / 2,
-                self.pixmap().width() - self.margin, 16)
-      r2 = painter.boundingRect(r, Qt.AlignRight, self.url)
-      r2.setBottomLeft(r2.bottomLeft() + QPoint(-self.margin, self.margin))
-      painter.setBrush(colorGroup.base())
-      painter.setPen(colorGroup.buttonText())
-      painter.drawRoundRect(r2, 16, 16)
-      painter.drawText(r2, Qt.AlignCenter, self.url)
+    if self.linkText:
+      r = QRect(self.x() + self.margin,
+                self.y() + self.margin + self.pixmap().height() + self.fontHeight,
+                self.pixmap().width(), self.fontHeight)
+      f = QFont(self.iconView().font())
+      f.setUnderline(True)
+      painter.setPen(colorGroup.link())
+      painter.setFont(f)
+      painter.drawText(r, Qt.AlignCenter, self.linkText)

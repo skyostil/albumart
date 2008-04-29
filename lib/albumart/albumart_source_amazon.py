@@ -63,13 +63,18 @@ class Amazon(albumart.Source):
   def getCover(self, album):
     if self.enabled:
       try:
-        i = urllib.urlopen(album, proxies=amazon.getProxies())
+        url, linkUrl = album
+        if linkUrl:
+          linkText = "Buy at Amazon.com"
+        else:
+          linkText = None
+        i = urllib.urlopen(url, proxies=amazon.getProxies())
         output = tempfile.mktemp(".jpg")
         o = open(output, "wb")
         o.write(i.read())
         o.close()
         if self.verifyCover(output):
-          return output
+          return albumart.Cover(output, linkUrl = linkUrl, linkText = linkText)
         else:
           os.unlink(output)
           return None

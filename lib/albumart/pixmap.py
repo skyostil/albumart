@@ -21,9 +21,10 @@ def getPixmapForPath(path):
     noCoverPixmap = loadPixmap("nocover.png")
 
   if albumart.hasCover(path):
-    filename = albumart.getCover(path)
+    cover = albumart.getCover(path)
 
-    if filename:
+    if cover:
+      filename = cover.path
       # if we're running on Qt 2, convert the image to a png.
       if qVersion().split(".")[0]=='2' and imghdr.what(filename) != "png":
         try:

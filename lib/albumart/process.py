@@ -65,21 +65,21 @@ class CoverDownloaderProcess(Process):
         if self.isCanceled():
           break
           
-        img = Image.open(c)
+        img = Image.open(c.path)
         img.load()
         
         # convert to JPEG if needed
         if img.format != "JPEG":
             img = img.convert("RGB")
-            img.save(c)
+            img.save(c.path)
           
-        self.postEvent(self.dialog, CoverDownloadedEvent(self,c))
+        self.postEvent(self.dialog, CoverDownloadedEvent(self, c))
         # better fake progress than none at all :)
         # we can't tell how many covers we've
         # downloaded as they may have been blank or
         # corrupt.
         self.setProgress(coversFound - 1,coversFound)
-    except Exception, x:    
+    except Exception, x:
       self.postEvent(self.dialog, ExceptionEvent(self, x))
 
     if coversFound > 0:
@@ -113,7 +113,7 @@ class AutoDownloadProcess(Process):
           break
 
         (artist, album) = albumart.guessArtistAndAlbum(path)
-          
+
         if artist and album:
           recognized += 1
           self.setStatusText(self.dialog.tr('Searching cover for "%(album)s" by %(artist)s...') % \
@@ -130,16 +130,16 @@ class AutoDownloadProcess(Process):
             for cover in albumart.getAvailableCovers(artist, album, requireExactMatch = self.requireExactMatch):
               foundAny = True
               try:
-                img = Image.open(cover)
+                img = Image.open(cover.path)
                 img.load()
                 coversFound += 1
-                
+
                 # convert to JPEG if needed
                 if img.format != "JPEG":
                   img = img.convert("RGB")
-                  img.save(cover)
-    
-                cache[(artist, album)] = cover                
+                  img.save(cover.path)
+
+                cache[(artist, album)] = cover
                 albumart.setCover(path, cover)
                 coversInstalled += 1
               except Exception, x:
@@ -150,13 +150,13 @@ class AutoDownloadProcess(Process):
               failures += 1
         itemsProcessed += 1
         self.setProgress(itemsProcessed, len(self.items))
-    except Exception, x:    
+    except Exception, x:
       self.postEvent(self.dialog, ExceptionEvent(self, x))
     self.triggerReload()
     
     # clear the cache
     for cover in cache.values():
-      os.unlink(cover)
+      os.unlink(cover.path)
     
     self.setComplete(
       self.dialog.tr(
@@ -183,7 +183,7 @@ class SynchronizeProcess(Process):
       self.setStatusText(self.dialog.tr('Synchronizing %s...') % \
                          (path.replace(self.dir,"")))
       albumart.synchronizeCovers(path)
-            
+
       itemsProcessed += 1
       self.setProgress(itemsProcessed, len(self.items))
 
@@ -213,7 +213,7 @@ class DeleteProcess(Process):
         except Exception,x:
           traceback.print_exc(file = sys.stderr)
           errors.append(str(x))
-            
+
       itemsProcessed += 1
       self.setProgress(itemsProcessed, len(self.items))
 

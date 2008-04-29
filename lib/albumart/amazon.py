@@ -55,8 +55,8 @@ Other usage notes:
 
 __author__ = "Mark Pilgrim (f8dy@diveintomark.org)"
 __version__ = "0.64.1"
-__cvsversion__ = "$Revision: 1.5 $"[11:-2]
-__date__ = "$Date: 2008-04-28 19:13:33 $"[7:-2]
+__cvsversion__ = "$Revision: 1.6 $"[11:-2]
+__date__ = "$Date: 2008-04-29 19:48:09 $"[7:-2]
 __copyright__ = "Copyright (c) 2002 Mark Pilgrim"
 __license__ = "Python"
 # Powersearch and return object type fix by Joseph Reagle <geek@goatee.net>
@@ -193,12 +193,18 @@ def unmarshal(element):
     largeImageElements = [e for e in element.getElementsByTagName("LargeImage") if isinstance(e, minidom.Element)]
     if largeImageElements:
         for largeImageElement in largeImageElements:
+            parent = largeImageElement.parentNode
+            detailUrls = [e for e in parent.getElementsByTagName("DetailPageURL") if isinstance(e, minidom.Element)]
+            if len(detailUrls) == 1:
+              detailUrl = detailUrls[0].firstChild.data
+            else:
+              detailUrl = None
             url = largeImageElement.getElementsByTagName("URL")[0].firstChild.data
             # Skip any duplicated images
             if hasattr(rc, url):
                 continue
             setattr(rc, url, "")
-            results.append(url)
+            results.append((url, detailUrl))
     return results
 
 def buildURL(artist, album, license_key, locale):
@@ -212,8 +218,7 @@ def buildURL(artist, album, license_key, locale):
     if album and len(album):
         url += "&Keywords=%s" % (urllib.quote(album))
     # just return the image information
-    url += "&ResponseGroup=Images"
-    print url
+    url += "&ResponseGroup=Images,Small"
     return url
 
 
@@ -241,12 +246,12 @@ def search(artist, album, license_key = None, http_proxy = None, locale = None, 
     usock = u.open(url)
     xmldoc = minidom.parse(usock)
 
-#    from xml.dom.ext import PrettyPrint
-#    PrettyPrint(xmldoc)
+    #from xml.dom.ext import PrettyPrint
+    #PrettyPrint(xmldoc)
 
     usock.close()
-    data = unmarshal(xmldoc)        
-        
+    data = unmarshal(xmldoc)
+
     if hasattr(data, 'ErrorMsg'):
         raise AmazonError, data.ErrorMsg
     else:
