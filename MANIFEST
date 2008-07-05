@@ -46,6 +46,8 @@ lib/albumart/albumart_exception_dialog.py
 lib/albumart/albumart_exception_dialog_base.py
 lib/albumart/albumart_exception_dialog_base.ui
 lib/albumart/albumart_images.py
+lib/albumart/albumart_progress_widget.py
+lib/albumart/albumart_progress_widget.ui
 lib/albumart/albumart_recognizer_id3v2.py
 lib/albumart/albumart_recognizer_path.py
 lib/albumart/albumart_source_amazon.py
@@ -82,6 +84,7 @@ share/albumart/albumart.ico
 share/albumart/albumart.png
 share/albumart/albumart.svg
 share/albumart/autodownload.png
+share/albumart/button_cancel.png
 share/albumart/cover.png
 share/albumart/download.png
 share/albumart/exit.png

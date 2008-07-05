@@ -1,3 +1,6 @@
+1.6.5:
+        - Support for ID3 v2.4 files courtesy of Andy Ward.
+
 1.6.4:
 	- Added support for Amazon S4.0 web service. Thanks to Chris Brooker for this!
 	- Made a nicer download progress widget.

@@ -218,6 +218,9 @@ class AlbumArtDialog(AlbumArtDialogBase):
       for object in self.modules + [self]:
         config.readObjectConfiguration(object, self.config)
       fn = os.path.join(config.getConfigPath("albumart"), "config")
+      for section in self.config.sections():
+        for option, value in self.config.items(section):
+          self.config.set(section, option, unicode(value).encode(sys.getfilesystemencoding()))
       self.config.write(open(fn, "w"))
     except Exception, x:
       self.reportException(self.tr("Saving settings"), x)
@@ -239,7 +242,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
     """Walk the given path and fill the album list with all the albums found."""
 
     try:
-      path = unicode(path)
+      path = unicode(path, sys.getfilesystemencoding())
       self.dir = path
 
       # update the widget states
