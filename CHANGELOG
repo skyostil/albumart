@@ -1,4 +1,5 @@
 1.6.5:
+        - Support unicode paths.
         - Support for ID3 v2.4 files courtesy of Andy Ward.
 
 1.6.4:
