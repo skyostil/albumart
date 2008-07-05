@@ -81,7 +81,8 @@ class ID3v2(albumart.Target):
         frame = id3v2.get_apic_frame('Cover Image')
         frame.image = data
         frame.picturetype = self.pictureType
-        frame.unsynchronisation = True
+        if id3v2.version[1] < 4:
+          frame.unsynchronisation = True
         id3v2.save()
         # restore the modification date and time
         os.utime(f, (stat.st_atime, stat.st_mtime))
