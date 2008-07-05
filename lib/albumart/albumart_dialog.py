@@ -556,7 +556,12 @@ class AlbumArtDialog(AlbumArtDialogBase):
     if event.type() == CoverDownloadedEvent.id:
       self.addCoverToList(event.cover.path, delete = True, linkUrl = event.cover.linkUrl, linkText = event.cover.linkText)
     elif event.type() == TaskFinishedEvent.id:
-      self.thread.wait()
+      if os.name == "nt":
+        # For some reason threads don't always terminate with Q..3/Windows Edition
+        self.thread.terminate()
+        self.thread.wait(500)
+      else:
+        self.thread.wait()
       self.thread = None
       self.statusBar().removeWidget(self.progressWidget)
       self.progressWidget.close()
