@@ -472,8 +472,8 @@ class AlbumArtDialog(AlbumArtDialogBase):
         pass
     self.currentCoverItems = []
     # add new ones for this item
-    [self.currentCoverItems.append(self.addCoverToList(f.path)) \
-     for f in self.scanItemForCovers(a0)]
+    for f in self.scanItemForCovers(a0):
+      self.currentCoverItems.append(self.addCoverToList(f.path.encode(sys.getfilesystemencoding()))) 
 
   def scanItemForCovers(self, item):
     """Scans the given item for cover images and the

@@ -118,7 +118,7 @@ def getAvailableCovers(artist, album, requireExactMatch = False):
         results += s.findAlbum("%s" % (artist), "%s" % (album))
       except TypeError:
         if requireExactMatch:
-          return
+          continue
 
         try:
           results+=s.findAlbum("", "%s" % (album))
@@ -133,6 +133,8 @@ def getAvailableCovers(artist, album, requireExactMatch = False):
         if c:
           assert isinstance(c, Cover)
           yield c
+  except GeneratorExit:
+    pass
   except Exception, x:
     traceback.print_exc(file = sys.stderr)
     raise
