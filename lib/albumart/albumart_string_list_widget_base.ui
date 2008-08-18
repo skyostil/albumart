@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>445</width>
-            <height>356</height>
+            <width>454</width>
+            <height>384</height>
         </rect>
     </property>
     <property name="caption">
@@ -26,32 +26,13 @@
         </widget>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout6</cstring>
+                <cstring>layout2</cstring>
             </property>
-            <hbox>
+            <grid>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLineEdit">
-                    <property name="name">
-                        <cstring>lineEdit</cstring>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>addButton</cstring>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                    <property name="text">
-                        <string>&amp;Add</string>
-                    </property>
-                    <property name="accel">
-                        <string>Alt+A</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
+                <widget class="QPushButton" row="1" column="2">
                     <property name="name">
                         <cstring>removeButton</cstring>
                     </property>
@@ -65,7 +46,43 @@
                         <string>Alt+R</string>
                     </property>
                 </widget>
-            </hbox>
+                <widget class="QLineEdit" row="0" column="0" rowspan="1" colspan="3">
+                    <property name="name">
+                        <cstring>lineEdit</cstring>
+                    </property>
+                </widget>
+                <widget class="QPushButton" row="1" column="1">
+                    <property name="name">
+                        <cstring>addButton</cstring>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Add</string>
+                    </property>
+                    <property name="accel">
+                        <string>Alt+A</string>
+                    </property>
+                </widget>
+                <spacer row="1" column="0">
+                    <property name="name">
+                        <cstring>spacer1</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>241</width>
+                            <height>21</height>
+                        </size>
+                    </property>
+                </spacer>
+            </grid>
         </widget>
     </vbox>
 </widget>

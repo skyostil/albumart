@@ -49,6 +49,8 @@ class Generic(albumart.Target):
     if not "%(" in self.filename:
       return self.filename
     (artist, album) = albumart.guessArtistAndAlbum(path)
+    artist = artist or "Unknown"
+    album = album or "Unknown"
     return self.filename\
       .replace("%(album)", album)\
       .replace("%(artist)", artist)

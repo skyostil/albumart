@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>600</width>
-            <height>292</height>
+            <width>628</width>
+            <height>407</height>
         </rect>
     </property>
     <property name="caption">
@@ -44,8 +44,14 @@
                 <property name="name">
                     <cstring>pageView</cstring>
                 </property>
+                <property name="minimumSize">
+                    <size>
+                        <width>200</width>
+                        <height>0</height>
+                    </size>
+                </property>
                 <property name="rootIsDecorated">
-                    <bool>true</bool>
+                    <bool>false</bool>
                 </property>
             </widget>
             <widget class="QWidgetStack">
@@ -62,7 +68,7 @@
                 </property>
                 <property name="minimumSize">
                     <size>
-                        <width>320</width>
+                        <width>400</width>
                         <height>0</height>
                     </size>
                 </property>

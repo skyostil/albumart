@@ -22,7 +22,8 @@ import urllib
 import tempfile
 import Image
 import ConfigParser
-import cPickle as pickle
+import pickle
+import codecs
 from qt import *
 
 # local imports
@@ -243,6 +244,8 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
     try:
       path = unicode(path, sys.getfilesystemencoding())
+      # Get rid of any possible BOM
+      path = path.lstrip(unicode(codecs.BOM_UTF8, "utf8"))
       self.dir = path
 
       # update the widget states
@@ -511,7 +514,7 @@ class AlbumArtDialog(AlbumArtDialogBase):
 
   def getQString(self, qstring):
     """@returns a python string representation of the given QString"""
-    return unicode(qstring).encode("latin-1", "replace")
+    return unicode(qstring).encode(sys.getfilesystemencoding(), "replace")
 
   def getSelectedItems(self, expand = True):
     """@returns a list of selected media items to process"""
