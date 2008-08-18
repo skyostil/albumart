@@ -1,6 +1,11 @@
 albumart (1.6.6-1) stable; urgency=low
 
   * Fixed unicode BOM bug for UTF-8/16 systems.
+  * Fixed unicode BOM bug for UTF-8/16 systems.
+  * Removed hardcoded latin-1 encoding.
+  * Made the configuration dialog more accessible.
+  * Don't crash when using the generic image exporter on an item 
+    that was not recognized.
 
  -- Sami Kyöstilä <sami.kyostila@gmail.com>  Mon, 18 Aug 2008 20:25:00 +0200 
 
