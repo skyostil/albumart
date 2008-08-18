@@ -61,10 +61,11 @@ Section "MainSection" SEC01
   File "..\win32\readme.txt"
   File "..\win32\sip.pyd"
   File "..\win32\zlib.pyd"
+  File "..\..\share\albumart\albumart.ico"
 
   CreateDirectory "$SMPROGRAMS\Album Cover Art Downloader"
-  CreateShortCut "$SMPROGRAMS\Album Cover Art Downloader\Album Cover Art Downloader.lnk" "$INSTDIR\albumart-qt.exe"
-  CreateShortCut "$DESKTOP\Album Cover Art Downloader.lnk" "$INSTDIR\albumart-qt.exe"
+  CreateShortCut "$SMPROGRAMS\Album Cover Art Downloader\Album Cover Art Downloader.lnk" "$INSTDIR\albumart-qt.exe" "" "$INSTDIR\albumart.ico" 0
+  CreateShortCut "$DESKTOP\Album Cover Art Downloader.lnk" "$INSTDIR\albumart-qt.exe" "" "$INSTDIR\albumart.ico" 0
 SectionEnd
 
 Section -AdditionalIcons
@@ -111,6 +112,7 @@ Section Uninstall
   Delete "$INSTDIR\readme.txt"
   Delete "$INSTDIR\sip.pyd"
   Delete "$INSTDIR\zlib.pyd"
+  Delete "$INSTDIR\albumart.ico"
 
   Delete "$SMPROGRAMS\Album Cover Art Downloader\Uninstall.lnk"
   Delete "$SMPROGRAMS\Album Cover Art Downloader\Website.lnk"

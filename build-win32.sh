@@ -1,9 +1,9 @@
 CX_FREEZE=c:/proj/cx_Freeze-3.0.3/FreezePython.exe
 MAKENSIS=c:/Program\ Files/NSIS/makensis
-PYUIC=/c/python24/bin/pyuic.exe
+PYUIC=c:/python24/bin/pyuic.exe
 
 # Build everything
-make PYUIC=$(PYUIC)
+make PYUIC=$PYUIC
 
 # Gather the dynamically loaded modules
 MODULES=albumart_dialog,sip,encodings.iso8859_1,encodings.utf_8

@@ -22,7 +22,7 @@ import urllib
 import tempfile
 import Image
 import ConfigParser
-import pickle
+import cPickle as pickle
 import codecs
 from qt import *
 
