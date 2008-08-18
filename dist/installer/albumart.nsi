@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Album Cover Art Downloader"
-!define PRODUCT_VERSION "1.6.5"
+!define PRODUCT_VERSION "1.6.6"
 !define PRODUCT_PUBLISHER "Sami Kyöstilä"
 !define PRODUCT_WEB_SITE "http://unrealvoodoo.org/hiteck/projects/albumart"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\albumart-qt.exe"

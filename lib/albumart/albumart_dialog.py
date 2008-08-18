@@ -243,7 +243,8 @@ class AlbumArtDialog(AlbumArtDialogBase):
     """Walk the given path and fill the album list with all the albums found."""
 
     try:
-      path = unicode(path, sys.getfilesystemencoding())
+      if not isinstance(path, unicode):
+        path = unicode(path, sys.getfilesystemencoding())
       # Get rid of any possible BOM
       path = path.lstrip(unicode(codecs.BOM_UTF8, "utf8"))
       self.dir = path
@@ -465,8 +466,13 @@ class AlbumArtDialog(AlbumArtDialogBase):
     self.pushSet.setEnabled(0)
 
   def dirlist_currentChanged(self, a0):
-    self.artistEdit.setText(a0.getArtistName())
-    self.albumEdit.setText(a0.getAlbumName())
+    try:
+      self.artistEdit.setText(a0.getArtistName())
+      self.albumEdit.setText(a0.getAlbumName())
+    except AttributeError:
+      self.artistEdit.setText("")
+      self.albumEdit.setText("")
+
     # clean up the previous cover items
     for item in self.currentCoverItems:
       try:
